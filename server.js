@@ -16,10 +16,10 @@ app.use(bodyParser.json());
 const db = require("./config/keys").mongoURI;
 
 // connect to MongoDB
-mongoose
-  .connect(db)
-  .then(() => console.log(`MongoDB connected`))
-  .catch(err => console.log(err));
+// mongoose
+//   .connect(db)
+//   .then(() => console.log(`MongoDB connected`))
+//   .catch(err => console.log(err));
 
 //passport middleware
 app.use(passport.initialize());
