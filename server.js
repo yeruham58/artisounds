@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 //   .catch(err => console.log(err));
 
 // connect to postgresDB
-const db = require("./config/database");
+const db = require("./config/database.js");
 
 db.authenticate()
   .then(() => {

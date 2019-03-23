@@ -2,7 +2,7 @@
 // const Schema = mongoose.Schema;
 
 const Sequelize = require("sequelize");
-const db = require("../config/database");
+const db = require("../config/database.js");
 
 //Create user schema
 // const UserSchema = new Schema({
