@@ -1,5 +1,5 @@
 const express = require("express");
-const mongoose = require("mongoose");
+// const mongoose = require("mongoose");
 const users = require("./routes/api/users");
 const profile = require("./routes/api/profile");
 const posts = require("./routes/api/posts");
@@ -13,13 +13,24 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // db config
-const db = require("./config/keys").mongoURI;
+// const db = require("./config/keys").mongoURI;
 
 // connect to MongoDB
-mongoose
-  .connect(db)
-  .then(() => console.log(`MongoDB connected`))
-  .catch(err => console.log(err));
+// mongoose
+//   .connect(db)
+//   .then(() => console.log(`MongoDB connected`))
+//   .catch(err => console.log(err));
+
+// connect to postgresDB
+const db = require("./config/database.js");
+
+db.authenticate()
+  .then(() => {
+    console.log("Connection has been established successfully.");
+  })
+  .catch(err => {
+    console.error("Unable to connect to the database:", err);
+  });
 
 //passport middleware
 app.use(passport.initialize());
