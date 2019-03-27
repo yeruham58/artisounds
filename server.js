@@ -12,16 +12,6 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// db config
-// const db = require("./config/keys").mongoURI;
-
-// connect to MongoDB
-// mongoose
-//   .connect(db)
-//   .then(() => console.log(`MongoDB connected`))
-//   .catch(err => console.log(err));
-
-// connect to postgresDB
 const db = require("./config/database.js");
 
 db.authenticate()
