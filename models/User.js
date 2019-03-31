@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database.js");
+const Profile = require("./Profile");
 
 //Create user schem
 const User = db.define("user", {

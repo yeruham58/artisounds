@@ -1,7 +1,9 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database.js");
 const User = require("./User");
+// const models = require("../models");
 
+// module.exports = function(db, DataTypes) {
 const Profile = db.define("profile", {
   user_id: {
     type: Sequelize.INTEGER,
@@ -47,9 +49,19 @@ const Profile = db.define("profile", {
       }
     )
   }
-  // social: {
-  //   type: Sequelize.JSON
-  // }
 });
+//   Profile.belongsTo(User, {
+//     as: "user",
+//     foreignKey: "user_id"
+//   });
+//   return Profile;
+// };
+
+Profile.associate = function(User) {
+  Profile.belongsTo(User, {
+    foreignKey: "user_id"
+  });
+};
 
 module.exports = Profile;
+// };
