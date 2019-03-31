@@ -22,11 +22,11 @@ router.get(
     const errors = {};
     // Profile.belongsTo(User, { foreignKey: "user_id", as: "user" });
     Profile.findOne({
-      where: { user_id: req.user.id },
-      include: {
-        model: User,
-        as: "user"
-      }
+      where: { user_id: req.user.id }
+      // include: {
+      //   model: User,
+      //   as: "user"
+      // }
     })
       .then(profile => {
         if (!profile) {
