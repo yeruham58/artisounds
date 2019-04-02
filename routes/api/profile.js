@@ -2,10 +2,15 @@ const express = require("express");
 const router = express.Router();
 
 const db = require("../../config/database.js");
-const User = require("../../models/User");
-const Profile = require("../../models/Profile");
+const Sequelize = require("sequelize");
+// const User = require("../../models/User");
+const User = require("../../models/user")(db, Sequelize.DataTypes);
+// const Profile = require("../../models/Profile1");
+const Profile = require("../../models/profile")(db, Sequelize.DataTypes);
 const passport = require("passport");
 const validateProfileInput = require("../../validation/profile");
+
+Profile.belongsTo(User, { foreignKey: "user_id", as: "user" });
 
 //@ route   GET api/profile/test
 //@desc     test profile route
@@ -20,13 +25,12 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     const errors = {};
-    // Profile.belongsTo(User, { foreignKey: "user_id", as: "user" });
     Profile.findOne({
-      where: { user_id: req.user.id }
-      // include: {
-      //   model: User,
-      //   as: "user"
-      // }
+      where: { user_id: req.user.id },
+      include: {
+        model: User,
+        as: "user"
+      }
     })
       .then(profile => {
         if (!profile) {
@@ -72,7 +76,13 @@ router.post(
     if (req.body.instagram) profileFields.social.instagram = req.body.instagram;
     if (req.body.linkedin) profileFields.social.linkedin = req.body.linkedin;
 
-    Profile.findOne({ where: { user_id: req.user.id } }).then(profile => {
+    Profile.findOne({
+      where: { user_id: req.user.id },
+      include: {
+        model: User,
+        as: "user"
+      }
+    }).then(profile => {
       if (profile) {
         //update
         profile.update(profileFields).then(profile => res.json(profile));

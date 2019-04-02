@@ -6,8 +6,11 @@ const keys = require("../../config/keys");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
+const Sequelize = require("sequelize");
 const db = require("../../config/database");
-const User = require("../../models/User");
+const User = require("../../models/user")(db, Sequelize.DataTypes);
+// const User = new UserModel(db, Sequelize);
+// const User = UserModel;
 
 //load Input validation
 const validateRgisterInput = require("../../validation/register");
@@ -27,6 +30,7 @@ router.get("/test", (req, res) => {
 //@desc     register user
 //@access   public
 router.post("/register", (req, res) => {
+  console.log(req.body);
   const { errors, isValid } = validateRgisterInput(req.body);
 
   // check validation
