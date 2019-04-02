@@ -9,8 +9,6 @@ const jwt = require("jsonwebtoken");
 const Sequelize = require("sequelize");
 const db = require("../../config/database");
 const User = require("../../models/user")(db, Sequelize.DataTypes);
-// const User = new UserModel(db, Sequelize);
-// const User = UserModel;
 
 //load Input validation
 const validateRgisterInput = require("../../validation/register");
