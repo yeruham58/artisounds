@@ -83,16 +83,15 @@ function insertArtPractics(artPracticNameList, artTypeId) {
   });
 }
 
-// const artTypes = ["Music", "Painting", "Photography"];
-const artTypes = ["Music1", "Painting2", "Photography3"];
+const artTypes = [];
 
-const musicSubArtTypes = ["Classic", "Jazz", "Rock"];
-const paintingSubArtTypes = ["Comics", "Caricature"];
-const photographySubArtTypes = ["View", "Children"];
+const musicSubArtTypes = [];
+const paintingSubArtTypes = [];
+const photographySubArtTypes = [];
 
-const musicPractics = ["Guitar", "Drums", "flute"];
-const paintingPractics = ["Oil painting", "Pencil drawing"];
+const musicPractics = [];
+const paintingPractics = [];
 
-// insertArtTypes(artTypes);
-// insertSubArtTypes(photographySubArtTypes, 15);
-insertArtPractics(paintingPractics, 80);
+// insertArtTypes();
+// insertSubArtTypes();
+// insertArtPractics();
