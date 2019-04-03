@@ -3,9 +3,7 @@ const router = express.Router();
 
 const db = require("../../config/database.js");
 const Sequelize = require("sequelize");
-// const User = require("../../models/User");
 const User = require("../../models/user")(db, Sequelize.DataTypes);
-// const Profile = require("../../models/Profile1");
 const Profile = require("../../models/profile")(db, Sequelize.DataTypes);
 const passport = require("passport");
 const validateProfileInput = require("../../validation/profile");
@@ -25,19 +23,28 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     const errors = {};
-    Profile.findOne({
-      where: { user_id: req.user.id },
+    // Profile.findOne({
+    //   where: { user_id: req.user.id },
+    //   include: {
+    //     model: User,
+    //     as: "user"
+    //   }
+    // })
+    User.findOne({
+      where: { id: req.user.id },
       include: {
-        model: User,
-        as: "user"
+        model: Profile,
+        as: "profile"
       }
     })
-      .then(profile => {
-        if (!profile) {
+      // .then(profile => {
+      //   if (!profile) {
+      .then(user => {
+        if (!user.profile) {
           errors.noProfole = "There is no profile for this user";
           return res.status(404).json(errors);
         }
-        res.status(200).json(profile);
+        res.status(200).json(user);
       })
       .catch(err => res.status(404).json(err));
   }
@@ -77,7 +84,7 @@ router.post(
     if (req.body.linkedin) profileFields.social.linkedin = req.body.linkedin;
 
     Profile.findOne({
-      where: { user_id: req.user.id },
+      where: { id: req.user.id },
       include: {
         model: User,
         as: "user"
