@@ -7,6 +7,7 @@ const User = require("../../models/user")(db, Sequelize.DataTypes);
 const Profile = require("../../models/profile")(db, Sequelize.DataTypes);
 const passport = require("passport");
 const validateProfileInput = require("../../validation/profile");
+const userArtsControler = require("../apiFunctions/userArtTypes");
 
 Profile.belongsTo(User, { foreignKey: "user_id", as: "user" });
 
@@ -66,14 +67,30 @@ router.post(
     profileFields.user_id = req.user.id;
     if (req.body.location) profileFields.location = req.body.location;
     //Should be a list
-    if (req.body.art_types)
+    if (req.body.art_types) {
       profileFields.art_types = req.body.art_types.split(",");
+      userArtsControler.createAndUpdateUserArtTypes(
+        req.body.art_types.split(","),
+        req.user.id
+      );
+    }
     //Should be a list
-    if (req.body.sub_art_types)
+    if (req.body.sub_art_types) {
       profileFields.sub_art_types = req.body.sub_art_types.split(",");
+      userArtsControler.updateUserSubArtTypes(
+        req.body.sub_art_types.split(","),
+        req.user.id
+      );
+    }
+
     //Should be a list
-    if (req.body.art_practics)
+    if (req.body.art_practics) {
       profileFields.art_practics = req.body.art_practics.split(",");
+      userArtsControler.updateUserPractics(
+        req.body.art_practics.split(","),
+        req.user.id
+      );
+    }
     if (req.body.description) profileFields.description = req.body.description;
     //social should be a json
     profileFields.social = {};
