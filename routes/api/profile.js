@@ -65,33 +65,25 @@ router.post(
     }
     const profileFields = {};
     profileFields.user_id = req.user.id;
-    if (req.body.location) profileFields.location = req.body.location;
+    profileFields.location = req.body.location ? req.body.location : null;
     //Should be a list
-    if (req.body.art_types) {
-      profileFields.art_types = req.body.art_types.split(",");
-      userArtsControler.createAndUpdateUserArtTypes(
-        req.body.art_types.split(","),
-        req.user.id
-      );
-    }
+    const artTypeList = req.body.art_types ? req.body.art_types.split(",") : [];
+    userArtsControler.createAndUpdateUserArtTypes(artTypeList, req.user.id);
     //Should be a list
-    if (req.body.sub_art_types) {
-      profileFields.sub_art_types = req.body.sub_art_types.split(",");
-      userArtsControler.updateUserSubArtTypes(
-        req.body.sub_art_types.split(","),
-        req.user.id
-      );
-    }
+    const subArtTypeList = req.body.sub_art_types
+      ? req.body.sub_art_types.split(",")
+      : [];
+    userArtsControler.updateUserSubArtTypes(subArtTypeList, req.user.id);
 
     //Should be a list
-    if (req.body.art_practics) {
-      profileFields.art_practics = req.body.art_practics.split(",");
-      userArtsControler.updateUserPractics(
-        req.body.art_practics.split(","),
-        req.user.id
-      );
-    }
-    if (req.body.description) profileFields.description = req.body.description;
+    const artPracticList = req.body.art_practics
+      ? req.body.art_practics.split(",")
+      : [];
+    userArtsControler.updateUserPractics(artPracticList, req.user.id);
+
+    profileFields.description = req.body.description
+      ? req.body.description
+      : null;
     //social should be a json
     profileFields.social = {};
     if (req.body.website) profileFields.social.website = req.body.website;

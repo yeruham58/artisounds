@@ -19,7 +19,7 @@ const UserArtPractic = require("../../models/userartpractic")(
 );
 
 const createAndUpdateUserArtTypes = function(artTypeList, userId) {
-  convertListItemsToInt(artTypeList);
+  if (artTypeList[0]) convertListItemsToInt(artTypeList);
   UserArtType.findAll({
     attributes: ["art_type_id"],
     where: { user_id: userId }
@@ -34,7 +34,7 @@ const createAndUpdateUserArtTypes = function(artTypeList, userId) {
         }
       });
     }
-    addNewArtTypes(artTypeList, userId);
+    if (artTypeList[0]) addNewArtTypes(artTypeList, userId);
   });
 };
 
@@ -99,7 +99,7 @@ const initUserArtPractics = function(artTypeId, userId) {
 };
 
 const updateUserSubArtTypes = function(subArtTypesList, userId) {
-  convertListItemsToInt(subArtTypesList);
+  if (subArtTypesList[0]) convertListItemsToInt(subArtTypesList);
   UserSubArtType.findAll({
     where: { user_id: userId, is_active: true }
   }).then(userSubArtTypes => {
@@ -111,7 +111,7 @@ const updateUserSubArtTypes = function(subArtTypesList, userId) {
         }
       });
     }
-    addNewSubArtTypes(subArtTypesList, userId);
+    if (subArtTypesList[0]) addNewSubArtTypes(subArtTypesList, userId);
   });
 };
 
@@ -119,12 +119,18 @@ const addNewSubArtTypes = function(subArtTypesList, userId) {
   subArtTypesList.forEach(function(subArtTypeId) {
     UserSubArtType.findOne({
       where: { sub_art_type_id: subArtTypeId, user_id: userId }
-    }).then(userSubArtType => userSubArtType.update({ is_active: true }));
+    }).then(userSubArtType => {
+      if (userSubArtType) {
+        userSubArtType.update({ is_active: true });
+      } else {
+        addNewSubArtTypes(subArtTypesList, userId);
+      }
+    });
   });
 };
 
 const updateUserPractics = function(userPracticsList, userId) {
-  convertListItemsToInt(userPracticsList);
+  if (userPracticsList[0]) convertListItemsToInt(userPracticsList);
   UserArtPractic.findAll({
     where: { user_id: userId, is_active: true }
   }).then(userArtPractics => {
@@ -136,7 +142,7 @@ const updateUserPractics = function(userPracticsList, userId) {
         }
       });
     }
-    addNewArtPractics(userPracticsList, userId);
+    if (userPracticsList[0]) addNewArtPractics(userPracticsList, userId);
   });
 };
 
@@ -144,11 +150,19 @@ const addNewArtPractics = function(userPracticsList, userId) {
   userPracticsList.forEach(function(artPracticId) {
     UserArtPractic.findOne({
       where: { art_practic_id: artPracticId, user_id: userId }
-    }).then(userArtPractic => userArtPractic.update({ is_active: true }));
+    }).then(userArtPractic => {
+      if (userArtPractic) {
+        userArtPractic.update({ is_active: true });
+      } else {
+        addNewArtPractics(userPracticsList, userId);
+      }
+    });
   });
 };
 
 const convertListItemsToInt = function(list) {
+  console.log("list");
+  console.log(list);
   list.forEach(function(strNum) {
     list[list.indexOf(strNum)] = parseInt(strNum);
   });
