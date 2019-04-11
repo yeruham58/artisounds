@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
   );
   SubArtType.associate = function(models) {
     // associations can be defined here
-    SubArtType.belongsTo(models.ArtType);
+    // SubArtType.belongsTo(models.ArtType);
   };
   return SubArtType;
 };

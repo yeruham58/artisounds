@@ -9,8 +9,6 @@ module.exports = (sequelize, DataTypes) => {
   );
   ArtType.associate = function(models) {
     // associations can be defined here
-    ArtType.hasMany(models.subArtType);
-    ArtType.hasMany(models.artPractic);
   };
   return ArtType;
 };

@@ -9,6 +9,12 @@ const jwt = require("jsonwebtoken");
 const Sequelize = require("sequelize");
 const db = require("../../config/database");
 const User = require("../../models/user")(db, Sequelize.DataTypes);
+const Profile = require("../../models/profile")(db, Sequelize.DataTypes);
+const User1 = require("../../classes/User");
+const Profile1 = require("../../classes/Profile");
+const UserArtType = require("../../classes/UserArtType");
+const UserSubArtType = require("../../classes/UserSubArtType");
+const UserArtPractic = require("../../classes/UserArtPractic");
 
 //load Input validation
 const validateRgisterInput = require("../../validation/register");
@@ -18,11 +24,31 @@ const validateLoginInput = require("../../validation/login");
 //@desc     test users route
 //@access   public
 router.get("/test", (req, res) => {
-  res.json({ msg: "users works!!!" });
+  // res.json({ msg: "users works!!!" });
+  testFun().then(users => {
+    res.json(users);
+  });
   User.findAll()
-    .then(users => console.log(users))
+    .then(users => console.log("users"))
     .catch(err => console.log(err));
 });
+
+const testFun = function() {
+  const UserInst = User1.build({});
+  console.log("in test");
+  return User1.findOne({
+    where: { id: 1 },
+    include: [
+      {
+        model: Profile1,
+        as: "profile"
+      },
+      { model: UserArtType, as: "art_types" },
+      { model: UserSubArtType, as: "sub_art_types" },
+      { model: UserArtPractic, as: "art_practics" }
+    ]
+  });
+};
 
 //@route    POST api/users/register
 //@desc     register user

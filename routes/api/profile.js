@@ -8,8 +8,14 @@ const Profile = require("../../models/profile")(db, Sequelize.DataTypes);
 const passport = require("passport");
 const validateProfileInput = require("../../validation/profile");
 const userArtsControler = require("../apiFunctions/userArtTypes");
+const UserArtType = require("../../models/subarttype");
+const UserSubArtType = require("../../models/usersubarttype");
+const UserArtPractic = require("../../models/userartpractic");
 
-Profile.belongsTo(User, { foreignKey: "user_id", as: "user" });
+// Profile.belongsTo(User, { foreignKey: "user_id", as: "user" });
+// User.hasOne(UserArtType, { foreignKey: "user_id" });
+// User.hasOne(UserSubArtType, { foreignKey: "user_id" });
+// User.hasOne(UserArtPractic, { foreignKey: "user_id" });
 
 //@ route   GET api/profile/test
 //@desc     test profile route
@@ -24,19 +30,17 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     const errors = {};
-    // Profile.findOne({
-    //   where: { user_id: req.user.id },
-    //   include: {
-    //     model: User,
-    //     as: "user"
-    //   }
-    // })
     User.findOne({
       where: { id: req.user.id },
-      include: {
-        model: Profile,
-        as: "profile"
-      }
+      include: [
+        {
+          model: Profile,
+          as: "profile"
+        },
+        { model: UserArtType, as: "user_art_types" },
+        { model: UserSubArtType, as: "user_sub_art_types" },
+        { model: UserArtPractic, as: "user_art_practics" }
+      ]
     })
       // .then(profile => {
       //   if (!profile) {

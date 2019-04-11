@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
   );
   UserArtPractic.associate = function(models) {
     // associations can be defined here
+    // UserArtPractic.belongsTo(models.user);
   };
   return UserArtPractic;
 };
