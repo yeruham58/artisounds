@@ -20,6 +20,8 @@ const UserArtPractic = require("../../models/userartpractic")(
 
 const createAndUpdateUserArtTypes = function(artTypeList, userId) {
   if (artTypeList[0]) convertListItemsToInt(artTypeList);
+  console.log("artTypeList");
+  console.log(artTypeList);
   UserArtType.findAll({
     attributes: ["art_type_id"],
     where: { user_id: userId }

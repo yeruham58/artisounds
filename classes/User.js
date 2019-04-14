@@ -10,8 +10,24 @@ class User extends Sequelize.Model {
   static associate(models) {
     // User.hasOne(models.profile);
   }
+
   // someMethod() {}
+  static getAllUserInfo(userId) {
+    return User.findOne({
+      where: { id: userId },
+      include: [
+        {
+          model: Profile,
+          as: "profile"
+        },
+        { model: UserArtType, as: "art_types" },
+        { model: UserSubArtType, as: "sub_art_types" },
+        { model: UserArtPractic, as: "art_practics" }
+      ]
+    });
+  }
 }
+
 User.init(
   {
     name: Sequelize.STRING,

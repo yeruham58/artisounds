@@ -1,21 +1,11 @@
 const express = require("express");
 const router = express.Router();
-
-const db = require("../../config/database.js");
-const Sequelize = require("sequelize");
-const User = require("../../models/user")(db, Sequelize.DataTypes);
-const Profile = require("../../models/profile")(db, Sequelize.DataTypes);
 const passport = require("passport");
 const validateProfileInput = require("../../validation/profile");
 const userArtsControler = require("../apiFunctions/userArtTypes");
-const UserArtType = require("../../models/subarttype");
-const UserSubArtType = require("../../models/usersubarttype");
-const UserArtPractic = require("../../models/userartpractic");
 
-// Profile.belongsTo(User, { foreignKey: "user_id", as: "user" });
-// User.hasOne(UserArtType, { foreignKey: "user_id" });
-// User.hasOne(UserSubArtType, { foreignKey: "user_id" });
-// User.hasOne(UserArtPractic, { foreignKey: "user_id" });
+const User = require("../../classes/User");
+const Profile = require("../../classes/profile");
 
 //@ route   GET api/profile/test
 //@desc     test profile route
@@ -30,20 +20,7 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     const errors = {};
-    User.findOne({
-      where: { id: req.user.id },
-      include: [
-        {
-          model: Profile,
-          as: "profile"
-        },
-        { model: UserArtType, as: "user_art_types" },
-        { model: UserSubArtType, as: "user_sub_art_types" },
-        { model: UserArtPractic, as: "user_art_practics" }
-      ]
-    })
-      // .then(profile => {
-      //   if (!profile) {
+    User.getAllUserInfo(req.user.id)
       .then(user => {
         if (!user.profile) {
           errors.noProfole = "There is no profile for this user";
@@ -70,20 +47,39 @@ router.post(
     const profileFields = {};
     profileFields.user_id = req.user.id;
     profileFields.location = req.body.location ? req.body.location : null;
+
     //Should be a list
     const artTypeList = req.body.art_types ? req.body.art_types.split(",") : [];
-    userArtsControler.createAndUpdateUserArtTypes(artTypeList, req.user.id);
+    convertStrListToIntList(artTypeList);
+
+    // Profile.getUserArtTypes(req.user.id).then(userArtTypes => {
+    //   if (userArtTypes[0]) {
+    //     Profile.deleteArtTypesThatNotInList(
+    //       req.user.id,
+    //       userArtTypes,
+    //       artTypeList
+    //     ).then(newArtTypeList => {
+    //       Profile.addNewArtTypes(newArtTypeList, req.user.id);
+    //     });
+    //   } else {
+    //     if (artTypeList[0]) Profile.addNewArtTypes(artTypeList, req.user.id);
+    //   }
+    // });
+
+    Profile.createAndUpdateUserArtTypes(artTypeList, req.user.id);
+
     //Should be a list
     const subArtTypeList = req.body.sub_art_types
       ? req.body.sub_art_types.split(",")
       : [];
-    userArtsControler.updateUserSubArtTypes(subArtTypeList, req.user.id);
+    convertStrListToIntList(subArtTypeList);
+    Profile.updateUserSubArtTypes(subArtTypeList, req.user.id);
 
     //Should be a list
     const artPracticList = req.body.art_practics
       ? req.body.art_practics.split(",")
       : [];
-    userArtsControler.updateUserPractics(artPracticList, req.user.id);
+    Profile.updateUserPractics(artPracticList, req.user.id);
 
     profileFields.description = req.body.description
       ? req.body.description
@@ -97,21 +93,31 @@ router.post(
     if (req.body.linkedin) profileFields.social.linkedin = req.body.linkedin;
 
     Profile.findOne({
-      where: { id: req.user.id },
-      include: {
-        model: User,
-        as: "user"
-      }
+      where: { id: req.user.id }
     }).then(profile => {
       if (profile) {
         //update
-        profile.update(profileFields).then(profile => res.json(profile));
+        profile.update(profileFields).then(() => {
+          setTimeout(function() {
+            User.getAllUserInfo(req.user.id).then(user => res.json(user));
+          }, 1000);
+        });
       } else {
         // create
-        Profile.create(profileFields).then(profile => res.json(profile));
+        Profile.create(profileFields).then(() => {
+          setTimeout(function() {
+            User.getAllUserInfo(req.user.id).then(user => res.json(user));
+          }, 1000);
+        });
       }
     });
   }
 );
+
+const convertStrListToIntList = function(strList) {
+  strList.forEach(function(strNum) {
+    strList[strList.indexOf(strNum)] = parseInt(strNum);
+  });
+};
 
 module.exports = router;
