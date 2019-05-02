@@ -4,6 +4,8 @@ const ArtType = require("./models/arttype")(db, Sequelize.DataTypes);
 const SubArtType = require("./models/subarttype")(db, Sequelize.DataTypes);
 const ArtPractic = require("./models/artpractic")(db, Sequelize.DataTypes);
 
+//all functions in this file shoud be in classes
+
 // can insert to db art types
 function insertArtTypes(artTypeNameList) {
   artTypeNameList.forEach(function(artType) {

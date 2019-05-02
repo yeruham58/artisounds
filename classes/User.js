@@ -6,10 +6,17 @@ const UserArtType = require("./UserArtType");
 const UserArtPractic = require("./UserArtPractic");
 const UserSubArtType = require("./UserSubArtType");
 
+const ArtType = require("./ArtType");
+const SubArtType = require("./SubArtType");
+const ArtPractic = require("./ArtPractic");
+
 class User extends Sequelize.Model {
-  static associate(models) {
-    // User.hasOne(models.profile);
-  }
+  static associate(models) {}
+
+  // constructor() {
+  //   super();
+  //   this.id = null;
+  // }
 
   // someMethod() {}
   static getAllUserInfo(userId) {
@@ -18,11 +25,39 @@ class User extends Sequelize.Model {
       include: [
         {
           model: Profile,
+          attributes: [],
           as: "profile"
         },
-        { model: UserArtType, as: "art_types" },
-        { model: UserSubArtType, as: "sub_art_types" },
-        { model: UserArtPractic, as: "art_practics" }
+        {
+          model: UserArtType,
+          as: "art_types",
+          attributes: ["art_type_id"],
+          include: {
+            model: ArtType,
+            as: "art_type_details",
+            attributes: ["art_type_name"]
+          }
+        },
+        {
+          model: UserSubArtType,
+          as: "sub_art_types",
+          attributes: ["sub_art_type_id", "art_type_id", "is_active"],
+          include: {
+            model: SubArtType,
+            as: "sub_art_type_details",
+            attributes: ["sub_art_type_name"]
+          }
+        },
+        {
+          model: UserArtPractic,
+          as: "art_practics",
+          attributes: ["art_practic_id", "art_type_id", "is_active"],
+          include: {
+            model: ArtPractic,
+            as: "art_practic_details",
+            attributes: ["art_practic_name"]
+          }
+        }
       ]
     });
   }

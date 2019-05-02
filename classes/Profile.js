@@ -10,31 +10,12 @@ const UserArtPractic = require("../classes/userartpractic");
 const Promise = require("promise");
 
 class Profile extends Sequelize.Model {
-  static associate(models) {
-    // User.hasOne(models.profile);
-  }
-  // someMethod() {}
-  // static getUserArtTypes(userId) {
-  //   return UserArtType.findAll({
-  //     attributes: ["art_type_id"],
-  //     where: { user_id: userId }
-  //   });
-  // }
+  static associate(models) {}
+  // When creating new art type, we also create all sub art types/ art practics for this art type, and colomn "is active" = false, Sub art type will update to be true acording to sun art type list, after art type is created.
 
-  // static deleteArtTypesThatNotInList(userId, DBArtList, newArtList) {
-  //   return new Promise(function(resolve, reject) {
-  //     DBArtList.map(function(userArtType) {
-  //       const artTypeId = userArtType.dataValues.art_type_id;
-  //       if (newArtList.indexOf(artTypeId) < 0) {
-  //         deleteUserArtType(artTypeId, userId);
-  //       } else {
-  //         newArtList.splice(newArtList.indexOf(artTypeId), 1);
-  //       }
-  //     });
-  //     resolve(newArtList);
-  //   });
-  // }
-
+  // This function get a the newest art types list from the user, and dellete from DB all the art types that user don't want any more,
+  // also delete from this list all the art types that already exist in user profile, by using "deleteUserArtType" function,
+  //Then we send the updated list with the new art types list that the user want to add, to function "addNewArtTypes"
   static createAndUpdateUserArtTypes(artTypeList, userId) {
     UserArtType.findAll({
       attributes: ["art_type_id"],
@@ -54,12 +35,8 @@ class Profile extends Sequelize.Model {
     });
   }
 
-  static convertListItemsToInt(list) {
-    list.forEach(function(strNum) {
-      list[list.indexOf(strNum)] = parseInt(strNum);
-    });
-  }
-
+  // This function get a the newest sub art types list from the user, and set as "is active = false" - all the sub art types that user don't want any more,
+  //Then we send the updated list with the new sub art types list that the user want to add, to function "addNewSubArtTypes"
   static updateUserSubArtTypes(subArtTypesList, userId) {
     UserSubArtType.findAll({
       where: { user_id: userId, is_active: true }
@@ -76,6 +53,7 @@ class Profile extends Sequelize.Model {
     });
   }
 
+  // Same logic as "updateUserSubArtTypes" function
   static updateUserPractics(userPracticsList, userId) {
     if (userPracticsList[0]) convertListItemsToInt(userPracticsList);
     UserArtPractic.findAll({
@@ -90,6 +68,12 @@ class Profile extends Sequelize.Model {
         });
       }
       if (userPracticsList[0]) addNewArtPractics(userPracticsList, userId);
+    });
+  }
+
+  static convertListItemsToInt(list) {
+    list.forEach(function(strNum) {
+      list[list.indexOf(strNum)] = parseInt(strNum);
     });
   }
 }
@@ -123,6 +107,7 @@ Profile.init(
   { sequelize, modelName: "Profile" }
 );
 
+// When we delete user art type, we also delete all the sub art types/ art prctics that releted to this art type
 const deleteUserArtType = function(artTypeId, userId) {
   UserArtType.destroy({
     where: { user_id: userId, art_type_id: artTypeId }
@@ -136,14 +121,13 @@ const deleteUserArtType = function(artTypeId, userId) {
   });
 };
 
+// When we add user art type, we also create (by using "initUserSubArtTypes" function) all the sub art types/ art prctics that releted to this art type, and set field "is active" as false
 const addNewArtTypes = function(newArtTypes, userId) {
   newArtTypes.forEach(function(artTypeId) {
-    UserArtType.create({ art_type_id: artTypeId, user_id: userId }).then(
-      userArtType => {
-        initUserSubArtTypes(artTypeId, userId);
-        initUserArtPractics(artTypeId, userId);
-      }
-    );
+    UserArtType.create({ art_type_id: artTypeId, user_id: userId }).then(() => {
+      initUserSubArtTypes(artTypeId, userId);
+      initUserArtPractics(artTypeId, userId);
+    });
   });
 };
 
@@ -183,6 +167,7 @@ const initUserArtPractics = function(artTypeId, userId) {
   });
 };
 
+// When we add user sub art type, we only set field is active as true, Some times when created art type in the same req, we still don't have the sub art type field, so we call this function again until this field will be created as is active false, then we update it to be true
 const addNewSubArtTypes = function(subArtTypesList, userId) {
   subArtTypesList.forEach(function(subArtTypeId) {
     UserSubArtType.findOne({

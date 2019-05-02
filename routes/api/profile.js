@@ -52,20 +52,6 @@ router.post(
     const artTypeList = req.body.art_types ? req.body.art_types.split(",") : [];
     convertStrListToIntList(artTypeList);
 
-    // Profile.getUserArtTypes(req.user.id).then(userArtTypes => {
-    //   if (userArtTypes[0]) {
-    //     Profile.deleteArtTypesThatNotInList(
-    //       req.user.id,
-    //       userArtTypes,
-    //       artTypeList
-    //     ).then(newArtTypeList => {
-    //       Profile.addNewArtTypes(newArtTypeList, req.user.id);
-    //     });
-    //   } else {
-    //     if (artTypeList[0]) Profile.addNewArtTypes(artTypeList, req.user.id);
-    //   }
-    // });
-
     Profile.createAndUpdateUserArtTypes(artTypeList, req.user.id);
 
     //Should be a list
