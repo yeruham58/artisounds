@@ -10,6 +10,7 @@ class UserSubArtType extends Sequelize.Model {
 UserSubArtType.init(
   {
     user_id: Sequelize.INTEGER,
+    user_art_type_id: Sequelize.INTEGER,
     sub_art_type_id: Sequelize.INTEGER,
     art_type_id: Sequelize.INTEGER,
     is_active: Sequelize.BOOLEAN

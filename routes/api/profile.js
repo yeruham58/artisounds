@@ -44,6 +44,7 @@ router.post(
     if (!isValid) {
       return res.status(400).json(errors);
     }
+
     const profileFields = {};
     profileFields.user_id = req.user.id;
     profileFields.location = req.body.location ? req.body.location : null;
@@ -81,6 +82,8 @@ router.post(
     Profile.findOne({
       where: { id: req.user.id }
     }).then(profile => {
+      console.log("hiiiiiiiiiiiiii");
+
       if (profile) {
         //update
         profile.update(profileFields).then(() => {

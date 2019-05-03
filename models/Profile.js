@@ -5,9 +5,6 @@ module.exports = (sequelize, DataTypes) => {
     {
       user_id: DataTypes.INTEGER,
       location: DataTypes.STRING,
-      art_types: DataTypes.ARRAY(DataTypes.INTEGER),
-      sub_art_types: DataTypes.ARRAY(DataTypes.INTEGER),
-      art_practics: DataTypes.ARRAY(DataTypes.INTEGER),
       description: DataTypes.STRING,
       social: DataTypes.JSON(
         {
@@ -31,7 +28,6 @@ module.exports = (sequelize, DataTypes) => {
   );
   Profile.associate = function(models) {
     // associations can be defined here
-    // Profile.belongsTo(models.user);
   };
   return Profile;
 };

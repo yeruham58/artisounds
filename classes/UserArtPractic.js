@@ -10,6 +10,7 @@ class UserArtPractic extends Sequelize.Model {
 UserArtPractic.init(
   {
     user_id: Sequelize.INTEGER,
+    user_art_type_id: Sequelize.INTEGER,
     art_practic_id: Sequelize.INTEGER,
     art_type_id: Sequelize.INTEGER,
     is_active: Sequelize.BOOLEAN

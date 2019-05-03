@@ -82,9 +82,6 @@ Profile.init(
   {
     user_id: Sequelize.INTEGER,
     location: Sequelize.STRING,
-    art_types: Sequelize.ARRAY(Sequelize.INTEGER),
-    sub_art_types: Sequelize.ARRAY(Sequelize.INTEGER),
-    art_practics: Sequelize.ARRAY(Sequelize.INTEGER),
     description: Sequelize.STRING,
     social: Sequelize.JSON(
       {
@@ -124,14 +121,17 @@ const deleteUserArtType = function(artTypeId, userId) {
 // When we add user art type, we also create (by using "initUserSubArtTypes" function) all the sub art types/ art prctics that releted to this art type, and set field "is active" as false
 const addNewArtTypes = function(newArtTypes, userId) {
   newArtTypes.forEach(function(artTypeId) {
-    UserArtType.create({ art_type_id: artTypeId, user_id: userId }).then(() => {
-      initUserSubArtTypes(artTypeId, userId);
-      initUserArtPractics(artTypeId, userId);
-    });
+    UserArtType.create({ art_type_id: artTypeId, user_id: userId }).then(
+      userArtType => {
+        const userArtTypeId = userArtType.dataValues.id;
+        initUserSubArtTypes(artTypeId, userId, userArtTypeId);
+        initUserArtPractics(artTypeId, userId, userArtTypeId);
+      }
+    );
   });
 };
 
-const initUserSubArtTypes = function(artTypeId, userId) {
+const initUserSubArtTypes = function(artTypeId, userId, userArtTypeId) {
   SubArtType.findAll({
     attributes: ["id"],
     where: { art_type_id: artTypeId }
@@ -142,6 +142,7 @@ const initUserSubArtTypes = function(artTypeId, userId) {
           sub_art_type_id: subArtType.dataValues.id,
           art_type_id: artTypeId,
           user_id: userId,
+          user_art_type_id: userArtTypeId,
           is_active: false
         }).then(console.log("sub art type created"));
       });
@@ -149,19 +150,23 @@ const initUserSubArtTypes = function(artTypeId, userId) {
   });
 };
 
-const initUserArtPractics = function(artTypeId, userId) {
+const initUserArtPractics = function(artTypeId, userId, userArtTypeId) {
   ArtPractic.findAll({
     attributes: ["id"],
     where: { art_type_id: artTypeId }
   }).then(artPractics => {
     if (artPractics[0]) {
       artPractics.map(function(artPractic) {
+        console.log("user.... before created " + userArtTypeId);
         UserArtPractic.create({
           art_practic_id: artPractic.dataValues.id,
           art_type_id: artTypeId,
           user_id: userId,
+          user_art_type_id: userArtTypeId,
           is_active: false
-        }).then(console.log("art practic created"));
+        })
+          .then(console.log("art practic created"))
+          .catch(err => console.log(err));
       });
     }
   });
