@@ -12,6 +12,37 @@ const Profile = require("../../classes/profile");
 //@access   public
 router.get("/test", (req, res) => res.json({ msg: "profile works" }));
 
+//@ route   GET api/profile/all
+//@desc     get list of all users
+//@access   public
+router.get("/all", (req, res) => {
+  User.getListOfAllUsers()
+    .then(users => {
+      if (!users) {
+        errors.noUser = "There is no users yet";
+        return res.status(404).json(errors);
+      }
+      res.status(200).json(users);
+    })
+    .catch(err => res.status(404).json(err));
+});
+
+//@ route   GET api/profile/user/:user_id
+//@desc     get profile by hendle
+//@access   public
+router.get("/user/:user_id", (req, res) => {
+  const errors = {};
+  User.getAllUserInfo(req.params.user_id)
+    .then(user => {
+      if (!user) {
+        errors.noUser = "There is no user for this handle";
+        return res.status(404).json(errors);
+      }
+      res.status(200).json(user);
+    })
+    .catch(err => res.status(404).json(err));
+});
+
 //@ route   GET api/profile
 //@desc     get corrent user profile
 //@access   private
@@ -23,7 +54,7 @@ router.get(
     User.getAllUserInfo(req.user.id)
       .then(user => {
         if (!user.profile) {
-          errors.noProfole = "There is no profile for this user";
+          errors.noProfile = "There is no profile for this user";
           return res.status(404).json(errors);
         }
         res.status(200).json(user);

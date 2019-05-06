@@ -58,6 +58,12 @@ class User extends Sequelize.Model {
       ]
     });
   }
+
+  static getListOfAllUsers() {
+    return User.findAll({
+      attributes: ["name", "avatar", "id"]
+    });
+  }
 }
 
 User.init(
