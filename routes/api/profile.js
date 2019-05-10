@@ -113,8 +113,6 @@ router.post(
     Profile.findOne({
       where: { id: req.user.id }
     }).then(profile => {
-      console.log("hiiiiiiiiiiiiii");
-
       if (profile) {
         //update
         profile.update(profileFields).then(() => {
