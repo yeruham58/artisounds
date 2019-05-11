@@ -3,17 +3,29 @@ const sequelize = require("../config/database");
 
 class Dislike extends Sequelize.Model {
   static associate(models) {}
-  // someMethod() {}
+
+  static createDislike(dislikeInfo) {
+    dislikeInfo.dislike_score = calculateDislikeScore(dislikeInfo.user_id);
+    return Dislike.create(dislikeInfo);
+  }
 }
+
 Dislike.init(
   {
     user_id: Sequelize.INTEGER,
     name: Sequelize.STRING,
     avatar: Sequelize.STRING,
     post_id: Sequelize.INTEGER,
-    dislink_score: Sequelize.FLOAT
+    dislike_score: Sequelize.FLOAT
   },
   { sequelize, modelName: "Dislike" }
 );
+
+const calculateDislikeScore = function(user_id) {
+  const dislikeScore = 1;
+  //some calculate
+
+  return dislikeScore;
+};
 
 module.exports = Dislike;

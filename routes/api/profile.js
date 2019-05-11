@@ -27,10 +27,10 @@ router.get("/all", (req, res) => {
     .catch(err => res.status(404).json(err));
 });
 
-//@ route   GET api/profile/user/:user_id
+//@ route   GET api/profile/:user_id
 //@desc     get profile by hendle
 //@access   public
-router.get("/user/:user_id", (req, res) => {
+router.get("/:user_id", (req, res) => {
   const errors = {};
   User.getAllUserInfo(req.params.user_id)
     .then(user => {

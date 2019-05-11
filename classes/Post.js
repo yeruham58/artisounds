@@ -5,9 +5,46 @@ const Like = require("./Like");
 const Dislike = require("./Dislike");
 const Comment = require("./Comment");
 
+const include = [
+  {
+    model: Like,
+    as: "likes"
+  },
+  {
+    model: Dislike,
+    as: "dislikes"
+  },
+  {
+    model: Comment,
+    as: "comments"
+  }
+];
+
 class Post extends Sequelize.Model {
   static associate(models) {}
-  // someMethod() {}
+
+  static getPostByPostId(postId) {
+    return Post.findOne({
+      where: { id: postId },
+      include: include
+    });
+  }
+
+  static getPostsByUserId(userId) {
+    return Post.findAll({
+      where: { user_id: userId },
+      order: ["updatedAt"],
+      include: include
+    });
+  }
+
+  static getAllPosts() {
+    return Post.findAll({
+      limit: 10,
+      order: ["updatedAt"],
+      include: include
+    });
+  }
 }
 Post.init(
   {
@@ -23,8 +60,8 @@ Post.init(
   { sequelize, modelName: "Post" }
 );
 
-Post.hasMany(Like, { foreignKey: "post_id", as: "post_likes" });
-Post.hasMany(Dislike, { foreignKey: "post_id", as: "post_dislikes" });
-Post.hasMany(Comment, { foreignKey: "post_id", as: "post_comments" });
+Post.hasMany(Like, { foreignKey: "post_id", as: "likes" });
+Post.hasMany(Dislike, { foreignKey: "post_id", as: "dislikes" });
+Post.hasMany(Comment, { foreignKey: "post_id", as: "comments" });
 
 module.exports = Post;

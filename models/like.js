@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       avatar: DataTypes.STRING,
       post_id: DataTypes.INTEGER,
-      link_score: DataTypes.FLOAT
+      like_score: DataTypes.FLOAT
     },
     {}
   );
