@@ -3,6 +3,7 @@ const router = express.Router();
 const passport = require("passport");
 
 const validatePostInput = require("../../validation/post");
+const validateCommentInput = require("../../validation/comment");
 
 const Post = require("../../classes/Post");
 const Like = require("../../classes/Like");
@@ -105,9 +106,15 @@ router.post(
               dislike.destroy();
             }
           });
-          Like.createLike(likeInfo).then(like => res.json(like));
+          Like.createLike(likeInfo).then(() => {
+            Post.getPostByPostId(req.params.id).then(post => res.json(post));
+          });
         } else {
-          like.destroy().then(() => res.json({ msg: "like deleted" }));
+          like
+            .destroy()
+            .then(() =>
+              Post.getPostByPostId(req.params.id).then(post => res.json(post))
+            );
         }
       })
       .catch(err => res.json({ msg: "Sorry, we have some err" }));
@@ -138,12 +145,72 @@ router.post(
               like.destroy();
             }
           });
-          Dislike.createDislike(dislikeInfo).then(dislike => res.json(dislike));
+          Dislike.createDislike(dislikeInfo).then(() => {
+            Post.getPostByPostId(req.params.id).then(post => res.json(post));
+          });
         } else {
-          dislike.destroy().then(() => res.json({ msg: "dislike deleted" }));
+          dislike.destroy().then(() => {
+            Post.getPostByPostId(req.params.id).then(post => res.json(post));
+          });
         }
       })
       .catch(err => res.json({ msg: "Sorry, we have some err" }));
+  }
+);
+
+//@ route   POST api/posts/comment/:id
+//@desc     add comment to post
+//@access   private
+router.post(
+  "/comment/:id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const { errors, isValid } = validateCommentInput(req.body);
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
+    const commentInfo = {};
+    commentInfo.user_id = req.user.id;
+    commentInfo.post_id = req.params.id;
+    commentInfo.name = req.body.name;
+    commentInfo.avatar = req.body.avatar;
+    commentInfo.comment_contant = req.body.comment_contant;
+
+    Comment.create(commentInfo)
+      .then(() => {
+        Post.getPostByPostId(req.params.id).then(post => res.json(post));
+      })
+      .catch(err => res.json(err));
+  }
+);
+
+//@ route   DELETE api/posts/comment/:id/comment_id
+//@desc     remove comment from post
+//@access   private
+router.delete(
+  "/comment/:comment_id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    //chack the comment ouner
+    Comment.findByPk(req.params.comment_id)
+      .then(comment => {
+        if (comment.user_id !== req.user.id) {
+          return res
+            .status(401)
+            .json({ msg: "This comment is not belong to you!" });
+        } else {
+          postId = comment.post_id;
+          comment.destroy().then(() => {
+            console.log("postId");
+            console.log(postId);
+            Post.getPostByPostId(postId).then(post => res.json(post));
+          });
+        }
+      })
+      .then(() => {
+        Post.getPostByPostId(req.params.id).then(post => res.json(post));
+      })
+      .catch(err => res.json(err));
   }
 );
 
