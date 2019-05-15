@@ -6,6 +6,8 @@ const UserArtType = require("./UserArtType");
 const UserArtPractic = require("./UserArtPractic");
 const UserSubArtType = require("./UserSubArtType");
 
+const Post = require("./Post");
+
 const ArtType = require("./ArtType");
 const SubArtType = require("./SubArtType");
 const ArtPractic = require("./ArtPractic");
@@ -63,6 +65,26 @@ class User extends Sequelize.Model {
     return User.findAll({
       attributes: ["name", "avatar", "id"]
     });
+  }
+
+  static getUserScoreByUserId(userId) {
+    console.log("it is a functoin");
+    // Post.getPostsByUserId(userId).then(posts => {
+    //   userScore = 0;
+    //   posts.forEach(function(post) {
+    //     postScore = 0;
+    //     post.likes.forEach(function(like) {
+    //       postScore += like.like_score;
+    //     });
+    //     post.dislikes.forEach(function(dislike) {
+    //       postScore -= dislike.dislike_score;
+    //     });
+    //     if (postScore > 50) {
+    //       userScore += postScore / 10;
+    //     }
+    //   });
+    //   return userScore;
+    // });
   }
 }
 

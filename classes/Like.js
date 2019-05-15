@@ -1,6 +1,8 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/database");
 
+const User = require("./User");
+
 class Like extends Sequelize.Model {
   static associate(models) {}
 
@@ -22,7 +24,10 @@ Like.init(
 );
 
 const calculateLikeScore = function(user_id) {
-  const likeScore = 1;
+  const likeScore = 27.5;
+  const userScore = User.getAllUserInfo(user_id);
+  console.log("userScore");
+  console.log(userScore);
   //some calculate
 
   return likeScore;

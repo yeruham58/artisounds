@@ -54,9 +54,9 @@ router.post(
     newPost.video = req.body.video;
     if (req.body.text_contant) newPost.text_contant = req.body.text_contant;
     if (req.body.link) newPost.link = req.body.link;
-    Post.create(newPost).then(post =>
-      res.json(post).catch(err => res.json(err))
-    );
+    Post.create(newPost)
+      .then(post => res.json(post))
+      .catch(err => res.json(err));
   }
 );
 
@@ -90,34 +90,36 @@ router.post(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     //if already liked
-    Like.findOne({ where: { post_id: req.params.id, user_id: req.user.id } })
-      .then(like => {
-        if (!like) {
-          const likeInfo = {};
-          likeInfo.user_id = req.user.id;
-          likeInfo.post_id = req.params.id;
-          //I have to send name and avatar inside body
-          likeInfo.name = req.body.name;
-          likeInfo.avatar = req.body.avatar;
-          Dislike.findOne({
-            where: { post_id: req.params.id, user_id: req.user.id }
-          }).then(dislike => {
-            if (dislike) {
-              dislike.destroy();
-            }
-          });
-          Like.createLike(likeInfo).then(() => {
-            Post.getPostByPostId(req.params.id).then(post => res.json(post));
-          });
-        } else {
-          like
-            .destroy()
-            .then(() =>
-              Post.getPostByPostId(req.params.id).then(post => res.json(post))
-            );
-        }
-      })
-      .catch(err => res.json({ msg: "Sorry, we have some err" }));
+    Like.findOne({
+      where: { post_id: req.params.id, user_id: req.user.id }
+    }).then(like => {
+      if (!like) {
+        const likeInfo = {};
+        likeInfo.user_id = req.user.id;
+        likeInfo.post_id = req.params.id;
+        //I have to send name and avatar inside body
+        likeInfo.name = req.body.name;
+        likeInfo.avatar = req.body.avatar;
+        Dislike.findOne({
+          where: { post_id: req.params.id, user_id: req.user.id }
+        }).then(dislike => {
+          if (dislike) {
+            dislike.destroy();
+          }
+        });
+        Like.createLike(likeInfo).then(() => {
+          // Post.getPostScoreByPostId(req.params.id);
+          Post.getPostByPostId(req.params.id).then(post => res.json(post));
+        });
+      } else {
+        like
+          .destroy()
+          .then(() =>
+            Post.getPostByPostId(req.params.id).then(post => res.json(post))
+          );
+      }
+    });
+    // .catch(err => res.json(err));
   }
 );
 
@@ -201,8 +203,6 @@ router.delete(
         } else {
           postId = comment.post_id;
           comment.destroy().then(() => {
-            console.log("postId");
-            console.log(postId);
             Post.getPostByPostId(postId).then(post => res.json(post));
           });
         }

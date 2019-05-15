@@ -45,6 +45,19 @@ class Post extends Sequelize.Model {
       include: include
     });
   }
+
+  static getPostScoreByPostId(postId) {
+    Post.getPostByPostId(postId).then(post => {
+      var postScore = 0;
+      post.likes.forEach(function(like) {
+        postScore += like.like_score;
+      });
+      post.dislikes.forEach(function(dislike) {
+        postScore -= dislike.dislike_score;
+      });
+      return postScore;
+    });
+  }
 }
 Post.init(
   {
