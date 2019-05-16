@@ -1,13 +1,12 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/database");
-
-const User = require("./User");
+const User = require("../classes/User");
 
 class Like extends Sequelize.Model {
   static associate(models) {}
 
-  static createLike(likeInfo) {
-    likeInfo.like_score = calculateLikeScore(likeInfo.user_id);
+  static createLike(likeInfo, userScore) {
+    likeInfo.like_score = 1 + parseInt(userScore) / 10;
     return Like.create(likeInfo);
   }
 }
@@ -22,15 +21,5 @@ Like.init(
   },
   { sequelize, modelName: "Like" }
 );
-
-const calculateLikeScore = function(user_id) {
-  const likeScore = 27.5;
-  const userScore = User.getAllUserInfo(user_id);
-  console.log("userScore");
-  console.log(userScore);
-  //some calculate
-
-  return likeScore;
-};
 
 module.exports = Like;

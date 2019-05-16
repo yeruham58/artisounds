@@ -5,6 +5,7 @@ const passport = require("passport");
 const validatePostInput = require("../../validation/post");
 const validateCommentInput = require("../../validation/comment");
 
+const User = require("../../classes/User");
 const Post = require("../../classes/Post");
 const Like = require("../../classes/Like");
 const Dislike = require("../../classes/Dislike");
@@ -92,34 +93,36 @@ router.post(
     //if already liked
     Like.findOne({
       where: { post_id: req.params.id, user_id: req.user.id }
-    }).then(like => {
-      if (!like) {
-        const likeInfo = {};
-        likeInfo.user_id = req.user.id;
-        likeInfo.post_id = req.params.id;
-        //I have to send name and avatar inside body
-        likeInfo.name = req.body.name;
-        likeInfo.avatar = req.body.avatar;
-        Dislike.findOne({
-          where: { post_id: req.params.id, user_id: req.user.id }
-        }).then(dislike => {
-          if (dislike) {
-            dislike.destroy();
-          }
-        });
-        Like.createLike(likeInfo).then(() => {
-          // Post.getPostScoreByPostId(req.params.id);
-          Post.getPostByPostId(req.params.id).then(post => res.json(post));
-        });
-      } else {
-        like
-          .destroy()
-          .then(() =>
-            Post.getPostByPostId(req.params.id).then(post => res.json(post))
-          );
-      }
-    });
-    // .catch(err => res.json(err));
+    })
+      .then(like => {
+        if (!like) {
+          const likeInfo = {};
+          likeInfo.user_id = req.user.id;
+          likeInfo.post_id = req.params.id;
+          //I have to send name and avatar inside body
+          likeInfo.name = req.body.name;
+          likeInfo.avatar = req.body.avatar;
+          Dislike.findOne({
+            where: { post_id: req.params.id, user_id: req.user.id }
+          }).then(dislike => {
+            if (dislike) {
+              dislike.destroy();
+            }
+          });
+          User.getUserScoreByUserId(likeInfo.user_id).then(userScore => {
+            Like.createLike(likeInfo, userScore).then(() => {
+              Post.getPostByPostId(req.params.id).then(post => res.json(post));
+            });
+          });
+        } else {
+          like
+            .destroy()
+            .then(() =>
+              Post.getPostByPostId(req.params.id).then(post => res.json(post))
+            );
+        }
+      })
+      .catch(err => res.json(err));
   }
 );
 

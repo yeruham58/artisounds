@@ -1,6 +1,8 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/database");
 
+const Promise = require("promise");
+
 const Profile = require("./Profile");
 const UserArtType = require("./UserArtType");
 const UserArtPractic = require("./UserArtPractic");
@@ -68,23 +70,24 @@ class User extends Sequelize.Model {
   }
 
   static getUserScoreByUserId(userId) {
-    console.log("it is a functoin");
-    // Post.getPostsByUserId(userId).then(posts => {
-    //   userScore = 0;
-    //   posts.forEach(function(post) {
-    //     postScore = 0;
-    //     post.likes.forEach(function(like) {
-    //       postScore += like.like_score;
-    //     });
-    //     post.dislikes.forEach(function(dislike) {
-    //       postScore -= dislike.dislike_score;
-    //     });
-    //     if (postScore > 50) {
-    //       userScore += postScore / 10;
-    //     }
-    //   });
-    //   return userScore;
-    // });
+    return new Promise(function(resolve, reject) {
+      Post.getPostsByUserId(userId).then(posts => {
+        var userScore = 0;
+        posts.forEach(function(post) {
+          var postScore = 0;
+          post.likes.forEach(function(like) {
+            postScore += like.like_score;
+          });
+          post.dislikes.forEach(function(dislike) {
+            postScore -= dislike.dislike_score;
+          });
+          if (postScore > 50) {
+            userScore += postScore / 100;
+          }
+        });
+        resolve(userScore);
+      });
+    });
   }
 }
 
