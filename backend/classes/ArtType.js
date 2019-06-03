@@ -6,7 +6,24 @@ const ArtPractic = require("./ArtPractic");
 
 class ArtType extends Sequelize.Model {
   static associate(models) {}
-  // someMethod() {}
+
+  static getAllArtTypes() {
+    return ArtType.findAll({
+      attributes: ["id", "art_type_name"],
+      include: [
+        {
+          model: SubArtType,
+          attributes: ["id", "sub_art_type_name", "art_type_id"],
+          as: "sub_art_types"
+        },
+        {
+          model: ArtPractic,
+          attributes: ["id", "art_practic_name", "art_type_id"],
+          as: "art_practics"
+        }
+      ]
+    });
+  }
 }
 ArtType.init(
   {

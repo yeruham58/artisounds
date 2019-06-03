@@ -4,13 +4,23 @@ const passport = require("passport");
 const validateProfileInput = require("../../validation/profile");
 const userArtsControler = require("../apiFunctions/userArtTypes");
 
+const ArtType = require("../../classes/ArtType");
 const User = require("../../classes/User");
 const Profile = require("../../classes/profile");
 
 //@ route   GET api/profile/test
 //@desc     test profile route
 //@access   public
+
 router.get("/test", (req, res) => res.json({ msg: "profile works" }));
+//@ route   GET api/profile/art-types
+//@desc     Get all art types
+//@access   public
+router.get("/art-types", (req, res) => {
+  ArtType.getAllArtTypes()
+    .then(artTypes => res.status(200).json(artTypes))
+    .catch(err => res.status(404).json(err));
+});
 
 //@ route   GET api/profile/all
 //@desc     get list of all users
