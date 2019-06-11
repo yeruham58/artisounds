@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
-import axios from "axios";
+import { withRouter, Link } from "react-router-dom";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import TextFieldGroup from "../common/TextFieldGroup";
@@ -8,7 +7,8 @@ import TextAreaFieldGroup from "../common/TextAreaFieldGroup";
 import SelectListGroup from "../common/SelectListGroup";
 import InputGroup from "../common/InputGroup";
 import CheckboxListGroup from "../common/CheckboxListGroup";
-import { createProfile } from "../../actions/profileActions";
+import { createProfile, getCurrentProfile } from "../../actions/profileActions";
+import isEmpty from "../../validation/isEmpty";
 
 class CreateProfile extends Component {
   constructor(props) {
@@ -34,16 +34,6 @@ class CreateProfile extends Component {
       errors: {}
     };
 
-    // Get all art types from database
-    axios
-      .get("/api/profile/art-types")
-      .then(artTypes => {
-        this.setState({ allArtTypes: artTypes.data });
-      })
-      .catch(err => {
-        console.log(err);
-      });
-
     this.onChange = this.onChange.bind(this);
     this.artTypesOnChange = this.artTypesOnChange.bind(this);
     this.checkboxOnChange = this.checkboxOnChange.bind(this);
@@ -57,11 +47,85 @@ class CreateProfile extends Component {
     this.onSubmit = this.onSubmit.bind(this);
   }
 
+  componentDidMount() {
+    this.props.getCurrentProfile();
+  }
+
   componentWillReceiveProps(nextProp) {
     if (nextProp.errors) {
       this.setState({
         errors: nextProp.errors
       });
+    }
+    if (nextProp.profile) {
+      if (nextProp.profile.profile) {
+        const profile = nextProp.profile.profile.profile;
+        const profileArts = nextProp.profile.profile.art_types;
+        const allArtTypes = nextProp.profile.profile.allArtTypes;
+
+        const artTypesList = [];
+        const subArtTypesList = [];
+        const artPracticsList = [];
+
+        for (let artType of profileArts) {
+          artTypesList.push(artType.art_type_id);
+          for (let subArtType of artType.sub_art_types.filter(
+            subArtType => subArtType.is_active
+          )) {
+            subArtTypesList.push(subArtType.sub_art_type_details.id);
+          }
+          for (let artPractic of artType.art_practics.filter(
+            artPractic => artPractic.is_active
+          )) {
+            artPracticsList.push(artPractic.art_practic_details.id);
+          }
+        }
+
+        // Make art types & sub arts to string for to use "isEmpty"
+        const artTypesString = artTypesList.toString();
+        const subArtTypesString = subArtTypesList.toString();
+        const artPracticsString = artPracticsList.toString();
+
+        profile.art_types = !isEmpty(artTypesString) ? artTypesList : [];
+        profile.sub_art_types = !isEmpty(subArtTypesString)
+          ? subArtTypesList
+          : [];
+        profile.art_practics = !isEmpty(artPracticsString)
+          ? artPracticsList
+          : [];
+        profile.description = !isEmpty(profile.description)
+          ? profile.description
+          : "";
+        profile.location = !isEmpty(profile.location) ? profile.location : "";
+        profile.social = !isEmpty(profile.social) ? profile.social : {};
+        profile.social.website = !isEmpty(profile.social.website)
+          ? profile.social.website
+          : "";
+        profile.social.youtube = !isEmpty(profile.social.youtube)
+          ? profile.social.youtube
+          : "";
+        profile.social.facebook = !isEmpty(profile.social.facebook)
+          ? profile.social.facebook
+          : "";
+        profile.social.instagram = !isEmpty(profile.social.instagram)
+          ? profile.social.instagram
+          : "";
+        // Set state with profile data
+        this.setState({
+          allArtTypes: allArtTypes,
+          art_types_to_send: profile.art_types,
+          sub_art_types_to_send: profile.sub_art_types,
+          art_practics_to_send: profile.art_practics,
+          location: profile.location,
+          description: profile.description,
+          website: profile.social.website,
+          youtube: profile.social.youtube,
+          facebook: profile.social.facebook,
+          instagram: profile.social.instagram,
+          displayAddedArtTypes: profile.art_types[0],
+          displaySubArtTypes: false
+        });
+      }
     } else {
       this.setState({
         art_types: nextProp,
@@ -379,7 +443,8 @@ class CreateProfile extends Component {
         const fullArtType = allArtTypes.find(
           artType => artType.id === artTypeId
         );
-        if (this.state.art_types.indexOf(artTypeId.toString()) < 0) {
+        // if (this.state.art_types.indexOf(artTypeId.toString()) < 0) {
+        if (this.state.art_types_to_send[0] && this.state.allArtTypes[0]) {
           this.createMarkupListToAddedCechkbox(
             "art_practics",
             artTypeId,
@@ -427,10 +492,10 @@ class CreateProfile extends Component {
         <div className="container">
           <div className="row">
             <div className="col-md-8 m-auto">
-              <h1 className="display-4 text-center">Create Your Profile</h1>
-              <p className="lead text-center">
-                Let's get some information to make your profile stand out
-              </p>
+              <Link to="/dashboard" className="btn btn-light">
+                Go Back
+              </Link>
+              <h1 className="display-4 text-center">Edit Profile</h1>
               <small className="d-block pb-3">* = required field</small>
               {addedArtTypes}
               <form onSubmit={this.onSubmit}>
@@ -491,6 +556,7 @@ class CreateProfile extends Component {
 
 CreateProfile.propTypes = {
   createProfile: PropTypes.func.isRequired,
+  getCurrentProfile: PropTypes.func.isRequired,
   profile: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
 };
@@ -502,5 +568,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { createProfile }
+  { createProfile, getCurrentProfile }
 )(withRouter(CreateProfile));

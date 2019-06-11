@@ -16,6 +16,9 @@ import Register from "./components/auth/Register";
 import Login from "./components/auth/Login";
 import Dashboard from "./components/dashboard/Dashboard";
 import CreateProfile from "./components/create-profile/CreateProfile";
+import EditProfile from "./components/edit-profile/EditProfile";
+import Profiles from "./components/profiles/Profiles";
+import Profile from "./components/profile/Profile";
 
 import "./App.css";
 
@@ -28,12 +31,14 @@ if (localStorage.jwtToken) {
   // Set current user
   store.dispatch(setCurrentUser(decoded));
   // Chace for expired token
-  const currentTime = Date.now / 1000;
+  const currentTime = Date.now() / 1000;
+
   if (decoded.exp < currentTime) {
+    console.log("is expierd");
     // Logout user
-    store.dispatch(logoutUser);
+    store.dispatch(logoutUser());
     // Clear current profile
-    store.dispatch(clearCurrentProfile);
+    store.dispatch(clearCurrentProfile());
     // redirect to login
     window.location.href = "/login";
   }
@@ -49,6 +54,8 @@ function App() {
           <div className="container">
             <Route exact path="/register" component={Register} />
             <Route exact path="/login" component={Login} />
+            <Route exact path="/profiles" component={Profiles} />
+            <Route exact path="/profile/:id" component={Profile} />
             <Switch>
               <PrivateRoute exact path="/dashboard" component={Dashboard} />
             </Switch>
@@ -57,6 +64,13 @@ function App() {
                 exact
                 path="/create-profile"
                 component={CreateProfile}
+              />
+            </Switch>
+            <Switch>
+              <PrivateRoute
+                exact
+                path="/edit-profile"
+                component={EditProfile}
               />
             </Switch>
           </div>

@@ -91,22 +91,16 @@ router.post(
     profileFields.location = req.body.location ? req.body.location : null;
 
     //Should be a list
-    const artTypeList = req.body.art_types ? req.body.art_types.split(",") : [];
-    convertStrListToIntList(artTypeList);
+    const artTypeList = req.body.art_types ? req.body.art_types : [];
 
     Profile.createAndUpdateUserArtTypes(artTypeList, req.user.id);
 
     //Should be a list
-    const subArtTypeList = req.body.sub_art_types
-      ? req.body.sub_art_types.split(",")
-      : [];
-    convertStrListToIntList(subArtTypeList);
+    const subArtTypeList = req.body.sub_art_types ? req.body.sub_art_types : [];
     Profile.updateUserSubArtTypes(subArtTypeList, req.user.id);
 
     //Should be a list
-    const artPracticList = req.body.art_practics
-      ? req.body.art_practics.split(",")
-      : [];
+    const artPracticList = req.body.art_practics ? req.body.art_practics : [];
     Profile.updateUserPractics(artPracticList, req.user.id);
 
     profileFields.description = req.body.description
@@ -121,7 +115,7 @@ router.post(
     if (req.body.linkedin) profileFields.social.linkedin = req.body.linkedin;
 
     Profile.findOne({
-      where: { id: req.user.id }
+      where: { user_id: req.user.id }
     }).then(profile => {
       if (profile) {
         //update
@@ -141,11 +135,5 @@ router.post(
     });
   }
 );
-
-const convertStrListToIntList = function(strList) {
-  strList.forEach(function(strNum) {
-    strList[strList.indexOf(strNum)] = parseInt(strNum);
-  });
-};
 
 module.exports = router;

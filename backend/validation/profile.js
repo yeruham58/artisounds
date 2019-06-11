@@ -5,11 +5,11 @@ const isEmpty = require("./is-empty");
 module.exports = function validateProfileInput(data) {
   let errors = {};
 
-  data.art_types = !isEmpty(data.art_types) ? data.art_types : "";
-  // if (Validator.isEmpty(data.art_types)) {
-  //   errors.art_types =
-  //     "To create an artist profile you should submit at list one type of art";
-  // }
+  data.art_types = !isEmpty(data.art_types.toString()) ? data.art_types : "";
+  if (Validator.isEmpty(data.art_types.toString())) {
+    errors.art_types =
+      "To create an artist profile you should submit at list one type of art";
+  }
   if (!isEmpty(data.website)) {
     if (!Validator.isURL(data.website)) {
       errors.website = "Not a valid URL";

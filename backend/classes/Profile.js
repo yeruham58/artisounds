@@ -55,7 +55,6 @@ class Profile extends Sequelize.Model {
 
   // Same logic as "updateUserSubArtTypes" function
   static updateUserPractics(userPracticsList, userId) {
-    if (userPracticsList[0]) convertListItemsToInt(userPracticsList);
     UserArtPractic.findAll({
       where: { user_id: userId, is_active: true }
     }).then(userArtPractics => {
@@ -68,12 +67,6 @@ class Profile extends Sequelize.Model {
         });
       }
       if (userPracticsList[0]) addNewArtPractics(userPracticsList, userId);
-    });
-  }
-
-  static convertListItemsToInt(list) {
-    list.forEach(function(strNum) {
-      list[list.indexOf(strNum)] = parseInt(strNum);
     });
   }
 }
