@@ -19,6 +19,7 @@ import CreateProfile from "./components/create-profile/CreateProfile";
 import EditProfile from "./components/edit-profile/EditProfile";
 import Profiles from "./components/profiles/Profiles";
 import Profile from "./components/profile/Profile";
+import Posts from "./components/posts/Posts";
 
 import "./App.css";
 
@@ -34,7 +35,6 @@ if (localStorage.jwtToken) {
   const currentTime = Date.now() / 1000;
 
   if (decoded.exp < currentTime) {
-    console.log("is expierd");
     // Logout user
     store.dispatch(logoutUser());
     // Clear current profile
@@ -56,6 +56,7 @@ function App() {
             <Route exact path="/login" component={Login} />
             <Route exact path="/profiles" component={Profiles} />
             <Route exact path="/profile/:id" component={Profile} />
+            <Route exact path="/feed" component={Posts} />
             <Switch>
               <PrivateRoute exact path="/dashboard" component={Dashboard} />
             </Switch>
