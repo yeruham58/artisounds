@@ -57,7 +57,11 @@ router.post(
     if (req.body.link) newPost.link = req.body.link;
     Post.create(newPost)
       .then(post => res.json(post))
-      .catch(err => res.json(err));
+      .catch(err => {
+        errors.text_contant_or_link =
+          "We codn't upload this post, please try again";
+        return res.status(400).json(errors);
+      });
   }
 );
 
