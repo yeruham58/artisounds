@@ -105,20 +105,27 @@ class CreateProfile extends Component {
 
   onSubmit(e) {
     e.preventDefault();
+    if (
+      this.state.art_types === "0" ||
+      this.state.art_types === "" ||
+      window.confirm(
+        "Are you sure you dont want to add the art types you have marked? if you want to add it,  - press the button 'add' before you submit, press 'ok' to submit, and 'cancle' to add your art types"
+      )
+    ) {
+      const profileData = {
+        art_types: this.state.art_types_to_send,
+        sub_art_types: this.state.sub_art_types_to_send,
+        art_practics: this.state.art_practics_to_send,
+        location: this.state.location,
+        description: this.state.description,
+        website: this.state.website,
+        youtube: this.state.youtube,
+        facebook: this.state.facebook,
+        instagram: this.state.instagram
+      };
 
-    const profileData = {
-      art_types: this.state.art_types_to_send,
-      sub_art_types: this.state.sub_art_types_to_send,
-      art_practics: this.state.art_practics_to_send,
-      location: this.state.location,
-      description: this.state.description,
-      website: this.state.website,
-      youtube: this.state.youtube,
-      facebook: this.state.facebook,
-      instagram: this.state.instagram
-    };
-
-    this.props.createProfile(profileData, this.props.history);
+      this.props.createProfile(profileData, this.props.history);
+    }
   }
 
   addArtTypesToSend() {

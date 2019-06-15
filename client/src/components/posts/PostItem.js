@@ -13,8 +13,14 @@ class PostItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      likeNum: this.props.post.likes.length,
-      dislikeNum: this.props.post.dislikes.length,
+      likeUserInfo: {
+        name: this.props.auth.user.name,
+        avatar: this.props.auth.user.avatar
+      },
+      likeNum: this.props.post.likes ? this.props.post.likes.length : 0,
+      dislikeNum: this.props.post.dislikes
+        ? this.props.post.dislikes.length
+        : 0,
       like: this.findUserLikeOrDisilke(this.props.post.likes),
       dislike: this.findUserLikeOrDisilke(this.props.post.dislikes)
     };
@@ -25,11 +31,15 @@ class PostItem extends Component {
   }
 
   onLikeClick(postId) {
-    this.props.addAndRemoveLike(postId);
+    this.props.addAndRemoveLike(postId, this.state.likeUserInfo);
     const likeNum = !this.state.like
       ? this.state.likeNum + 1
       : this.state.likeNum - 1;
+    const dislikeNum = !this.state.dislike
+      ? this.state.dislikeNum
+      : this.state.dislikeNum - 1;
     this.setState({
+      dislikeNum: dislikeNum,
       likeNum: likeNum,
       like: !this.state.like,
       dislike: false
@@ -40,8 +50,12 @@ class PostItem extends Component {
     const dislikeNum = !this.state.dislike
       ? this.state.dislikeNum + 1
       : this.state.dislikeNum - 1;
-    this.props.addAndRemoveDislike(postId);
+    const likeNum = !this.state.like
+      ? this.state.likeNum
+      : this.state.likeNum - 1;
+    this.props.addAndRemoveDislike(postId, this.state.likeUserInfo);
     this.setState({
+      likeNum: likeNum,
       dislikeNum: dislikeNum,
       dislike: !this.state.dislike,
       like: false
@@ -50,85 +64,97 @@ class PostItem extends Component {
 
   findUserLikeOrDisilke(likesOrDislikes) {
     const { auth } = this.props;
-    return likesOrDislikes.filter(
-      likeOrDislike => likeOrDislike.user_id === auth.user.id
-    )[0];
+    return likesOrDislikes
+      ? likesOrDislikes.filter(
+          likeOrDislike => likeOrDislike.user_id === auth.user.id
+        )[0]
+      : false;
   }
 
   render() {
-    const { auth, post } = this.props;
+    const { auth, post, showActions } = this.props;
 
     return (
       <div className="card card-body mb-3">
         <div className="row">
           <div className="col-md-2">
-            <a href="profile.html">
+            <Link to={`/profile/${post.user_id}`}>
               <img
                 className="rounded-circle d-none d-md-block"
                 src={post.avatar}
                 alt=""
               />
-            </a>
-            <br />
-            <p className="text-center">
-              <strong>{post.name}</strong>
-            </p>
+            </Link>
           </div>
           <div className="col-md-10">
-            <p className="lead">{post.text_contant}</p>
-            <button
-              onClick={this.onLikeClick.bind(this, post.id)}
-              type="button"
-              className="btn btn-light mr-1"
-            >
-              <i
-                className={classnames(
-                  "fas fa-thumbs-up",
-                  {
-                    "text-info": this.state.like
-                  },
-                  {
-                    "text-secondary": !this.state.like
-                  }
-                )}
-              />
-              {post.likes ? (
-                <span className="badge badge-light">{this.state.likeNum}</span>
-              ) : null}
-            </button>
-            <button
-              onClick={this.onDislikeClick.bind(this, post.id)}
-              type="button"
-              className="btn btn-light mr-1"
-            >
-              <i
-                className={classnames(
-                  "fas fa-thumbs-down",
-                  {
-                    "text-danger": this.state.dislike
-                  },
-                  {
-                    "text-secondary": !this.state.dislike
-                  }
-                )}
-              />
-              {post.dislikes ? (
-                <span className="badge badge-light">
-                  {this.state.dislikeNum}
-                </span>
-              ) : null}
-            </button>
-            <Link to={`/post/${post.id}`} className="btn btn-info mr-1">
-              Comments
+            <Link to={`/profile/${post.user_id}`}>
+              <p className="text-dark">
+                <strong>{post.name}</strong>
+              </p>
             </Link>
-            {post.user_id === auth.user.id ? (
-              <button
-                onClick={this.onDeleteClick.bind(this, post.id)}
-                type="button"
-                className="btn btn-danger mr-1"
-              >
-                <i className="fas fa-times" />
-              </button>
+            <br />
+
+            <p className="lead">{post.text_contant}</p>
+            {showActions ? (
+              <span>
+                <button
+                  onClick={this.onLikeClick.bind(this, post.id)}
+                  type="button"
+                  className="btn btn-light mr-1"
+                >
+                  <i
+                    className={classnames(
+                      "fas fa-thumbs-up",
+                      {
+                        "text-info": this.state.like
+                      },
+                      {
+                        "text-secondary": !this.state.like
+                      }
+                    )}
+                  />
+                  {post.likes ? (
+                    <span className="badge badge-light">
+                      {this.state.likeNum}
+                    </span>
+                  ) : null}
+                </button>
+                <button
+                  onClick={this.onDislikeClick.bind(this, post.id)}
+                  type="button"
+                  className="btn btn-light mr-1"
+                >
+                  <i
+                    className={classnames(
+                      "fas fa-thumbs-down",
+                      {
+                        "text-danger": this.state.dislike
+                      },
+                      {
+                        "text-secondary": !this.state.dislike
+                      }
+                    )}
+                  />
+                  {post.dislikes ? (
+                    <span className="badge badge-light">
+                      {this.state.dislikeNum}
+                    </span>
+                  ) : null}
+                </button>
+                <Link to={`/post/${post.id}`} className="btn btn-info mr-1">
+                  Comments
+                </Link>
+                {post.user_id === auth.user.id ? (
+                  <button
+                    onClick={this.onDeleteClick.bind(this, post.id)}
+                    type="button"
+                    className="btn btn-light mr-1"
+                  >
+                    {/* <i className="fas fa-times" /> */}
+                    <i className="far fa-trash-alt" />
+                  </button>
+                ) : null}
+              </span>
             ) : null}
           </div>
         </div>
@@ -136,6 +162,10 @@ class PostItem extends Component {
     );
   }
 }
+
+PostItem.defaultProps = {
+  showActions: true
+};
 
 PostItem.propTypes = {
   deletePost: PropTypes.func.isRequired,

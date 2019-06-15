@@ -20,7 +20,7 @@ class Navbar extends Component {
       <ul className="navbar-nav ml-auto">
         <li className="nav-item">
           <Link className="nav-link" to="/feed">
-            Post feed
+            Home
           </Link>
         </li>
         <li className="nav-item">
@@ -29,13 +29,15 @@ class Navbar extends Component {
           </Link>
         </li>
         <li className="nav-item">
-          <img
-            className="rounded-circle"
-            src={user.avatar}
-            alt={user.name}
-            style={{ width: "25px", marginRight: "5px", marginTop: "7px" }}
-            title="you must have a Gravatar connected to your email to display an image"
-          />
+          <Link to={`/profile/${user.id}`}>
+            <img
+              className="rounded-circle ml-2"
+              src={user.avatar}
+              alt={user.name}
+              style={{ width: "25px", marginRight: "5px", marginTop: "7px" }}
+              title="you must have a Gravatar connected to your email to display an image"
+            />
+          </Link>
         </li>
         <li className="nav-item">
           <a
@@ -64,10 +66,12 @@ class Navbar extends Component {
       </ul>
     );
 
+    const logoDir = isAuthenticated ? "/feed" : "/";
+
     return (
       <nav className="navbar navbar-expand-sm navbar-dark bg-dark mb-4">
         <div className="container">
-          <Link className="navbar-brand" to="/">
+          <Link className="navbar-brand" to={logoDir}>
             ArtiSounds
           </Link>
           <button

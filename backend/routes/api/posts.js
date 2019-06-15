@@ -80,6 +80,16 @@ router.delete(
             .status(401)
             .json({ msg: "This post is not belong to you!" });
         } else {
+          Like.findAll({
+            where: { post_id: post.id, user_id: req.user.id }
+          }).then(likes => {
+            likes.map(like => like.destroy());
+          });
+          Dislike.findAll({
+            where: { post_id: post.id, user_id: req.user.id }
+          }).then(dislikes => {
+            dislikes.map(dislike => dislike.destroy());
+          });
           post.destroy().then(() => res.json({ succuss: true }));
         }
       })
@@ -103,7 +113,6 @@ router.post(
           const likeInfo = {};
           likeInfo.user_id = req.user.id;
           likeInfo.post_id = req.params.id;
-          //I have to send name and avatar inside body
           likeInfo.name = req.body.name;
           likeInfo.avatar = req.body.avatar;
           Dislike.findOne({
@@ -144,7 +153,6 @@ router.post(
           const dislikeInfo = {};
           dislikeInfo.user_id = req.user.id;
           dislikeInfo.post_id = req.params.id;
-          //I have to send name and avatar inside body
           dislikeInfo.name = req.body.name;
           dislikeInfo.avatar = req.body.avatar;
           Like.findOne({

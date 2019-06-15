@@ -21,12 +21,14 @@ class ProfileAbout extends Component {
               <div className="mb-2">
                 <strong>My art practics are:</strong>
               </div>
-              {artType.art_practics.map((artPractic, index) => (
-                <span key={index} className="p-3">
-                  <i className="fas fa-music" />
-                  {" " + artPractic.art_practic_details.art_practic_name}
-                </span>
-              ))}
+              {artType.art_practics
+                .filter(artPractic => artPractic.is_active)
+                .map((artPractic, index) => (
+                  <span key={index} className="p-3">
+                    <i className="fas fa-music" />
+                    {" " + artPractic.art_practic_details.art_practic_name}
+                  </span>
+                ))}
             </div>
           ) : null}
         </div>
@@ -36,12 +38,14 @@ class ProfileAbout extends Component {
               <div className="mb-2 mt-1">
                 <strong>My sub art types are:</strong>
               </div>
-              {artType.sub_art_types.map((subArt, index) => (
-                <span key={index} className="p-3">
-                  <i className="fas fa-music" />
-                  {" " + subArt.sub_art_type_details.sub_art_type_name}
-                </span>
-              ))}
+              {artType.sub_art_types
+                .filter(subArt => subArt.is_active)
+                .map((subArt, index) => (
+                  <span key={index} className="p-3">
+                    <i className="fas fa-music" />
+                    {" " + subArt.sub_art_type_details.sub_art_type_name}
+                  </span>
+                ))}
             </div>
           ) : null}
         </div>

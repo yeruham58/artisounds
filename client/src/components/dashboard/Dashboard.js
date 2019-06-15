@@ -31,17 +31,16 @@ class Dashboard extends Component {
             <p className="lead text-muted">
               Wellcome
               <Link to={`/profile/${profile.id}`}> {user.name}</Link>
-              {/* <Link to="/profile"> {user.name}</Link> */}
             </p>
             <ProfileActions />
             <div style={{ marginTop: "60px" }}>
               {/* this button is not gonna work becouse there is no api iet for delete account */}
-              <button
+              {/* <button
                 onClick={this.onDeleteClick.bind(this)}
                 className="btn btn-danger"
               >
                 Delete my account
-              </button>
+              </button> */}
             </div>
           </div>
         );
