@@ -7,7 +7,11 @@ import TextAreaFieldGroup from "../common/TextAreaFieldGroup";
 import SelectListGroup from "../common/SelectListGroup";
 import InputGroup from "../common/InputGroup";
 import CheckboxListGroup from "../common/CheckboxListGroup";
-import { createProfile, getCurrentProfile } from "../../actions/profileActions";
+import {
+  createProfile,
+  getCurrentProfile,
+  clearErrors
+} from "../../actions/profileActions";
 import isEmpty from "../../validation/isEmpty";
 
 class CreateProfile extends Component {
@@ -58,7 +62,7 @@ class CreateProfile extends Component {
       });
     }
     if (nextProp.profile) {
-      if (nextProp.profile.profile) {
+      if (nextProp.profile.profile && !Object.keys(nextProp.errors)[0]) {
         const profile = nextProp.profile.profile.profile;
         const profileArts = nextProp.profile.profile.art_types;
         const allArtTypes = nextProp.profile.profile.allArtTypes;
@@ -135,6 +139,10 @@ class CreateProfile extends Component {
   }
 
   onChange(e) {
+    const { errors } = this.state;
+    if (errors[e.target.name] && errors[e.target.name] !== "") {
+      this.props.clearErrors(e.target.name);
+    }
     this.setState({ [e.target.name]: e.target.value });
   }
 
@@ -145,11 +153,15 @@ class CreateProfile extends Component {
         art_types: ""
       },
       [e.target.name]: e.target.value,
+      sub_art_types: [],
+      art_practics: [],
       displaySubArtTypes: e.target.value !== "0"
     });
   }
 
   checkboxOnChange(e) {
+    this.props.clearErrors(e.target.name);
+    this.props.clearErrors("art_types");
     if (e.target.checked) {
       this.setState({
         [e.target.name]: [
@@ -171,6 +183,7 @@ class CreateProfile extends Component {
     e.preventDefault();
     if (
       this.state.art_types === "0" ||
+      this.state.art_types === "" ||
       window.confirm(
         "Are you sure you dont want to add the art types you have marked? if you want to add it,  - press the button 'add' before you submit, press 'ok' to submit, and 'cancle' to add your art types"
       )
@@ -215,10 +228,6 @@ class CreateProfile extends Component {
       );
 
       this.setState({
-        errors: {
-          ...this.state.errors,
-          art_practics: ""
-        },
         art_types_to_send: art_types_to_send,
         sub_art_types_to_send: sub_art_types_to_send,
         art_practics_to_send: art_practics_to_send,
@@ -561,6 +570,7 @@ class CreateProfile extends Component {
 }
 
 CreateProfile.propTypes = {
+  clearErrors: PropTypes.func.isRequired,
   createProfile: PropTypes.func.isRequired,
   getCurrentProfile: PropTypes.func.isRequired,
   profile: PropTypes.object.isRequired,
@@ -574,5 +584,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { createProfile, getCurrentProfile }
+  { createProfile, getCurrentProfile, clearErrors }
 )(withRouter(CreateProfile));

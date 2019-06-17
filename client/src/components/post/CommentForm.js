@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import TextAreaFieldGroup from "../common/TextAreaFieldGroup";
-import { addComment } from "../../actions/postActions";
+import { addComment, clearErrors } from "../../actions/postActions";
 
 class CommentForm extends Component {
   constructor(props) {
@@ -23,6 +23,9 @@ class CommentForm extends Component {
   }
 
   onChange(e) {
+    if (this.state.errors["comment_contant"]) {
+      this.props.clearErrors("comment_contant");
+    }
     this.setState({
       [e.target.name]: e.target.value
     });
@@ -40,7 +43,7 @@ class CommentForm extends Component {
     };
 
     this.props.addComment(postId, newComment);
-    this.setState({ text: "", errors: {} });
+    this.setState({ text: "" });
   }
 
   render() {
@@ -73,6 +76,7 @@ class CommentForm extends Component {
 
 CommentForm.propTypes = {
   addComment: PropTypes.func.isRequired,
+  clearErrors: PropTypes.func.isRequired,
   postId: PropTypes.number.isRequired,
   auth: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
@@ -85,5 +89,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { addComment }
+  { addComment, clearErrors }
 )(CommentForm);

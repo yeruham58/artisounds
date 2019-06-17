@@ -21,20 +21,24 @@ class Profile extends Component {
     if (profile === null || loading) {
       profileContent = <Spinner />;
     } else {
-      profileContent = (
-        <div>
-          <div className="row">
-            <div className="col-md-6">
-              <Link to="/profiles" className="btn btn-light mb-3 float-left">
-                Back to profiles
-              </Link>
+      if (profile.profile === null) {
+        profileContent = <p>{profile.name} dont have an artist profile yet</p>;
+      } else {
+        profileContent = (
+          <div>
+            <div className="row">
+              <div className="col-md-6">
+                <Link to="/profiles" className="btn btn-light mb-3 float-left">
+                  Back to profiles
+                </Link>
+              </div>
+              <div className="col-md-6" />
             </div>
-            <div className="col-md-6" />
+            <ProfileHeader profile={profile} />
+            <ProfileAbout profile={profile} />
           </div>
-          <ProfileHeader profile={profile} />
-          <ProfileAbout profile={profile} />
-        </div>
-      );
+        );
+      }
     }
     return (
       <div className="profile">

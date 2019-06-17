@@ -29,7 +29,7 @@ class Navbar extends Component {
           </Link>
         </li>
         <li className="nav-item">
-          <Link to={`/profile/${user.id}`}>
+          <a href={`/profile/${user.id}`}>
             <img
               className="rounded-circle ml-2"
               src={user.avatar}
@@ -37,7 +37,7 @@ class Navbar extends Component {
               style={{ width: "25px", marginRight: "5px", marginTop: "7px" }}
               title="you must have a Gravatar connected to your email to display an image"
             />
-          </Link>
+          </a>
         </li>
         <li className="nav-item">
           <a

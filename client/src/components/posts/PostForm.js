@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import TextAreaFieldGroup from "../common/TextAreaFieldGroup";
-import { addPost } from "../../actions/postActions";
+import { addPost, clearErrors } from "../../actions/postActions";
 
 class PostForm extends Component {
   constructor(props) {
@@ -23,6 +23,9 @@ class PostForm extends Component {
   }
 
   onChange(e) {
+    if (this.state["text_contant_or_link"]) {
+      this.props.clearErrors("text_contant_or_link");
+    }
     this.setState({
       [e.target.name]: e.target.value
     });
@@ -42,7 +45,7 @@ class PostForm extends Component {
     };
 
     this.props.addPost(newPost);
-    this.setState({ text: "", errors: {} });
+    this.setState({ text: "" });
   }
 
   render() {
@@ -75,6 +78,7 @@ class PostForm extends Component {
 
 PostForm.propTypes = {
   addPost: PropTypes.func.isRequired,
+  clearErrors: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
 };
@@ -86,5 +90,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { addPost }
+  { addPost, clearErrors }
 )(PostForm);

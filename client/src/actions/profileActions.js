@@ -5,6 +5,7 @@ import {
   PROFILE_LOADING,
   CLEAR_CURRENT_PROFILE,
   GET_ERRORS,
+  CLEAR_ERRORS,
   SET_CURRENT_USER,
   GET_PROFILES
 } from "./types";
@@ -97,5 +98,13 @@ export const setProfileLoading = () => {
 export const clearCurrentProfile = () => {
   return {
     type: CLEAR_CURRENT_PROFILE
+  };
+};
+
+//Clear errors
+export const clearErrors = errToClear => {
+  return {
+    type: CLEAR_ERRORS,
+    payload: errToClear
   };
 };

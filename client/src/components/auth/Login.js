@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
-import { loginUser } from "../../actions/authActions";
+import { loginUser, clearErrors } from "../../actions/authActions";
 import TextFieldGroup from "../common/TextFieldGroup";
 
 class Login extends Component {
@@ -34,6 +34,10 @@ class Login extends Component {
   }
 
   onChange(e) {
+    const { errors } = this.state;
+    if (errors[e.target.name] && errors[e.target.name] !== "") {
+      this.props.clearErrors(e.target.name);
+    }
     this.setState({ [e.target.name]: e.target.value });
   }
 
@@ -60,7 +64,7 @@ class Login extends Component {
               <p className="lead text-center">
                 Sign in to your ArtiSounds account
               </p>
-              <form onSubmit={this.onSubmit}>
+              <form noValidate onSubmit={this.onSubmit}>
                 <TextFieldGroup
                   type="email"
                   placeholder="Email Address"
@@ -89,6 +93,7 @@ class Login extends Component {
 }
 
 Login.propTypes = {
+  clearErrors: PropTypes.func.isRequired,
   loginUser: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
@@ -101,5 +106,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { loginUser }
+  { loginUser, clearErrors }
 )(Login);

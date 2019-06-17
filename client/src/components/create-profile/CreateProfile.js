@@ -8,7 +8,7 @@ import TextAreaFieldGroup from "../common/TextAreaFieldGroup";
 import SelectListGroup from "../common/SelectListGroup";
 import InputGroup from "../common/InputGroup";
 import CheckboxListGroup from "../common/CheckboxListGroup";
-import { createProfile } from "../../actions/profileActions";
+import { createProfile, clearErrors } from "../../actions/profileActions";
 
 class CreateProfile extends Component {
   constructor(props) {
@@ -71,6 +71,10 @@ class CreateProfile extends Component {
   }
 
   onChange(e) {
+    const { errors } = this.state;
+    if (errors[e.target.name] && errors[e.target.name] !== "") {
+      this.props.clearErrors(e.target.name);
+    }
     this.setState({ [e.target.name]: e.target.value });
   }
 
@@ -81,11 +85,15 @@ class CreateProfile extends Component {
         art_types: ""
       },
       [e.target.name]: e.target.value,
+      sub_art_types: [],
+      art_practics: [],
       displaySubArtTypes: e.target.value !== "0"
     });
   }
 
   checkboxOnChange(e) {
+    this.props.clearErrors(e.target.name);
+    this.props.clearErrors("art_types");
     if (e.target.checked) {
       this.setState({
         [e.target.name]: [
@@ -498,6 +506,7 @@ class CreateProfile extends Component {
 
 CreateProfile.propTypes = {
   createProfile: PropTypes.func.isRequired,
+  clearErrors: PropTypes.func.isRequired,
   profile: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
 };
@@ -509,5 +518,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { createProfile }
+  { createProfile, clearErrors }
 )(withRouter(CreateProfile));
