@@ -16,15 +16,18 @@ export const getCurrentProfile = () => dispatch => {
   axios
     .get("/api/profile/art-types")
     .then(artTypes => {
-      axios
-        .get("/api/profile")
-        .then(res => {
-          res.data.allArtTypes = artTypes.data;
-          dispatch({ type: GET_PROFILE, payload: res.data });
-        })
-        .catch(err => {
-          dispatch({ type: GET_PROFILE, payload: {} });
-        });
+      axios.get("/api/profile/music-genres").then(musicGenres => {
+        axios
+          .get("/api/profile")
+          .then(res => {
+            res.data.allArtTypes = artTypes.data;
+            res.data.musicGenres = musicGenres.data;
+            dispatch({ type: GET_PROFILE, payload: res.data });
+          })
+          .catch(err => {
+            dispatch({ type: GET_PROFILE, payload: {} });
+          });
+      });
     })
     .catch(err => console.log(err));
 };

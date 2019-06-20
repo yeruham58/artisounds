@@ -23,7 +23,7 @@ class PostForm extends Component {
   }
 
   onChange(e) {
-    if (this.state["text_contant_or_link"]) {
+    if (this.state.errors.text_contant_or_link) {
       this.props.clearErrors("text_contant_or_link");
     }
     this.setState({

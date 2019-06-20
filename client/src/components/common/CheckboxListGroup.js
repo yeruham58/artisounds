@@ -11,7 +11,7 @@ const CheckboxListGroup = ({
   lable
 }) => {
   const selectOptions = options.map((option, i) => (
-    <div className="form-check form-check-inline" key={i}>
+    <div className="form-check form-check-inline mb-3" key={i}>
       <input
         className="form-check-input"
         type="checkbox"

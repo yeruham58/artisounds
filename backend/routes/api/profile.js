@@ -2,23 +2,34 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const validateProfileInput = require("../../validation/profile");
-const userArtsControler = require("../apiFunctions/userArtTypes");
+// const userArtsControler = require("../apiFunctions/userArtTypes");
 
 const ArtType = require("../../classes/ArtType");
+const MusicGenre = require("../../classes/MusicGenre");
+const UserMusicGenre = require("../../classes/UserMusicGenre");
 const User = require("../../classes/User");
 const Profile = require("../../classes/profile");
 
 //@ route   GET api/profile/test
 //@desc     test profile route
 //@access   public
-
 router.get("/test", (req, res) => res.json({ msg: "profile works" }));
+
 //@ route   GET api/profile/art-types
 //@desc     Get all art types
 //@access   public
 router.get("/art-types", (req, res) => {
   ArtType.getAllArtTypes()
     .then(artTypes => res.status(200).json(artTypes))
+    .catch(err => res.status(404).json(err));
+});
+
+//@ route   GET api/profile/music-genres
+//@desc     Get all music-genres
+//@access   public
+router.get("/music-genres", (req, res) => {
+  MusicGenre.getAllMusicGenres()
+    .then(musicGenres => res.status(200).json(musicGenres))
     .catch(err => res.status(404).json(err));
 });
 
@@ -91,13 +102,16 @@ router.post(
     profileFields.location = req.body.location ? req.body.location : null;
 
     //Should be a list
+    const musicGenresList = req.body.music_genres ? req.body.music_genres : [];
+    UserMusicGenre.createAndUpdateUserMusicGenres(musicGenresList, req.user.id);
+
     const artTypeList = req.body.art_types ? req.body.art_types : [];
 
     Profile.createAndUpdateUserArtTypes(artTypeList, req.user.id);
 
     //Should be a list
-    const subArtTypeList = req.body.sub_art_types ? req.body.sub_art_types : [];
-    Profile.updateUserSubArtTypes(subArtTypeList, req.user.id);
+    // const subArtTypeList = req.body.sub_art_types ? req.body.sub_art_types : [];
+    // Profile.updateUserSubArtTypes(subArtTypeList, req.user.id);
 
     //Should be a list
     const artPracticList = req.body.art_practics ? req.body.art_practics : [];

@@ -17,11 +17,6 @@ UserArtType.init(
   { sequelize, modelName: "UserArtType" }
 );
 
-// UserArtType.hasMany(UserSubArtType, {
-//   foreignKey: "user_art_type_id",
-//   as: "sub_art_types"
-// });
-
 UserArtType.belongsTo(ArtType, {
   foreignKey: "art_type_id",
   as: "art_type_details"

@@ -15,15 +15,15 @@ class CreateProfile extends Component {
     super(props);
     this.state = {
       displaySocialInputs: false,
-      displaySubArtTypes: false,
+      displayArtPractics: false,
       displayAddedArtTypes: false,
       allArtTypes: [],
+      musicGenres: [],
       art_types: "",
-      sub_art_types: [],
       art_practics: [],
       art_types_to_send: [],
-      sub_art_types_to_send: [],
       art_practics_to_send: [],
+      music_genres_to_send: [],
       location: "",
       description: "",
       website: "",
@@ -39,6 +39,16 @@ class CreateProfile extends Component {
       .get("/api/profile/art-types")
       .then(artTypes => {
         this.setState({ allArtTypes: artTypes.data });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+
+    // Get all art types from database
+    axios
+      .get("/api/profile/music-genres")
+      .then(musicGenres => {
+        this.setState({ musicGenres: musicGenres.data });
       })
       .catch(err => {
         console.log(err);
@@ -65,7 +75,7 @@ class CreateProfile extends Component {
     } else {
       this.setState({
         art_types: nextProp,
-        displaySubArtTypes: true
+        displayArtPractics: true
       });
     }
   }
@@ -85,9 +95,8 @@ class CreateProfile extends Component {
         art_types: ""
       },
       [e.target.name]: e.target.value,
-      sub_art_types: [],
       art_practics: [],
-      displaySubArtTypes: e.target.value !== "0"
+      displayArtPractics: e.target.value !== "0"
     });
   }
 
@@ -122,8 +131,8 @@ class CreateProfile extends Component {
     ) {
       const profileData = {
         art_types: this.state.art_types_to_send,
-        sub_art_types: this.state.sub_art_types_to_send,
         art_practics: this.state.art_practics_to_send,
+        music_genres: this.state.music_genres_to_send,
         location: this.state.location,
         description: this.state.description,
         website: this.state.website,
@@ -152,9 +161,6 @@ class CreateProfile extends Component {
         parseInt(this.state.art_types)
       ];
 
-      const sub_art_types_to_send = this.state.sub_art_types_to_send.concat(
-        this.state.sub_art_types
-      );
       const art_practics_to_send = this.state.art_practics_to_send.concat(
         this.state.art_practics
       );
@@ -165,7 +171,6 @@ class CreateProfile extends Component {
           art_practics: ""
         },
         art_types_to_send: art_types_to_send,
-        sub_art_types_to_send: sub_art_types_to_send,
         art_practics_to_send: art_practics_to_send,
         displayAddedArtTypes: true
       });
@@ -176,9 +181,8 @@ class CreateProfile extends Component {
   restartArtTypes() {
     this.setState({
       art_types: "0",
-      sub_art_types: [],
       art_practics: [],
-      displaySubArtTypes: false
+      displayArtPractics: false
     });
   }
 
@@ -205,6 +209,7 @@ class CreateProfile extends Component {
     const objList = fullArtType[listType].filter(
       details => this.state[listType + "_to_send"].indexOf(details.id) > -1
     );
+
     const subDitailName =
       listType === "sub_art_types" ? "sub_art_type_name" : "art_practic_name";
     for (var subart in objList) {
@@ -217,12 +222,7 @@ class CreateProfile extends Component {
   }
 
   editArtType(artTypeId) {
-    const {
-      art_types_to_send,
-      sub_art_types_to_send,
-      art_practics_to_send,
-      allArtTypes
-    } = this.state;
+    const { art_types_to_send, art_practics_to_send, allArtTypes } = this.state;
 
     const fullArtType = allArtTypes.find(artType => artType.id === artTypeId);
 
@@ -233,17 +233,8 @@ class CreateProfile extends Component {
     });
     this.componentWillReceiveProps(artTypeId.toString());
 
-    const filterdSubArtTypes = sub_art_types_to_send.filter(subArtId =>
-      fullArtType.sub_art_types.find(subArt => subArt.id === subArtId)
-    );
-
     const filterdArtPractics = art_practics_to_send.filter(subArtId =>
       fullArtType.art_practics.find(subArt => subArt.id === subArtId)
-    );
-
-    const filterdSubArtTypesToSend = sub_art_types_to_send.filter(
-      subArtId =>
-        !fullArtType.sub_art_types.find(subArt => subArt.id === subArtId)
     );
 
     const filterdArtPracticsToSend = art_practics_to_send.filter(
@@ -252,9 +243,7 @@ class CreateProfile extends Component {
     );
 
     this.setState({
-      sub_art_types: filterdSubArtTypes,
       art_practics: filterdArtPractics,
-      sub_art_types_to_send: filterdSubArtTypesToSend,
       art_practics_to_send: filterdArtPracticsToSend
     });
   }
@@ -265,11 +254,11 @@ class CreateProfile extends Component {
       allArtTypes,
       art_types_to_send,
       displaySocialInputs,
-      displaySubArtTypes,
+      displayArtPractics,
       displayAddedArtTypes
     } = this.state;
     let socialInput;
-    let subArtTypeAndPrctics;
+    let artPractics;
     let addedArtTypes;
     let editButton;
 
@@ -284,13 +273,31 @@ class CreateProfile extends Component {
       }
     ];
 
-    const filterdArtTypes = allArtTypes.filter(
-      artType => this.state.art_types_to_send.indexOf(artType.id) < 0
-    );
+    const filterdArtTypes = allArtTypes
+      .filter(artType => artType.art_practics[0])
+      .filter(artType => this.state.art_types_to_send.indexOf(artType.id) < 0);
     for (var artType in filterdArtTypes) {
       artTypesOptions.push({
         lable: filterdArtTypes[artType].art_type_name,
         value: filterdArtTypes[artType].id
+      });
+    }
+
+    let checkboxArtTypeOptions = [];
+
+    const filterdArtTypesToCheckbox = allArtTypes.filter(
+      artType => !artType.art_practics[0]
+    );
+
+    for (var checkboxArtType in filterdArtTypesToCheckbox) {
+      checkboxArtTypeOptions.push({
+        name: filterdArtTypesToCheckbox[checkboxArtType].art_type_name,
+        value: filterdArtTypesToCheckbox[checkboxArtType].id,
+        id: filterdArtTypesToCheckbox[checkboxArtType].id,
+        checked:
+          this.state.art_types_to_send.indexOf(
+            filterdArtTypesToCheckbox[checkboxArtType].id
+          ) > -1
       });
     }
 
@@ -333,19 +340,17 @@ class CreateProfile extends Component {
       );
     }
 
-    if (displaySubArtTypes) {
+    if (displayArtPractics) {
       // Checkbox options for sub art types and art practics
-      let checkboxSubArtTypes = [];
       let checkboxArtPractics = [];
 
       const artType = allArtTypes.find(
         artType => artType.id === parseInt(this.state.art_types)
       ).art_type_name;
 
-      this.createListToCheckbox("sub_art_types", artType, checkboxSubArtTypes);
       this.createListToCheckbox("art_practics", artType, checkboxArtPractics);
 
-      subArtTypeAndPrctics = (
+      artPractics = (
         <div>
           <CheckboxListGroup
             name="art_practics"
@@ -357,15 +362,6 @@ class CreateProfile extends Component {
             info="Check the art practics that relevant to you"
           />
           <small className="text-danger mb-2">{errors.art_practics}</small>
-          <CheckboxListGroup
-            name="sub_art_types"
-            value={"sub_art_types"}
-            onChange={this.checkboxOnChange}
-            options={checkboxSubArtTypes}
-            lable="select some sub art types"
-            error={errors.sub_art_types}
-            info="Check the sub art types that relevant to you"
-          />
           <div className="mb-3">
             <button
               type="button"
@@ -388,9 +384,13 @@ class CreateProfile extends Component {
 
     if (displayAddedArtTypes) {
       addedArtTypes = [];
-      for (const [index, artTypeId] of art_types_to_send.entries()) {
+      for (const [index, artTypeId] of art_types_to_send
+        .filter(
+          id => allArtTypes.find(artType => artType.id === id).art_practics[0]
+        )
+        .entries()) {
         const artPractics = [];
-        const subArtTypes = [];
+        // const subArtTypes = [];
         const fullArtType = allArtTypes.find(
           artType => artType.id === artTypeId
         );
@@ -400,14 +400,9 @@ class CreateProfile extends Component {
             artTypeId,
             artPractics
           );
-          this.createMarkupListToAddedCechkbox(
-            "sub_art_types",
-            artTypeId,
-            subArtTypes
-          );
         }
 
-        editButton = !displaySubArtTypes ? (
+        editButton = !displayArtPractics ? (
           <button
             type="button"
             onClick={() => this.editArtType(fullArtType.id)}
@@ -420,8 +415,6 @@ class CreateProfile extends Component {
           undefined
         );
 
-        const textForSubArtTypes =
-          subArtTypes.length > 0 ? "Your sub art types are: " : "";
         addedArtTypes.push(
           <div key={index} id={fullArtType.id} className="mb-3">
             <h3>
@@ -429,12 +422,26 @@ class CreateProfile extends Component {
             </h3>
             <strong>Your practics are: </strong>
             <div>{artPractics}</div>
-            <strong>{textForSubArtTypes}</strong>
-            <div>{subArtTypes}</div>
             {editButton}
           </div>
         );
       }
+    }
+
+    let checkboxMusicGenres = [];
+
+    const { musicGenres } = this.state;
+
+    for (var checkboxMusicGenre in musicGenres) {
+      checkboxMusicGenres.push({
+        name: musicGenres[checkboxMusicGenre].music_genre_name,
+        value: musicGenres[checkboxMusicGenre].id,
+        id: musicGenres[checkboxMusicGenre].id,
+        checked:
+          this.state.music_genres_to_send.indexOf(
+            musicGenres[checkboxMusicGenre].id
+          ) > -1
+      });
     }
 
     return (
@@ -447,6 +454,16 @@ class CreateProfile extends Component {
                 Let's get some information to make your profile stand out
               </p>
               <small className="d-block pb-3">* = required field</small>
+              {checkboxArtTypeOptions ? (
+                <CheckboxListGroup
+                  name="art_types_to_send"
+                  value={"art_types"}
+                  onChange={this.checkboxOnChange}
+                  options={checkboxArtTypeOptions}
+                  error={errors.art_types}
+                  info="Select from those checkbox what is relevant to you"
+                />
+              ) : null}
               {addedArtTypes}
               <form onSubmit={this.onSubmit}>
                 <SelectListGroup
@@ -458,7 +475,21 @@ class CreateProfile extends Component {
                   error={errors.art_types}
                   info="Please tel us what kind of art are you doing"
                 />
-                {subArtTypeAndPrctics}
+                {artPractics}
+                <br />
+                <strong className="mb-4">
+                  Select yout favorit music genres:
+                </strong>
+                {checkboxArtTypeOptions ? (
+                  <CheckboxListGroup
+                    name="music_genres_to_send"
+                    value={"music_genres"}
+                    onChange={this.checkboxOnChange}
+                    options={checkboxMusicGenres}
+                    error={errors.music_genres}
+                    info="Select your favorit music genres"
+                  />
+                ) : null}
                 <TextAreaFieldGroup
                   placeholder="Description"
                   name="description"

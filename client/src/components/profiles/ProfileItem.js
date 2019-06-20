@@ -39,12 +39,17 @@ class ProfileItem extends Component {
           <div className="col-md-4 d-none d-md-block">
             <h4>Art types</h4>
             <ul className="list-group">
-              {profile.art_types.slice(0, 4).map((artType, index) => (
+              {profile.art_types.slice(0, 2).map((artType, index) => (
                 <li key={index} className="list-group-item">
                   <i className="fa fa-check pr-1" />
                   {artType.art_type_details.art_type_name}
                 </li>
               ))}
+              {profile.art_types.length > 2 ? (
+                <li key={2} className="list-group-item">
+                  More...
+                </li>
+              ) : null}
             </ul>
           </div>
         </div>

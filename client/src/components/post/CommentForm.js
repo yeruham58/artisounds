@@ -23,7 +23,7 @@ class CommentForm extends Component {
   }
 
   onChange(e) {
-    if (this.state.errors["comment_contant"]) {
+    if (this.state.errors.comment_contant) {
       this.props.clearErrors("comment_contant");
     }
     this.setState({
