@@ -13,7 +13,8 @@ class EditProfilImg extends Component {
       fileDisable: true,
       selectedFile: null,
       selectedFiles: null,
-      fileUrl: null
+      fileUrl: this.props.profile.avatar,
+      imgHeight: ""
     };
   }
 
@@ -29,6 +30,12 @@ class EditProfilImg extends Component {
         fileUrl: newProps.upload.fileUrl
       });
       this.props.setProfileImg({ avatar: newProps.upload.fileUrl });
+    }
+
+    if (newProps.imgHeight) {
+      this.setState({
+        imgHeight: newProps.imgHeight
+      });
     }
 
     if (Object.keys(newProps)[0] === "fileDisable") {
@@ -71,6 +78,25 @@ class EditProfilImg extends Component {
       });
     }
   };
+
+  updateDimensions(e) {
+    this.componentWillReceiveProps({ updateDimensions: true });
+  }
+
+  componentWillUnmount() {
+    window.addEventListener("resize", this.onImgLoad.bind(this));
+  }
+
+  onImgLoad() {
+    const img = document.getElementById("profile-img");
+    if (img.offsetWidth) {
+      this.componentWillReceiveProps({ imgHeight: img.offsetWidth });
+    }
+  }
+
+  componentDidMount() {
+    window.addEventListener("resize", this.onImgLoad.bind(this));
+  }
 
   render() {
     const { profile } = this.props;
@@ -123,8 +149,11 @@ class EditProfilImg extends Component {
               <div className="col-4 col-md-3 m-auto">
                 <img
                   className="rounded-circle"
-                  src={fileUrl ? fileUrl : profile.avatar}
+                  src={fileUrl}
                   alt=""
+                  id="profile-img"
+                  height={this.state.imgHeight + "px"}
+                  onLoad={this.onImgLoad.bind(this)}
                 />
               </div>
             </div>

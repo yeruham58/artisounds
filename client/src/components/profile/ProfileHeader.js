@@ -2,6 +2,36 @@ import React, { Component } from "react";
 import isEmpty from "../../validation/isEmpty";
 
 class ProfileHeader extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      imgHeight: ""
+    };
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.imgHeight) {
+      this.setState({
+        imgHeight: newProps.imgHeight
+      });
+    }
+  }
+
+  onImgLoad() {
+    const img = document.getElementById("profile-img");
+    if (img.offsetWidth) {
+      this.componentWillReceiveProps({ imgHeight: img.offsetWidth });
+    }
+  }
+
+  componentDidMount() {
+    window.addEventListener("resize", this.onImgLoad.bind(this));
+  }
+
+  componentWillUnmount() {
+    window.addEventListener("resize", this.onImgLoad.bind(this));
+  }
+
   render() {
     const { profile } = this.props;
     const scoreLine =
@@ -21,7 +51,14 @@ class ProfileHeader extends Component {
           <div className="card card-body bg-info text-white mb-3">
             <div className="row">
               <div className="col-4 col-md-3 m-auto">
-                <img className="rounded-circle" src={profile.avatar} alt="" />
+                <img
+                  className="rounded-circle"
+                  src={profile.avatar}
+                  alt=""
+                  id="profile-img"
+                  height={this.state.imgHeight + "px"}
+                  onLoad={this.onImgLoad.bind(this)}
+                />
               </div>
             </div>
             <div className="text-center">

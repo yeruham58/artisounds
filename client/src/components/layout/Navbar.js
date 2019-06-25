@@ -7,6 +7,21 @@ import { logoutUser } from "../../actions/authActions";
 import { clearCurrentProfile } from "../../actions/profileActions";
 
 class Navbar extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      userAvatar: this.props.auth.user.avatar
+    };
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.profile && newProps.profile.profile) {
+      this.setState({
+        userAvatar: newProps.profile.profile.avatar
+      });
+    }
+  }
+
   onLogoutClick(e) {
     e.preventDefault();
     this.props.clearCurrentProfile();
@@ -32,9 +47,14 @@ class Navbar extends Component {
           <a href={`/profile/${user.id}`}>
             <img
               className="rounded-circle ml-2"
-              src={user.avatar}
+              src={this.state.userAvatar}
               alt={user.name}
-              style={{ width: "25px", marginRight: "5px", marginTop: "7px" }}
+              style={{
+                width: "25px",
+                height: "25px",
+                pxmarginRight: "5px",
+                marginTop: "7px"
+              }}
               title="you must have a Gravatar connected to your email to display an image"
             />
           </a>
@@ -102,11 +122,13 @@ class Navbar extends Component {
 
 Navbar.propTypes = {
   logoutUser: PropTypes.func.isRequired,
+  profile: PropTypes.object.isRequired,
   auth: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
-  auth: state.auth
+  auth: state.auth,
+  profile: state.profile
 });
 
 export default connect(
