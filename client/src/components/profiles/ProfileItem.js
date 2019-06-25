@@ -21,7 +21,7 @@ class ProfileItem extends Component {
 
   onImgLoad() {
     const img = document.getElementById("profile-img");
-    if (img.offsetWidth) {
+    if (img && img.offsetWidth) {
       this.componentWillReceiveProps({ imgHeight: img.offsetWidth });
     }
   }

@@ -22,8 +22,17 @@ class PostItem extends Component {
         ? this.props.post.dislikes.length
         : 0,
       like: this.findUserLikeOrDisilke(this.props.post.likes),
-      dislike: this.findUserLikeOrDisilke(this.props.post.dislikes)
+      dislike: this.findUserLikeOrDisilke(this.props.post.dislikes),
+      imgHeight: ""
     };
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.imgHeight) {
+      this.setState({
+        imgHeight: newProps.imgHeight
+      });
+    }
   }
 
   onDeleteClick(postId) {
@@ -71,6 +80,21 @@ class PostItem extends Component {
       : false;
   }
 
+  onImgLoad() {
+    const img = document.getElementById("profile-img");
+    if (img && img.offsetWidth) {
+      this.componentWillReceiveProps({ imgHeight: img.offsetWidth });
+    }
+  }
+
+  componentDidMount() {
+    window.addEventListener("resize", this.onImgLoad.bind(this));
+  }
+
+  componentWillUnmount() {
+    window.addEventListener("resize", this.onImgLoad.bind(this));
+  }
+
   render() {
     const { auth, post, showActions } = this.props;
 
@@ -83,6 +107,9 @@ class PostItem extends Component {
                 className="rounded-circle d-none d-md-block"
                 src={post.avatar}
                 alt=""
+                id="profile-img"
+                height={this.state.imgHeight + "px"}
+                onLoad={this.onImgLoad.bind(this)}
               />
             </Link>
           </div>

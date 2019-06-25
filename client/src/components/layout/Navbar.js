@@ -15,7 +15,11 @@ class Navbar extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    if (newProps.profile && newProps.profile.profile) {
+    if (
+      newProps.profile &&
+      newProps.profile.profile &&
+      newProps.profile.profile.id === this.props.auth.user.id
+    ) {
       this.setState({
         userAvatar: newProps.profile.profile.avatar
       });

@@ -152,7 +152,7 @@ class PostForm extends Component {
               {loading && <Spinner />}
               {fileUrl && (
                 <div className="mb-3">
-                  <img src={fileUrl} alt="" />
+                  <img src={fileUrl} alt="" className="rounded" />
                 </div>
               )}
               <div className="form-group">

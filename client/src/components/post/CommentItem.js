@@ -6,9 +6,37 @@ import PropTypes from "prop-types";
 import { deleteComment } from "../../actions/postActions";
 
 class CommentItem extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      imgHeight: ""
+    };
+  }
   onDeleteClick(commentId) {
-    console.log("this i s the func step 1");
     this.props.deleteComment(commentId);
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.imgHeight) {
+      this.setState({
+        imgHeight: newProps.imgHeight
+      });
+    }
+  }
+
+  onImgLoad() {
+    const img = document.getElementById("profile-img");
+    if (img && img.offsetWidth) {
+      this.componentWillReceiveProps({ imgHeight: img.offsetWidth });
+    }
+  }
+
+  componentDidMount() {
+    window.addEventListener("resize", this.onImgLoad.bind(this));
+  }
+
+  componentWillUnmount() {
+    window.addEventListener("resize", this.onImgLoad.bind(this));
   }
 
   render() {
@@ -22,6 +50,9 @@ class CommentItem extends Component {
                 className="rounded-circle d-none d-md-block"
                 src={comment.avatar}
                 alt=""
+                id="profile-img"
+                height={this.state.imgHeight + "px"}
+                onLoad={this.onImgLoad.bind(this)}
               />
             </Link>
           </div>

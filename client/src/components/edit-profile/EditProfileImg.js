@@ -79,22 +79,18 @@ class EditProfilImg extends Component {
     }
   };
 
-  updateDimensions(e) {
-    this.componentWillReceiveProps({ updateDimensions: true });
-  }
-
-  componentWillUnmount() {
-    window.addEventListener("resize", this.onImgLoad.bind(this));
-  }
-
   onImgLoad() {
     const img = document.getElementById("profile-img");
-    if (img.offsetWidth) {
+    if (img && img.offsetWidth) {
       this.componentWillReceiveProps({ imgHeight: img.offsetWidth });
     }
   }
 
   componentDidMount() {
+    window.addEventListener("resize", this.onImgLoad.bind(this));
+  }
+
+  componentWillUnmount() {
     window.addEventListener("resize", this.onImgLoad.bind(this));
   }
 
