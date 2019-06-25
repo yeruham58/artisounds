@@ -16,6 +16,21 @@ export const registerUser = (userData, history) => dispatch => {
     });
 };
 
+// Set profile img
+export const setProfileImg = newImg => dispatch => {
+  axios
+    .post("/api/users/set-profile-img", newImg)
+    .then(() => {
+      console.log("img uploaded");
+    })
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      });
+    });
+};
+
 // Login - Get user token
 export const loginUser = userData => dispatch => {
   axios

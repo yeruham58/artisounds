@@ -7,6 +7,7 @@ import TextAreaFieldGroup from "../common/TextAreaFieldGroup";
 import SelectListGroup from "../common/SelectListGroup";
 import InputGroup from "../common/InputGroup";
 import CheckboxListGroup from "../common/CheckboxListGroup";
+import EditProfileImg from "./EditProfileImg";
 import {
   createProfile,
   getCurrentProfile,
@@ -509,8 +510,12 @@ class CreateProfile extends Component {
               <Link to="/dashboard" className="btn btn-light">
                 Go Back
               </Link>
+
               <h1 className="display-4 text-center">Edit Profile</h1>
               <small className="d-block pb-3">* = required field</small>
+              {this.props.profile && this.props.profile.profile ? (
+                <EditProfileImg profile={this.props.profile.profile} />
+              ) : null}
 
               <form onSubmit={this.onSubmit}>
                 {checkboxArtTypeOptions ? (

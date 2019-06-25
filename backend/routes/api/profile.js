@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const validateProfileInput = require("../../validation/profile");
+
 // const userArtsControler = require("../apiFunctions/userArtTypes");
 
 const ArtType = require("../../classes/ArtType");

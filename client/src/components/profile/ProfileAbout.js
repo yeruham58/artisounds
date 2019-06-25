@@ -6,7 +6,12 @@ class ProfileAbout extends Component {
     const { profile } = this.props;
 
     //get first name
-    const firstName = profile.name.trim().split(" ")[0];
+    const firstName =
+      profile.name.charAt(0).toUpperCase() +
+      profile.name
+        .trim()
+        .split(" ")[0]
+        .slice(1);
 
     let singelCategoryArtSrt = "";
 
@@ -70,7 +75,9 @@ class ProfileAbout extends Component {
               </div>
             )}
 
-            <h3 className="text-center text-info mb-3">Art Types</h3>
+            <h3 className="text-center text-info mb-3">
+              {firstName}'s music sciles
+            </h3>
             <div className="row">
               <div className="d-flex flex-wrap justify-content-center align-items-center">
                 <div className="p-3">
@@ -92,25 +99,32 @@ class ProfileAbout extends Component {
               </div>
             </div>
             <hr />
-            <h3 className="text-center text-info mb-3">
-              {firstName}'s favorit genres
-            </h3>
-            <div className="row">
-              <div className="d-flex flex-wrap justify-content-center align-items-center">
-                <div className="p-3">
-                  <h5>
-                    <strong>
-                      {" "}
-                      {userMusicGenres.substring(
-                        0,
-                        userMusicGenres.length - 2
-                      ) + "."}
-                    </strong>
-                  </h5>
+            {isEmpty(userMusicGenres) ? null : (
+              <div>
+                <h3 className="text-center text-info mb-3">
+                  {firstName}'s favorit genres
+                </h3>
+                <div className="row">
+                  <div className="d-flex flex-wrap justify-content-center align-items-center">
+                    <div className="p-3">
+                      <h5>
+                        <strong>
+                          {" "}
+                          {userMusicGenres.substring(
+                            0,
+                            userMusicGenres.length - 2
+                          ) + "."}
+                        </strong>
+                      </h5>
+                    </div>
+                  </div>
                 </div>
+
+                <hr />
               </div>
-            </div>
-            {isEmpty(profile.profile.description) ? null : (
+            )}
+
+            {isEmpty(profile.profile.location) ? null : (
               <div>
                 <h3 className="text-center text-info mb-3">
                   {firstName}'s Location
