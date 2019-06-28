@@ -4,25 +4,38 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
 import { logoutUser } from "../../actions/authActions";
-import { clearCurrentProfile } from "../../actions/profileActions";
+import {
+  clearCurrentProfile,
+  getCurrentProfile
+} from "../../actions/profileActions";
 
 class Navbar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userAvatar: this.props.auth.user.avatar
+      // userAvatar: this.props.auth.user.avatar
+      userAvatar:
+        this.props.profile && this.props.profile.avatar
+          ? this.props.profile.avatar
+          : this.props.auth.user.avatar
     };
   }
 
+  componentDidMount() {
+    this.props.getCurrentProfile();
+  }
+
   componentWillReceiveProps(newProps) {
-    if (
-      newProps.profile &&
-      newProps.profile.profile &&
-      newProps.profile.profile.id === this.props.auth.user.id
-    ) {
+    if (newProps.auth) {
+      this.setState({
+        userAvatar: newProps.auth.user.avatar
+      });
+    }
+    if (newProps.profile && newProps.profile.profile) {
       this.setState({
         userAvatar: newProps.profile.profile.avatar
       });
+      this.props.auth.user.avatar = newProps.profile.profile.avatar;
     }
   }
 
@@ -38,17 +51,17 @@ class Navbar extends Component {
     const authLinks = (
       <ul className="navbar-nav ml-auto">
         <li className="nav-item">
-          <Link className="nav-link" to="/feed">
+          <Link to="/feed" className="nav-link">
             Home
           </Link>
         </li>
         <li className="nav-item">
-          <Link className="nav-link" to="/dashboard">
+          <Link to="/dashboard" className="nav-link">
             Dashboard
           </Link>
         </li>
         <li className="nav-item">
-          <a href={`/profile/${user.id}`}>
+          <Link to={`/profile/${user.id}`}>
             <img
               className="rounded-circle ml-2"
               src={this.state.userAvatar}
@@ -61,7 +74,7 @@ class Navbar extends Component {
               }}
               title="you must have a Gravatar connected to your email to display an image"
             />
-          </a>
+          </Link>
         </li>
         <li className="nav-item">
           <a
@@ -126,7 +139,7 @@ class Navbar extends Component {
 
 Navbar.propTypes = {
   logoutUser: PropTypes.func.isRequired,
-  profile: PropTypes.object.isRequired,
+  getCurrentProfile: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired
 };
 
@@ -137,5 +150,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { logoutUser, clearCurrentProfile }
+  { logoutUser, clearCurrentProfile, getCurrentProfile }
 )(Navbar);

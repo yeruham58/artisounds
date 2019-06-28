@@ -1,6 +1,8 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/database");
 
+const User = require("./user");
+
 class Like extends Sequelize.Model {
   static associate(models) {}
 
@@ -20,5 +22,7 @@ Like.init(
   },
   { sequelize, modelName: "Like" }
 );
+
+Like.belongsTo(User, { foreignKey: "user_id", as: "user_detailes" });
 
 module.exports = Like;

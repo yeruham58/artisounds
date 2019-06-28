@@ -48,6 +48,14 @@ export const singleFileUpload = data => dispatch => {
     });
 };
 
+//Delete profile img
+export const deleteProfileImg = fileKey => dispatch => {
+  axios
+    .delete("/api/upload/profile-img", { data: fileKey })
+    .then(data => console.log(data))
+    .catch(err => console.log(err));
+};
+
 //Post loading state
 export const setFileUploading = () => {
   return {

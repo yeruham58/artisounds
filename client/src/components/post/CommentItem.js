@@ -48,7 +48,11 @@ class CommentItem extends Component {
             <Link to={`/profile/${comment.user_id}`}>
               <img
                 className="rounded-circle d-none d-md-block"
-                src={comment.avatar}
+                src={
+                  comment.user_detailes
+                    ? comment.user_detailes.avatar
+                    : comment.avatar
+                }
                 alt=""
                 id="profile-img"
                 height={this.state.imgHeight + "px"}

@@ -1,6 +1,8 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/database");
 
+const User = require("./user");
+
 class Comment extends Sequelize.Model {
   static associate(models) {}
   // someMethod() {}
@@ -15,5 +17,7 @@ Comment.init(
   },
   { sequelize, modelName: "Comment" }
 );
+
+Comment.belongsTo(User, { foreignKey: "user_id", as: "user_detailes" });
 
 module.exports = Comment;

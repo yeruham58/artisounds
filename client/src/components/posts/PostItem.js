@@ -105,7 +105,9 @@ class PostItem extends Component {
             <Link to={`/profile/${post.user_id}`}>
               <img
                 className="rounded-circle d-none d-md-block"
-                src={post.avatar}
+                src={
+                  post.user_detailes ? post.user_detailes.avatar : post.avatar
+                }
                 alt=""
                 id="profile-img"
                 height={this.state.imgHeight + "px"}
@@ -169,7 +171,7 @@ class PostItem extends Component {
                   ) : null}
                 </button>
                 <Link to={`/post/${post.id}`} className="btn btn-info mr-1">
-                  Comments
+                  Comments {this.props.post.comments.length}
                 </Link>
                 {post.user_id === auth.user.id ? (
                   <button

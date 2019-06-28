@@ -8,6 +8,7 @@ const multer = require("multer");
 const path = require("path");
 
 const keys = require("../../config/keys");
+const User = require("../../classes/User");
 
 /**
  * PROFILE IMAGE STORING STARTS
@@ -80,11 +81,19 @@ router.post(
           res.json("Error: No File Selected");
         } else {
           // If Success
-          const imageName = req.file.key;
+          const imageKey = req.file.key;
           const imageLocation = req.file.location;
           // Save the file name into database into profile model
+          User.findOne({ where: { id: req.user.id } })
+            .then(user => {
+              if (user.avatar_key) {
+                deleteAwsProfileImg(user.avatar_key);
+              }
+
+              user.update({ avatar_key: imageKey, avatar: req.file.location });
+            })
+            .catch(err => console.log(err));
           res.json({
-            imageName: imageName,
             location: imageLocation
           });
         }
@@ -92,5 +101,30 @@ router.post(
     });
   }
 );
+
+// Delete file from aws
+const BUCKET = "profilesimg";
+
+const deleteAwsProfileImg = imgKey => {
+  const params = {
+    Bucket: BUCKET,
+    Delete: {
+      Objects: [
+        {
+          Key: imgKey
+        }
+      ]
+    }
+  };
+  s3.deleteObjects(params, function(err, data) {
+    if (err) {
+      // an error occurred
+      console.log(err);
+    } else {
+      // successful response
+      console.log(data);
+    }
+  });
+};
 
 module.exports = router;

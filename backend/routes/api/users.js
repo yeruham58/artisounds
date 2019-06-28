@@ -126,21 +126,4 @@ router.get(
   }
 );
 
-//Edit profile img
-router.post(
-  "/set-profile-img",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    User.findOne({
-      where: { id: req.user.id }
-    }).then(user => {
-      //update
-      const userFields = req.body;
-      user.update(userFields).then(user => {
-        res.json({ profileImg: user.avatar });
-      });
-    });
-  }
-);
-
 module.exports = router;

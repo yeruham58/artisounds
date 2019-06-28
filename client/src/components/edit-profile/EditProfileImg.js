@@ -2,8 +2,10 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
-import { singleFileUpload } from "../../actions/uploadFileActions";
-import { setProfileImg } from "../../actions/authActions";
+import {
+  singleFileUpload,
+  deleteProfileImg
+} from "../../actions/uploadFileActions";
 
 class EditProfilImg extends Component {
   constructor(props) {
@@ -29,7 +31,6 @@ class EditProfilImg extends Component {
         fileDisable: true,
         fileUrl: newProps.upload.fileUrl
       });
-      this.props.setProfileImg({ avatar: newProps.upload.fileUrl });
     }
 
     if (newProps.imgHeight) {
@@ -180,7 +181,7 @@ class EditProfilImg extends Component {
 
 EditProfilImg.propTypes = {
   singleFileUpload: PropTypes.func.isRequired,
-  setProfileImg: PropTypes.func.isRequired
+  deleteProfileImg: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -189,5 +190,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { singleFileUpload, setProfileImg }
+  { singleFileUpload, deleteProfileImg }
 )(EditProfilImg);

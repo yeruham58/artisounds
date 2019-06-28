@@ -1,6 +1,8 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/database");
 
+const User = require("./user");
+
 class Dislike extends Sequelize.Model {
   static associate(models) {}
 
@@ -27,5 +29,7 @@ const calculateDislikeScore = function(user_id) {
 
   return dislikeScore;
 };
+
+Dislike.belongsTo(User, { foreignKey: "user_id", as: "user_detailes" });
 
 module.exports = Dislike;
