@@ -2,7 +2,8 @@ import { ADD_FILE, FILE_UPLOADING } from "../actions/types";
 
 const initialState = {
   loading: false,
-  fileUrl: null
+  fileUrl: null,
+  uploadRes: null
 };
 
 export default function(state = initialState, action) {
@@ -16,7 +17,7 @@ export default function(state = initialState, action) {
     case ADD_FILE:
       return {
         ...state,
-        fileUrl: action.payload,
+        uploadRes: action.payload,
         loading: false
       };
 

@@ -2,15 +2,17 @@ import axios from "axios";
 
 import { GET_ERRORS, CLEAR_ERRORS, ADD_FILE, FILE_UPLOADING } from "./types";
 
-//Upload img
-export const singleFileUpload = data => dispatch => {
+//Upload data with file
+export const uploadDataWithFile = data => dispatch => {
   dispatch(setFileUploading());
   axios
-    .post("/api/upload/profile-img-upload", data, {
+    // .post("/api/upload/profile-img-upload", data, {
+    .post(`/api/upload/${data.get("endPoint")}`, data, {
       headers: {
         accept: "application/json",
         "Accept-Language": "en-US,en;q=0.8",
-        "Content-Type": `multipart/form-data; boundary=${data._boundary}`
+        "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
+        textContant: data.get("text_contant")
       }
     })
     .then(response => {
@@ -32,10 +34,9 @@ export const singleFileUpload = data => dispatch => {
           }
         } else {
           // Success
-          let file = response.data;
           dispatch({
             type: ADD_FILE,
-            payload: file.location
+            payload: response.data
           });
         }
       }

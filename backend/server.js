@@ -2,7 +2,8 @@ const express = require("express");
 const users = require("./routes/api/users");
 const profile = require("./routes/api/profile");
 const posts = require("./routes/api/posts");
-const upload = require("./routes/api/uploadFiles");
+const uploadProfileImg = require("./routes/api/uploadProfileImg");
+const uploadPostMedia = require("./routes/api/uploadPostMedia");
 const bodyParser = require("body-parser");
 const passport = require("passport");
 
@@ -33,7 +34,8 @@ require("./config/passport")(passport);
 app.use("/api/users", users);
 app.use("/api/profile", profile);
 app.use("/api/posts", posts);
-app.use("/api/upload", upload);
+app.use("/api/upload", uploadProfileImg);
+app.use("/api/upload", uploadPostMedia);
 
 const port = process.env.PORT || 5000;
 

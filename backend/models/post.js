@@ -9,8 +9,10 @@ module.exports = (sequelize, DataTypes) => {
       text: DataTypes.BOOLEAN,
       img: DataTypes.BOOLEAN,
       video: DataTypes.BOOLEAN,
+      audio: DataTypes.BOOLEAN,
       text_contant: DataTypes.STRING,
-      link: DataTypes.STRING
+      link: DataTypes.STRING,
+      media_key: DataTypes.STRING
     },
     {}
   );

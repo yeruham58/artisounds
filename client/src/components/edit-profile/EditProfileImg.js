@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
 import {
-  singleFileUpload,
+  uploadDataWithFile,
   deleteProfileImg
 } from "../../actions/uploadFileActions";
 
@@ -25,11 +25,11 @@ class EditProfilImg extends Component {
       this.setState({ errors: newProps.errors });
     }
 
-    if (newProps.upload && newProps.upload.fileUrl) {
+    if (newProps.upload && newProps.upload.uploadRes) {
       this.setState({
         selectedFile: null,
         fileDisable: true,
-        fileUrl: newProps.upload.fileUrl
+        fileUrl: newProps.upload.uploadRes.location
       });
     }
 
@@ -69,7 +69,8 @@ class EditProfilImg extends Component {
         this.state.selectedFile,
         this.state.selectedFile.name
       );
-      this.props.singleFileUpload(data);
+      data.append("endPoint", "profile-img-upload");
+      this.props.uploadDataWithFile(data);
     } else {
       this.componentWillReceiveProps({
         errors: {
@@ -98,7 +99,7 @@ class EditProfilImg extends Component {
   render() {
     const { profile } = this.props;
     const { errors, fileDisable } = this.state;
-    const singleFileUpload = (
+    const uploadDataWithFile = (
       <div
         className="card border-light mb-3 mt-5"
         style={{ boxShadow: "0 5px 10px 2px rgba(195,192,192,.5)" }}
@@ -157,7 +158,7 @@ class EditProfilImg extends Component {
             <div className="text-center">
               <h1 className="display-4 text-center">{profile.name}</h1>
             </div>
-            {fileDisable ? null : singleFileUpload}
+            {fileDisable ? null : uploadDataWithFile}
             {fileDisable ? (
               <div>
                 <div>
@@ -180,7 +181,7 @@ class EditProfilImg extends Component {
 }
 
 EditProfilImg.propTypes = {
-  singleFileUpload: PropTypes.func.isRequired,
+  uploadDataWithFile: PropTypes.func.isRequired,
   deleteProfileImg: PropTypes.func.isRequired
 };
 
@@ -190,5 +191,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { singleFileUpload, deleteProfileImg }
+  { uploadDataWithFile, deleteProfileImg }
 )(EditProfilImg);

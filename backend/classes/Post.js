@@ -84,8 +84,10 @@ Post.init(
     text: Sequelize.BOOLEAN,
     img: Sequelize.BOOLEAN,
     video: Sequelize.BOOLEAN,
+    audio: Sequelize.BOOLEAN,
     text_contant: Sequelize.STRING,
-    link: Sequelize.STRING
+    link: Sequelize.STRING,
+    media_key: Sequelize.STRING
   },
   { sequelize, modelName: "Post" }
 );

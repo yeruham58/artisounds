@@ -53,8 +53,10 @@ router.post(
     newPost.text = req.body.text;
     newPost.img = req.body.img;
     newPost.video = req.body.video;
+    newPost.audio = req.body.audio;
     if (req.body.text_contant) newPost.text_contant = req.body.text_contant;
     if (req.body.link) newPost.link = req.body.link;
+    if (req.body.media_key) newPost.media_key = req.body.media_key;
     Post.create(newPost)
       .then(post => res.json(post))
       .catch(err => {

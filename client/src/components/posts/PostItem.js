@@ -97,7 +97,10 @@ class PostItem extends Component {
 
   render() {
     const { auth, post, showActions } = this.props;
-
+    let imgLink;
+    if (post.img) {
+      imgLink = post.link;
+    }
     return (
       <div className="card card-body mb-3">
         <div className="row">
@@ -124,6 +127,11 @@ class PostItem extends Component {
             <br />
 
             <p className="lead">{post.text_contant}</p>
+            {imgLink && (
+              <div className="mb-3">
+                <img src={imgLink} alt="" className="rounded" />
+              </div>
+            )}
             {showActions ? (
               <span>
                 <button
@@ -171,7 +179,10 @@ class PostItem extends Component {
                   ) : null}
                 </button>
                 <Link to={`/post/${post.id}`} className="btn btn-info mr-1">
-                  Comments {this.props.post.comments.length}
+                  Comments{" "}
+                  {this.props.post.comments
+                    ? this.props.post.comments.length
+                    : null}
                 </Link>
                 {post.user_id === auth.user.id ? (
                   <button

@@ -3,8 +3,12 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
 import TextAreaFieldGroup from "../common/TextAreaFieldGroup";
-import { addPost, clearErrors } from "../../actions/postActions";
-import { singleFileUpload } from "../../actions/uploadFileActions";
+import {
+  addPost,
+  addPostWithFile,
+  clearErrors
+} from "../../actions/postActions";
+import { uploadDataWithFile } from "../../actions/uploadFileActions";
 import Spinner from "../common/Spinner";
 
 class PostForm extends Component {
@@ -13,10 +17,8 @@ class PostForm extends Component {
     this.state = {
       text: "",
       errors: {},
-      fileDisable: true,
+      displayAddFileIcon: true,
       selectedFile: null,
-      selectedFiles: null,
-      imgName: null,
       fileUrl: null
     };
 
@@ -28,20 +30,30 @@ class PostForm extends Component {
     if (newProps.errors) {
       this.setState({ errors: newProps.errors });
     }
-    if (newProps.upload && newProps.upload.fileUrl) {
+    if (
+      newProps.upload &&
+      newProps.upload.uploadRes &&
+      !newProps.upload.loading
+    ) {
       this.setState({
         selectedFile: null,
-        fileDisable: true,
-        fileUrl: newProps.upload.fileUrl
+        displayAddFileIcon: true,
+        text: "",
+        fileUrl: null
       });
+      this.props.addPostWithFile(newProps.upload.uploadRes);
     }
-    if (Object.keys(newProps)[0] === "fileDisable") {
-      this.setState({ fileDisable: newProps.fileDisable });
-      if (newProps.fileDisable) {
+    if (Object.keys(newProps)[0] === "displayAddFileIcon") {
+      this.setState({ displayAddFileIcon: newProps.displayAddFileIcon });
+      if (newProps.displayAddFileIcon) {
         this.setState({
-          selectedFile: null
+          selectedFile: null,
+          fileUrl: null
         });
       }
+    }
+    if (newProps.fileUrl) {
+      this.setState({ fileUrl: newProps.fileUrl, displayAddFileIcon: true });
     }
   }
 
@@ -64,6 +76,7 @@ class PostForm extends Component {
       text: true,
       img: false,
       video: false,
+      audio: false,
       text_contant: this.state.text
     };
 
@@ -71,9 +84,10 @@ class PostForm extends Component {
     this.setState({ text: "" });
   }
 
-  singleFileChangedHandler = event => {
+  onSelectFile = event => {
     this.setState({
-      selectedFile: event.target.files[0]
+      selectedFile: event.target.files[0],
+      fileUrl: URL.createObjectURL(event.target.files[0])
     });
     if (this.state.errors.uploadErrors) {
       this.props.clearErrors("uploadErrors");
@@ -85,11 +99,18 @@ class PostForm extends Component {
     // If file selected
     if (this.state.selectedFile) {
       data.append(
-        "profileImage",
+        "postMedia",
         this.state.selectedFile,
         this.state.selectedFile.name
       );
-      this.props.singleFileUpload(data);
+      data.append("endPoint", "post-media-upload");
+      data.append("text_contant", this.state.text);
+
+      this.props.uploadDataWithFile(data);
+
+      // this.componentWillReceiveProps({
+      //   fileUrl: URL.createObjectURL(this.state.selectedFile)
+      // });
     } else {
       this.componentWillReceiveProps({
         errors: {
@@ -101,23 +122,25 @@ class PostForm extends Component {
   };
 
   render() {
-    const { errors, fileDisable } = this.state;
-    const singleFileUpload = (
+    const { errors, displayAddFileIcon } = this.state;
+    const uploadDataWithFile = (
       <div
         className="card border-light mb-3 mt-5"
         style={{ boxShadow: "0 5px 10px 2px rgba(195,192,192,.5)" }}
       >
-        <div className="card-header">
+        {/* <div className="card-header">
           <p className="text-muted" style={{ marginLeft: "12px" }}>
             Upload Size: 250px x 250px ( Max 2MB )
           </p>
-        </div>
+        </div> */}
         <div className="card-body">
-          <p className="card-text">Please upload an image for your post</p>
+          {/* <p className="card-text">
+            Please upload a file for your post
+          </p> */}
           <input
             type="file"
-            onChange={this.singleFileChangedHandler}
-            disabled={this.state.selectedFile}
+            onChange={this.onSelectFile}
+            // disabled={this.state.selectedFile}
           />
 
           {errors.uploadErrors ? (
@@ -127,12 +150,12 @@ class PostForm extends Component {
           ) : null}
           <div className="mt-5">
             <label className="btn btn-info" onClick={this.uploadFile}>
-              Add to post
+              Submit and post
             </label>
             <label
               className="btn btn-light ml-3"
               onClick={() => {
-                this.componentWillReceiveProps({ fileDisable: true });
+                this.componentWillReceiveProps({ displayAddFileIcon: true });
               }}
             >
               Cancle
@@ -164,14 +187,16 @@ class PostForm extends Component {
                   error={errors.text_contant_or_link}
                 />
               </div>
-              {fileDisable ? null : singleFileUpload}
-              {fileDisable ? (
+              {displayAddFileIcon ? null : uploadDataWithFile}
+              {displayAddFileIcon ? (
                 <div>
                   <div>
                     <label
                       className="btn btn-light mr-1"
                       onClick={() => {
-                        this.componentWillReceiveProps({ fileDisable: false });
+                        this.componentWillReceiveProps({
+                          displayAddFileIcon: false
+                        });
                       }}
                     >
                       <i className="far fa-file-image" />
@@ -192,7 +217,8 @@ class PostForm extends Component {
 
 PostForm.propTypes = {
   addPost: PropTypes.func.isRequired,
-  singleFileUpload: PropTypes.func.isRequired,
+  addPostWithFile: PropTypes.func.isRequired,
+  uploadDataWithFile: PropTypes.func.isRequired,
   clearErrors: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
@@ -206,5 +232,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { addPost, clearErrors, singleFileUpload }
+  { addPost, clearErrors, uploadDataWithFile, addPostWithFile }
 )(PostForm);

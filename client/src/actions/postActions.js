@@ -28,6 +28,14 @@ export const addPost = postData => dispatch => {
     });
 };
 
+// Add post
+export const addPostWithFile = postData => dispatch => {
+  dispatch({
+    type: ADD_POST,
+    payload: postData
+  });
+};
+
 // Get posts
 export const getPosts = () => dispatch => {
   dispatch(setPostLoading());

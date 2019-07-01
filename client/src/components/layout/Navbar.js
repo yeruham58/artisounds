@@ -13,11 +13,11 @@ class Navbar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // userAvatar: this.props.auth.user.avatar
-      userAvatar:
-        this.props.profile && this.props.profile.avatar
-          ? this.props.profile.avatar
-          : this.props.auth.user.avatar
+      userAvatar: this.props.auth.user.avatar
+      // userAvatar:
+      //   this.props.profile && this.props.profile.avatar
+      //     ? this.props.profile.avatar
+      //     : this.props.auth.user.avatar
     };
   }
 
@@ -31,7 +31,11 @@ class Navbar extends Component {
         userAvatar: newProps.auth.user.avatar
       });
     }
-    if (newProps.profile && newProps.profile.profile) {
+    if (
+      newProps.profile &&
+      newProps.profile.profile &&
+      newProps.profile.profile.id === this.props.auth.user.id
+    ) {
       this.setState({
         userAvatar: newProps.profile.profile.avatar
       });
@@ -61,7 +65,15 @@ class Navbar extends Component {
           </Link>
         </li>
         <li className="nav-item">
-          <Link to={`/profile/${user.id}`}>
+          <Link
+            to={
+              this.props.profile &&
+              this.props.profile.profile &&
+              this.props.profile.profile.id === this.props.auth.user.id
+                ? `/profile/${user.id}`
+                : "/dashboard"
+            }
+          >
             <img
               className="rounded-circle ml-2"
               src={this.state.userAvatar}
@@ -140,7 +152,8 @@ class Navbar extends Component {
 Navbar.propTypes = {
   logoutUser: PropTypes.func.isRequired,
   getCurrentProfile: PropTypes.func.isRequired,
-  auth: PropTypes.object.isRequired
+  auth: PropTypes.object.isRequired,
+  profile: PropTypes.object
 };
 
 const mapStateToProps = state => ({

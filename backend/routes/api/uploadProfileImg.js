@@ -87,7 +87,7 @@ router.post(
           User.findOne({ where: { id: req.user.id } })
             .then(user => {
               if (user.avatar_key) {
-                deleteAwsProfileImg(user.avatar_key);
+                deleteAwsFile(user.avatar_key, "profilesimg");
               }
 
               user.update({ avatar_key: imageKey, avatar: req.file.location });
@@ -103,11 +103,10 @@ router.post(
 );
 
 // Delete file from aws
-const BUCKET = "profilesimg";
 
-const deleteAwsProfileImg = imgKey => {
+const deleteAwsFile = (imgKey, bucketName) => {
   const params = {
-    Bucket: BUCKET,
+    Bucket: bucketName,
     Delete: {
       Objects: [
         {
