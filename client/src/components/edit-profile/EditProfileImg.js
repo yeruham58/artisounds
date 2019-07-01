@@ -33,6 +33,12 @@ class EditProfilImg extends Component {
       });
     }
 
+    if (newProps.fileUrl) {
+      this.setState({
+        fileUrl: newProps.fileUrl
+      });
+    }
+
     if (newProps.imgHeight) {
       this.setState({
         imgHeight: newProps.imgHeight
@@ -40,7 +46,10 @@ class EditProfilImg extends Component {
     }
 
     if (Object.keys(newProps)[0] === "fileDisable") {
-      this.setState({ fileDisable: newProps.fileDisable });
+      this.setState({
+        fileDisable: newProps.fileDisable,
+        fileUrl: this.props.profile.avatar
+      });
       if (newProps.fileDisable) {
         this.setState({
           selectedFile: null
@@ -51,7 +60,8 @@ class EditProfilImg extends Component {
 
   singleFileChangedHandler = event => {
     this.setState({
-      selectedFile: event.target.files[0]
+      selectedFile: event.target.files[0],
+      fileUrl: URL.createObjectURL(event.target.files[0])
     });
     if (this.state.errors.uploadErrors) {
       this.componentWillReceiveProps({

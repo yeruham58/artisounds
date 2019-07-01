@@ -9,7 +9,6 @@ const path = require("path");
 
 const keys = require("../../config/keys");
 const Post = require("../../classes/Post");
-const validatePostInput = require("../../validation/post");
 
 /**
  * PROFILE IMAGE STORING STARTS
@@ -114,6 +113,7 @@ router.post(
 // Delete file from aws
 
 const deleteAwsFile = (imgKey, bucketName) => {
+  console.log("gonna dell");
   const params = {
     Bucket: bucketName,
     Delete: {
@@ -135,4 +135,4 @@ const deleteAwsFile = (imgKey, bucketName) => {
   });
 };
 
-module.exports = router;
+module.exports = { router, deleteAwsFile };

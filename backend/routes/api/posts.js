@@ -10,6 +10,7 @@ const Post = require("../../classes/Post");
 const Like = require("../../classes/Like");
 const Dislike = require("../../classes/Dislike");
 const Comment = require("../../classes/Comment");
+const { deleteAwsFile } = require("./uploadPostMedia");
 
 //@ route   GET api/posts/test
 //@desc     test posts route
@@ -92,6 +93,9 @@ router.delete(
           }).then(dislikes => {
             dislikes.map(dislike => dislike.destroy());
           });
+          if (post.media_key) {
+            deleteAwsFile(post.media_key, "postuploadedmedia");
+          }
           post.destroy().then(() => res.json({ succuss: true }));
         }
       })

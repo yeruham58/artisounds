@@ -173,7 +173,7 @@ class PostForm extends Component {
           <div className="card-body">
             <form onSubmit={this.onSubmit}>
               {loading && <Spinner />}
-              {fileUrl && (
+              {fileUrl && !loading && (
                 <div className="mb-3">
                   <img src={fileUrl} alt="" className="rounded" />
                 </div>

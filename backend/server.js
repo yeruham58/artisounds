@@ -35,7 +35,7 @@ app.use("/api/users", users);
 app.use("/api/profile", profile);
 app.use("/api/posts", posts);
 app.use("/api/upload", uploadProfileImg);
-app.use("/api/upload", uploadPostMedia);
+app.use("/api/upload", uploadPostMedia.router);
 
 const port = process.env.PORT || 5000;
 
