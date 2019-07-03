@@ -37,7 +37,7 @@ const postMediaUpload = multer({
       );
     }
   }),
-  limits: { fileSize: 2000000 }, // In bytes: 2000000 bytes = 2 MB
+  limits: { fileSize: 9000000 }, // In bytes: 2000000 bytes = 2 MB
   fileFilter: function(req, file, cb) {
     checkFileType(file, cb);
   }
@@ -56,10 +56,14 @@ function checkFileType(file, cb) {
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
   // Check mime
   const mimetype = filetypes.test(file.mimetype);
-  if (mimetype && extname) {
+  if (
+    (mimetype && extname) ||
+    file.mimetype.indexOf("video") > -1 ||
+    file.mimetype.indexOf("audio") > -1
+  ) {
     return cb(null, true);
   } else {
-    cb("Error: Images Only!");
+    cb("Error: We are not soporting this file type!");
   }
 }
 
@@ -89,9 +93,9 @@ router.post(
           newPost.name = req.user.name;
           newPost.avatar = req.user.avatar;
           newPost.text = textcontant.length > 0;
-          newPost.img = true;
-          newPost.video = false;
-          newPost.audio = false;
+          newPost.img = req.file.mimetype.indexOf("image") > -1;
+          newPost.video = req.file.mimetype.indexOf("video") > -1;
+          newPost.audio = req.file.mimetype.indexOf("audio") > -1;
           if (textcontant.length > 0) newPost.text_contant = textcontant;
           newPost.link = imageLocation;
           newPost.media_key = imageKey;
@@ -113,7 +117,6 @@ router.post(
 // Delete file from aws
 
 const deleteAwsFile = (imgKey, bucketName) => {
-  console.log("gonna dell");
   const params = {
     Bucket: bucketName,
     Delete: {

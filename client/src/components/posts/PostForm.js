@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import ReactPlayer from "react-player";
 
+// import musicGif from "../../img/musicGif.gif";
 import TextAreaFieldGroup from "../common/TextAreaFieldGroup";
 import {
   addPost,
@@ -19,7 +21,9 @@ class PostForm extends Component {
       errors: {},
       displayAddFileIcon: true,
       selectedFile: null,
-      fileUrl: null
+      fileUrl: null,
+      fileType: null,
+      videoPlayerConfig: {}
     };
 
     this.onChange = this.onChange.bind(this);
@@ -29,6 +33,7 @@ class PostForm extends Component {
   componentWillReceiveProps(newProps) {
     if (newProps.errors) {
       this.setState({ errors: newProps.errors });
+      this.props.upload.loading = false;
     }
     if (
       newProps.upload &&
@@ -47,6 +52,7 @@ class PostForm extends Component {
       this.setState({ displayAddFileIcon: newProps.displayAddFileIcon });
       if (newProps.displayAddFileIcon) {
         this.setState({
+          errors: {},
           selectedFile: null,
           fileUrl: null
         });
@@ -85,12 +91,19 @@ class PostForm extends Component {
   }
 
   onSelectFile = event => {
+    const videoPlayerConfig = event.target.files[0].type.indexOf("video")
+      ? { playing: false, volume: 2 }
+      : this.state.videoPlayerConfig;
+
     this.setState({
       selectedFile: event.target.files[0],
-      fileUrl: URL.createObjectURL(event.target.files[0])
+      fileUrl: URL.createObjectURL(event.target.files[0]),
+      fileType: event.target.files[0].type,
+      videoPlayerConfig: videoPlayerConfig
     });
-    if (this.state.errors.uploadErrors) {
-      this.props.clearErrors("uploadErrors");
+    if (Object.keys(this.state.errors).length > 0) {
+      // this.props.clearErrors("uploadErrors");
+      this.componentWillReceiveProps({ errors: {} });
     }
   };
 
@@ -107,10 +120,6 @@ class PostForm extends Component {
       data.append("text_contant", this.state.text);
 
       this.props.uploadDataWithFile(data);
-
-      // this.componentWillReceiveProps({
-      //   fileUrl: URL.createObjectURL(this.state.selectedFile)
-      // });
     } else {
       this.componentWillReceiveProps({
         errors: {
@@ -134,14 +143,7 @@ class PostForm extends Component {
           </p>
         </div> */}
         <div className="card-body">
-          {/* <p className="card-text">
-            Please upload a file for your post
-          </p> */}
-          <input
-            type="file"
-            onChange={this.onSelectFile}
-            // disabled={this.state.selectedFile}
-          />
+          <input type="file" onChange={this.onSelectFile} />
 
           {errors.uploadErrors ? (
             <div>
@@ -164,7 +166,7 @@ class PostForm extends Component {
         </div>
       </div>
     );
-    const { fileUrl } = this.state;
+    const { fileUrl, fileType, videoPlayerConfig } = this.state;
     const { loading } = this.props.upload;
     return (
       <div className="post-form mb-3">
@@ -175,9 +177,36 @@ class PostForm extends Component {
               {loading && <Spinner />}
               {fileUrl && !loading && (
                 <div className="mb-3">
-                  <img src={fileUrl} alt="" className="rounded" />
+                  {fileType.indexOf("image") > -1 && (
+                    <img src={fileUrl} alt="" className="rounded" />
+                  )}
+                  {fileType.indexOf("video") > -1 && (
+                    <ReactPlayer
+                      url={fileUrl}
+                      playing={videoPlayerConfig.playing}
+                      controls
+                      muted
+                      volume={videoPlayerConfig.volume}
+                      width="100%"
+                    />
+                  )}
+                  {fileType.indexOf("audio") > -1 && (
+                    <div>
+                      {/* <img src={musicGif} alt="" className="rounded" /> */}
+                      <ReactPlayer
+                        height="70px"
+                        url={fileUrl}
+                        playing={false}
+                        controls
+                        muted
+                        volume={2}
+                        width="100%"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
+
               <div className="form-group">
                 <TextAreaFieldGroup
                   placeholder="Create a post"

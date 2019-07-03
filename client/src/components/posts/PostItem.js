@@ -3,6 +3,9 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import classnames from "classnames";
 import { Link } from "react-router-dom";
+import ReactPlayer from "react-player";
+
+import musicGif from "../../img/musicGif.gif";
 import {
   deletePost,
   addAndRemoveLike,
@@ -23,11 +26,17 @@ class PostItem extends Component {
         : 0,
       like: this.findUserLikeOrDisilke(this.props.post.likes),
       dislike: this.findUserLikeOrDisilke(this.props.post.dislikes),
-      imgHeight: ""
+      imgHeight: "",
+      videoPlayerConfig: { playing: false, volume: 2 }
     };
   }
 
   componentWillReceiveProps(newProps) {
+    if (newProps.videoPlayerConfig) {
+      this.setState({
+        videoPlayerConfig: newProps.videoPlayerConfig
+      });
+    }
     if (newProps.imgHeight) {
       this.setState({
         imgHeight: newProps.imgHeight
@@ -87,19 +96,53 @@ class PostItem extends Component {
     }
   }
 
+  onScroll() {
+    const video = document.getElementById("videoPlayer" + this.props.post.id);
+    if (video && video.getBoundingClientRect()) {
+      if (
+        video.getBoundingClientRect().top > 0 - video.offsetHeight / 2 &&
+        video.getBoundingClientRect().bottom - video.offsetHeight / 2 <
+          window.innerHeight
+      ) {
+        this.componentWillReceiveProps({
+          videoPlayerConfig: { playing: true, volume: 2 }
+        });
+      } else {
+        if (this.state.videoPlayerConfig.playing) {
+          this.componentWillReceiveProps({
+            videoPlayerConfig: { playing: false, volume: 2 }
+          });
+        }
+      }
+    }
+  }
+
   componentDidMount() {
     window.addEventListener("resize", this.onImgLoad.bind(this));
+    window.addEventListener("scroll", this.onScroll.bind(this));
   }
 
   componentWillUnmount() {
     window.addEventListener("resize", this.onImgLoad.bind(this));
+    window.addEventListener("scroll", this.onScroll.bind(this));
   }
 
   render() {
     const { auth, post, showActions } = this.props;
+    const { videoPlayerConfig } = this.state;
     let imgLink;
+    let videoLink;
+    let audioLink;
     if (post.img) {
       imgLink = post.link;
+    }
+
+    if (post.video) {
+      videoLink = post.link;
+    }
+
+    if (post.audio) {
+      audioLink = post.link;
     }
     return (
       <div className="card card-body mb-3">
@@ -130,6 +173,33 @@ class PostItem extends Component {
             {imgLink && (
               <div className="mb-3">
                 <img src={imgLink} alt="" className="rounded" />
+              </div>
+            )}
+            {videoLink && (
+              <div className="mb-3">
+                <ReactPlayer
+                  url={videoLink}
+                  playing={videoPlayerConfig.playing}
+                  controls
+                  volume={videoPlayerConfig.volume}
+                  muted
+                  width="100%"
+                  id={"videoPlayer" + post.id}
+                />
+              </div>
+            )}
+            {audioLink && (
+              <div className="mb-3">
+                <img src={musicGif} alt="" className="rounded" />
+                <ReactPlayer
+                  height="70px"
+                  url={audioLink}
+                  playing={false}
+                  controls
+                  volume={2}
+                  muted
+                  width="100%"
+                />
               </div>
             )}
             {showActions ? (
