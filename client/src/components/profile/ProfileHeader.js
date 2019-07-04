@@ -7,6 +7,7 @@ class ProfileHeader extends Component {
     this.state = {
       imgHeight: ""
     };
+    this.onImgLoad = this.onImgLoad.bind(this);
   }
 
   componentWillReceiveProps(newProps) {
@@ -25,11 +26,11 @@ class ProfileHeader extends Component {
   }
 
   componentDidMount() {
-    window.addEventListener("resize", this.onImgLoad.bind(this));
+    window.addEventListener("resize", this.onImgLoad);
   }
 
   componentWillUnmount() {
-    window.addEventListener("resize", this.onImgLoad.bind(this));
+    window.removeEventListener("resize", this.onImgLoad);
   }
 
   render() {

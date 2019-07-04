@@ -29,6 +29,8 @@ class PostItem extends Component {
       imgHeight: "",
       videoPlayerConfig: { playing: false, volume: 2 }
     };
+    this.onImgLoad = this.onImgLoad.bind(this);
+    this.onScroll = this.onScroll.bind(this);
   }
 
   componentWillReceiveProps(newProps) {
@@ -118,13 +120,13 @@ class PostItem extends Component {
   }
 
   componentDidMount() {
-    window.addEventListener("resize", this.onImgLoad.bind(this));
-    window.addEventListener("scroll", this.onScroll.bind(this));
+    window.addEventListener("resize", this.onImgLoad);
+    window.addEventListener("scroll", this.onScroll);
   }
 
   componentWillUnmount() {
-    window.addEventListener("resize", this.onImgLoad.bind(this));
-    window.addEventListener("scroll", this.onScroll.bind(this));
+    window.removeEventListener("resize", this.onImgLoad);
+    window.removeEventListener("scroll", this.onScroll);
   }
 
   render() {

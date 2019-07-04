@@ -22,6 +22,7 @@ class CommentItem extends Component {
         imgHeight: newProps.imgHeight
       });
     }
+    this.onImgLoad = this.onImgLoad.bind(this);
   }
 
   onImgLoad() {
@@ -32,11 +33,11 @@ class CommentItem extends Component {
   }
 
   componentDidMount() {
-    window.addEventListener("resize", this.onImgLoad.bind(this));
+    window.addEventListener("resize", this.onImgLoad);
   }
 
   componentWillUnmount() {
-    window.addEventListener("resize", this.onImgLoad.bind(this));
+    window.removeEventListener("resize", this.onImgLoad);
   }
 
   render() {
