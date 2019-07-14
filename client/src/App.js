@@ -10,7 +10,7 @@ import setAuthToken from "./utils/setAuthToken";
 import { setCurrentUser, logoutUser } from "./actions/authActions";
 import { clearCurrentProfile } from "./actions/profileActions";
 import Navbar from "./components/layout/Navbar";
-import Footer from "./components/layout/Footer";
+// import Footer from "./components/layout/Footer";
 import Landing from "./components/layout/Landing";
 import Register from "./components/auth/Register";
 import Login from "./components/auth/Login";
@@ -21,6 +21,7 @@ import Profiles from "./components/profiles/Profiles";
 import Profile from "./components/profile/Profile";
 import Posts from "./components/posts/Posts";
 import Post from "./components/post/Post";
+import Chat from "./components/chat/ChatPage";
 
 import "./App.css";
 
@@ -58,9 +59,14 @@ function App() {
             <Route exact path="/login" component={Login} />
             <Route exact path="/profiles" component={Profiles} />
             <Route exact path="/profile/:id" component={Profile} />
-            {/* <Route exact path="/feed" component={Posts} /> */}
             <Switch>
               <PrivateRoute exact path="/feed" component={Posts} />
+            </Switch>
+            <Switch>
+              <PrivateRoute exact path="/chat" component={Chat} />
+            </Switch>
+            <Switch>
+              <PrivateRoute exact path="/chat/:nameAndId" component={Chat} />
             </Switch>
             <Switch>
               <PrivateRoute exact path="/post/:id" component={Post} />
@@ -83,7 +89,7 @@ function App() {
               />
             </Switch>
           </div>
-          <Footer />
+          {/* <Footer /> */}
         </div>
       </Router>
     </Provider>

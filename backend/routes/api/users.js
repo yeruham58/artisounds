@@ -5,12 +5,19 @@ const bcrypt = require("bcryptjs");
 const keys = require("../../config/keys");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
+const Chatkit = require("@pusher/chatkit-server");
 
 const User = require("../../classes/User");
 
 //load Input validation
 const validateRgisterInput = require("../../validation/register");
 const validateLoginInput = require("../../validation/login");
+const { instanceLocator, secretKey } = require("../../config/keys");
+
+const chatkit = new Chatkit.default({
+  instanceLocator: instanceLocator,
+  key: secretKey
+});
 
 //@route    GET api/users/test
 //@desc     test users route
@@ -33,7 +40,6 @@ router.post("/register", (req, res) => {
     return res.status(400).json(errors);
   }
 
-  // User.findOne({ email: req.body.email }).then(user => {
   User.findOne({ where: { email: req.body.email } }).then(user => {
     if (user) {
       errors.email = "Email already exists";
@@ -57,7 +63,22 @@ router.post("/register", (req, res) => {
           newUser.password = hash;
           let { name, email, avatar, password } = newUser;
           User.create({ name, email, avatar, password })
-            .then(user => res.json(user))
+            .then(user => {
+              chatkit
+                .createUser({
+                  id: user.id.toString(),
+                  name: user.name,
+                  avatarURL: user.avatar
+                })
+                .then(() => {
+                  console.log("User created successfully");
+                })
+                .catch(err => {
+                  console.log("chat user err");
+                  console.log(err);
+                });
+              res.json(user);
+            })
             .catch(err => console.log(err));
         });
       });

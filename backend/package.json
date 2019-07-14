@@ -13,6 +13,7 @@
   "author": "Yeruham Landau",
   "license": "MIT",
   "dependencies": {
+    "@pusher/chatkit-server": "^2.0.1",
     "aws-sdk": "^2.480.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",

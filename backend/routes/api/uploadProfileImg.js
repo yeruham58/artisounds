@@ -6,9 +6,17 @@ const aws = require("aws-sdk");
 const multerS3 = require("multer-s3");
 const multer = require("multer");
 const path = require("path");
+const Chatkit = require("@pusher/chatkit-server");
 
 const keys = require("../../config/keys");
 const User = require("../../classes/User");
+
+const { instanceLocator, secretKey } = require("../../config/keys");
+
+const chatkit = new Chatkit.default({
+  instanceLocator: instanceLocator,
+  key: secretKey
+});
 
 /**
  * PROFILE IMAGE STORING STARTS
@@ -91,6 +99,7 @@ router.post(
               }
 
               user.update({ avatar_key: imageKey, avatar: req.file.location });
+              updateChatImgs(req.file.location, user.id.toString(), user.name);
             })
             .catch(err => console.log(err));
           res.json({
@@ -101,6 +110,39 @@ router.post(
     });
   }
 );
+
+// Updat user chat imgs
+const updateChatImgs = (newImg, userId, userName) => {
+  chatkit
+    .getUserRooms({
+      userId
+    })
+    .then(rooms => {
+      rooms.map(room => {
+        const imgList = room.custom_data.imgUrls;
+        const imgObjToStay = imgList.find(
+          nameAndImg => Object.keys(nameAndImg)[0] !== userName
+        );
+
+        const newimgList = [imgObjToStay, { [userName]: newImg }];
+
+        chatkit
+          .updateRoom({
+            id: room.id,
+            name: room.name,
+            isPrivate: true,
+            customData: { imgUrls: newimgList }
+          })
+          .then(() => {
+            console.log("room successfully updated");
+          })
+          .catch(err => console.error(err));
+      });
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
 
 // Delete file from aws
 

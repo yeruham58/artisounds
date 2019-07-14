@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import isEmpty from "../../validation/isEmpty";
+import { splitNameAndId } from "../../config/chatConfig";
 
 class ProfileItem extends Component {
   constructor(props) {
@@ -69,9 +70,20 @@ class ProfileItem extends Component {
                 <span>{profile.location}</span>
               )}
             </p>
-            <Link to={`/profile/${profile.id}`} className="btn btn-info">
+            <Link
+              to={`/profile/${profile.id}`}
+              className="btn btn-info  mr-2 mb-2"
+            >
               View profile
             </Link>
+            {this.props.isAuthenticated ? (
+              <Link
+                to={`/chat/${profile.name + splitNameAndId + profile.id}`}
+                className="btn btn-outline-success"
+              >
+                Send a message
+              </Link>
+            ) : null}
           </div>
 
           <div className="col-md-4 d-none d-md-block">

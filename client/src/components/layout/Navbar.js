@@ -13,7 +13,7 @@ class Navbar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userAvatar: this.props.auth.user.avatar
+      userAvatar: null
       // userAvatar:
       //   this.props.profile && this.props.profile.avatar
       //     ? this.props.profile.avatar
@@ -26,11 +26,6 @@ class Navbar extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    if (newProps.auth) {
-      this.setState({
-        userAvatar: newProps.auth.user.avatar
-      });
-    }
     if (
       newProps.profile &&
       newProps.profile.profile &&
@@ -40,6 +35,11 @@ class Navbar extends Component {
         userAvatar: newProps.profile.profile.avatar
       });
       this.props.auth.user.avatar = newProps.profile.profile.avatar;
+    }
+    if (newProps.auth) {
+      this.setState({
+        userAvatar: newProps.auth.user.avatar
+      });
     }
   }
 
@@ -62,6 +62,11 @@ class Navbar extends Component {
         <li className="nav-item">
           <Link to="/dashboard" className="nav-link">
             Dashboard
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/chat" className="nav-link">
+            Messages
           </Link>
         </li>
         <li className="nav-item">
