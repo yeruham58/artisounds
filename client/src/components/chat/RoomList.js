@@ -24,7 +24,8 @@ class RoomList extends Component {
             <div className="container pr-0" key={room.id}>
               <div
                 className={`row room ${active}`}
-                onClick={() =>
+                onClick={() => {
+                  room.unreadCount = 0;
                   this.props.subscribeToRoom(
                     room.id,
                     room.name
@@ -34,8 +35,8 @@ class RoomList extends Component {
                           name.indexOf(this.props.user.name + splitNameAndId) <
                           0
                       )
-                  )
-                }
+                  );
+                }}
               >
                 <div className="col-1">
                   <img
@@ -55,6 +56,11 @@ class RoomList extends Component {
                 </div>
                 <div className="col-10 mt-2">
                   <strong className="ml-2">{memberName}</strong>
+                  {room.unreadCount > 0 ? (
+                    <strong className="unreadMessagesNumber ml-2">
+                      {room.unreadCount}
+                    </strong>
+                  ) : null}
                 </div>
                 <hr align="left" width="100%" className="mb-0 mt-0" />
               </div>

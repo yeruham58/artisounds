@@ -27,4 +27,5 @@ yarn-error.log*
 /package-lock.json
 /config.json
 /migrations
+/TestChat.js
 .DS_Store

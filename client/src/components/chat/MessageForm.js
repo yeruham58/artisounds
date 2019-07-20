@@ -16,6 +16,7 @@ class MessageForm extends Component {
 
   onChange(e) {
     this.setState({ [e.target.name]: e.target.value });
+    this.props.onUserTyping();
   }
 
   onSubmit(e) {

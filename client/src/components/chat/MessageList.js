@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 
+// import { splitNameAndId } from "../../config/chatConfig";
+import Message from "./Message";
+
 class MessageList extends Component {
   componentWillUpdate() {
     const node = ReactDOM.findDOMNode(this);
@@ -16,12 +19,15 @@ class MessageList extends Component {
   }
 
   render() {
+    // let room;
+    // let memberName;
+    // let memberId;
     if (!this.props.roomId) {
       return (
         <div
           className="messagelist"
           style={{
-            height: window.innerHeight - 200,
+            height: window.innerHeight,
             overflowY: "scroll"
           }}
         >
@@ -29,27 +35,35 @@ class MessageList extends Component {
         </div>
       );
     }
+    // else {
+    //   room = this.props.rooms.find(room => room.id === this.props.roomId);
+    //   memberName = room.name
+    //     .split(":")
+    //     .find(name => name.indexOf(this.props.user.name + splitNameAndId) < 0)
+    //     .split(splitNameAndId)[0];
+    //   memberId = room.name
+    //     .split(":")
+    //     .find(name => name.indexOf(this.props.user.name + splitNameAndId) < 0)
+    //     .split(splitNameAndId)[1];
+    // }
+
     return (
+      // <div>
+      //   <ChatBar room={room} memberName={memberName} memberId={memberId} />
       <div
         style={{
-          height: window.innerHeight - 180,
+          height: window.innerHeight - 250,
           overflowY: "scroll"
         }}
         className="messagelist pb-2"
       >
         {this.props.messages.map((message, index) => {
           return (
-            <div key={index} className=" mt-2 mb-2 ml-3">
-              <div>
-                <strong className="message-username">
-                  {message.sender.name}
-                </strong>
-              </div>
-              <div className="message-text">{message.text}</div>
-            </div>
+            <Message key={index} message={message} user={this.props.user} />
           );
         })}
       </div>
+      // </div>
     );
   }
 }

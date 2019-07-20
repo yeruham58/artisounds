@@ -22,6 +22,7 @@ import Profile from "./components/profile/Profile";
 import Posts from "./components/posts/Posts";
 import Post from "./components/post/Post";
 import Chat from "./components/chat/ChatPage";
+import TestChat from "./components/chat/TestChat";
 
 import "./App.css";
 
@@ -61,6 +62,9 @@ function App() {
             <Route exact path="/profile/:id" component={Profile} />
             <Switch>
               <PrivateRoute exact path="/feed" component={Posts} />
+            </Switch>
+            <Switch>
+              <PrivateRoute exact path="/test-chat" component={TestChat} />
             </Switch>
             <Switch>
               <PrivateRoute exact path="/chat" component={Chat} />

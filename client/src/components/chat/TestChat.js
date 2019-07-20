@@ -5,7 +5,6 @@ import { connect } from "react-redux";
 
 import { getProfileById } from "../../actions/profileActions";
 
-import RoomList from "./RoomList";
 import MessageList from "./MessageList";
 import MessageForm from "./MessageForm";
 import ChatBar from "./ChatBar";
@@ -17,7 +16,7 @@ import {
   splitNameAndId
 } from "../../config/chatConfig";
 
-class ChatPage extends Component {
+class TestChat extends Component {
   constructor() {
     super();
     this.state = {
@@ -41,7 +40,7 @@ class ChatPage extends Component {
   componentDidMount() {
     const chatManager = new ChatManager({
       instanceLocator,
-      userId: this.props.auth.user.id.toString(),
+      userId: "20",
       tokenProvider: new TokenProvider({
         url: tokenUrl
       })
@@ -51,10 +50,7 @@ class ChatPage extends Component {
       .connect()
       .then(currentUser => {
         this.currentUser = currentUser;
-        this.getRooms();
-        if (this.props.match.params.nameAndId) {
-          this.checkIfRoomCreated(this.props.match.params.nameAndId);
-        }
+        this.subscribeToRoom("6a98328d-6be0-4c11-9ce4-71058575ddd9", null);
       })
       .catch(err => console.log("error on connecting: ", err));
   }
@@ -130,14 +126,33 @@ class ChatPage extends Component {
     });
   }
 
+  setCursor(roomId, position) {
+    this.currentUser
+      .setReadCursor({
+        roomId,
+        position
+      })
+      .then(() => {
+        console.log("Success!");
+      })
+      .catch(err => {
+        console.log(`Error setting cursor: ${err}`);
+      });
+  }
+
+  onUserTyping() {
+    this.currentUser
+      .isTypingIn({ roomId: this.state.roomId })
+      .then(() => {
+        console.log("Success!");
+      })
+      .catch(err => {
+        console.log(`Error sending typing indicator: ${err}`);
+      });
+  }
+
   subscribeToRoom(roomId, endPoint) {
     if (roomId !== this.state.roomId) {
-      this.setState({
-        messages: []
-      });
-
-      window.history.pushState(null, "", `/chat/${endPoint}`);
-
       this.currentUser
         .subscribeToRoomMultipart({
           messageLimit: 20,
@@ -177,31 +192,6 @@ class ChatPage extends Component {
     }
   }
 
-  setCursor(roomId, position) {
-    this.currentUser
-      .setReadCursor({
-        roomId,
-        position
-      })
-      .then(() => {
-        console.log("Success!");
-      })
-      .catch(err => {
-        console.log(`Error setting cursor: ${err}`);
-      });
-  }
-
-  onUserTyping() {
-    this.currentUser
-      .isTypingIn({ roomId: this.state.roomId })
-      .then(() => {
-        console.log("Success!");
-      })
-      .catch(err => {
-        console.log(`Error sending typing indicator: ${err}`);
-      });
-  }
-
   sendMessage(text) {
     this.currentUser.sendMessage({
       text,
@@ -234,8 +224,7 @@ class ChatPage extends Component {
         <div className="container">
           <div className="row">
             <div className="col-md-3">
-              {console.log(this.state.joinedRooms)}
-              {this.state.joinedRooms[0] ? (
+              {/* {this.state.joinedRooms[0] ? (
                 <RoomList
                   user={this.props.auth.user}
                   roomId={this.state.roomId}
@@ -243,7 +232,7 @@ class ChatPage extends Component {
                   setUrlToRoom={this.setUrlToRoom}
                   rooms={this.state.joinedRooms}
                 />
-              ) : null}
+              ) : null} */}
             </div>
             <div className="col-md-9 pl-0">
               {room && (
@@ -274,7 +263,7 @@ class ChatPage extends Component {
   }
 }
 
-ChatPage.propTypes = {
+TestChat.propTypes = {
   getProfileById: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired
 };
@@ -287,4 +276,4 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   { getProfileById }
-)(ChatPage);
+)(TestChat);

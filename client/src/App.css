@@ -44,6 +44,21 @@ img {
   flex: 1;
 }
 
+.chatBar {
+  height: 55px;
+  background: #f0f8ff;
+}
+
+.message {
+  width: 75%;
+  float: left;
+}
+
+.message-body {
+  border-radius: 8px;
+  background: #5ea3d0;
+}
+
 .message-username {
   font-size: 11px;
   color: var(--main-text-color);
@@ -52,10 +67,24 @@ img {
 }
 
 .message-text {
-  background: #5ea3d0;
   color: white;
-  display: inline;
   padding: 4px 8px;
+  border-radius: 8px;
+  word-break: break-all;
+  /* display: block; */
+}
+
+.senderMessage-text {
+  color: #5ea3d0;
+}
+
+.senderMessageContainer {
+  float: right;
+}
+
+.senderMessageBody {
+  float: right;
+  background: white;
   border-radius: 8px;
 }
 
@@ -65,6 +94,14 @@ img {
 
 .room.active {
   background-color: WhiteSmoke;
+}
+
+.unreadMessagesNumber {
+  color: white;
+  font-size: 8px;
+  padding: 2px;
+  background: red;
+  border-radius: 8px;
 }
 
 .messagelist .join-room {
