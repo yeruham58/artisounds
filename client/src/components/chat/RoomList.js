@@ -56,7 +56,7 @@ class RoomList extends Component {
                 </div>
                 <div className="col-10 mt-2">
                   <strong className="ml-2">{memberName}</strong>
-                  {room.unreadCount > 0 ? (
+                  {room.unreadCount > 0 && room.id !== this.props.roomId ? (
                     <strong className="unreadMessagesNumber ml-2">
                       {room.unreadCount}
                     </strong>

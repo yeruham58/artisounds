@@ -14,3 +14,5 @@ export const DELETE_POST = "DELETE_POST";
 export const ADD_FILE = "ADD_FILE";
 export const FILE_UPLOADING = "FILE_UPLOADING";
 export const DELETE_FILE = "DELETE_FILE";
+export const CONNECT_CHAT = "CONNECT_CHAT";
+export const DISCONNECT_CHAT = "DISCONNECT_CHAT";

@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 
-// import { splitNameAndId } from "../../config/chatConfig";
 import Message from "./Message";
 
 class MessageList extends Component {
@@ -19,9 +18,6 @@ class MessageList extends Component {
   }
 
   render() {
-    // let room;
-    // let memberName;
-    // let memberId;
     if (!this.props.roomId) {
       return (
         <div
@@ -35,21 +31,8 @@ class MessageList extends Component {
         </div>
       );
     }
-    // else {
-    //   room = this.props.rooms.find(room => room.id === this.props.roomId);
-    //   memberName = room.name
-    //     .split(":")
-    //     .find(name => name.indexOf(this.props.user.name + splitNameAndId) < 0)
-    //     .split(splitNameAndId)[0];
-    //   memberId = room.name
-    //     .split(":")
-    //     .find(name => name.indexOf(this.props.user.name + splitNameAndId) < 0)
-    //     .split(splitNameAndId)[1];
-    // }
 
     return (
-      // <div>
-      //   <ChatBar room={room} memberName={memberName} memberId={memberId} />
       <div
         style={{
           height: window.innerHeight - 250,
@@ -63,7 +46,6 @@ class MessageList extends Component {
           );
         })}
       </div>
-      // </div>
     );
   }
 }

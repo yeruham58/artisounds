@@ -3,6 +3,10 @@ import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
+import {
+  connectUserToChat,
+  updateDisconnectChat
+} from "../../actions/chatActions";
 import { logoutUser } from "../../actions/authActions";
 import {
   clearCurrentProfile,
@@ -13,19 +17,46 @@ class Navbar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userAvatar: null
-      // userAvatar:
-      //   this.props.profile && this.props.profile.avatar
-      //     ? this.props.profile.avatar
-      //     : this.props.auth.user.avatar
+      userAvatar: null,
+      unreadMessages: null
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.props.getCurrentProfile();
+    if (
+      this.props.auth.isAuthenticated &&
+      window.location.href.indexOf("chat") < 0
+    ) {
+      this.props.connectUserToChat({
+        userId: this.props.auth.user.id.toString()
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    this.props.chat.currentUser.disconnect();
   }
 
   componentWillReceiveProps(newProps) {
+    if (newProps.chat && window.location.href.indexOf("chat") < 0) {
+      if (newProps.chat.userRooms && newProps.chat.userRooms[0]) {
+        let unreadMessages = 0;
+        newProps.chat.userRooms.map(
+          room => (unreadMessages += room.unreadCount)
+        );
+
+        if (
+          newProps.chat.currentUser.presenceStore[this.props.auth.user.id] ===
+            "online" &&
+          !newProps.chat.chatDisconnected
+        ) {
+          newProps.chat.currentUser.disconnect();
+          this.props.updateDisconnectChat();
+        }
+        this.setState({ unreadMessages });
+      }
+    }
     if (
       newProps.profile &&
       newProps.profile.profile &&
@@ -64,14 +95,20 @@ class Navbar extends Component {
             Dashboard
           </Link>
         </li>
-        <li className="nav-item">
+        {/* <li className="nav-item">
           <Link to="/test-chat" className="nav-link">
             Test Messages
           </Link>
-        </li>
+        </li> */}
         <li className="nav-item">
           <Link to="/chat" className="nav-link">
             Messages
+            {this.state.unreadMessages &&
+            window.location.href.indexOf("chat") < 0 ? (
+              <span className="unreadMessagesNumber ml-1">
+                {this.state.unreadMessages}
+              </span>
+            ) : null}
           </Link>
         </li>
         <li className="nav-item">
@@ -161,6 +198,8 @@ class Navbar extends Component {
 
 Navbar.propTypes = {
   logoutUser: PropTypes.func.isRequired,
+  connectUserToChat: PropTypes.func.isRequired,
+  updateDisconnectChat: PropTypes.func.isRequired,
   getCurrentProfile: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
   profile: PropTypes.object
@@ -168,10 +207,17 @@ Navbar.propTypes = {
 
 const mapStateToProps = state => ({
   auth: state.auth,
-  profile: state.profile
+  profile: state.profile,
+  chat: state.chat
 });
 
 export default connect(
   mapStateToProps,
-  { logoutUser, clearCurrentProfile, getCurrentProfile }
+  {
+    logoutUser,
+    clearCurrentProfile,
+    getCurrentProfile,
+    connectUserToChat,
+    updateDisconnectChat
+  }
 )(Navbar);

@@ -3,6 +3,10 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
+import {
+  connectUserToChat,
+  updateDisconnectChat
+} from "../../actions/chatActions";
 import { getProfileById } from "../../actions/profileActions";
 
 import RoomList from "./RoomList";
@@ -10,10 +14,10 @@ import MessageList from "./MessageList";
 import MessageForm from "./MessageForm";
 import ChatBar from "./ChatBar";
 
-import { ChatManager, TokenProvider } from "@pusher/chatkit-client";
+// import { ChatManager, TokenProvider } from "@pusher/chatkit-client";
 import {
-  tokenUrl,
-  instanceLocator,
+  // tokenUrl,
+  // instanceLocator,
   splitNameAndId
 } from "../../config/chatConfig";
 
@@ -39,31 +43,26 @@ class ChatPage extends Component {
   }
 
   componentDidMount() {
-    const chatManager = new ChatManager({
-      instanceLocator,
-      userId: this.props.auth.user.id.toString(),
-      tokenProvider: new TokenProvider({
-        url: tokenUrl
-      })
+    this.props.connectUserToChat({
+      userId: this.props.auth.user.id.toString()
     });
-
-    chatManager
-      .connect()
-      .then(currentUser => {
-        this.currentUser = currentUser;
-        this.getRooms();
-        if (this.props.match.params.nameAndId) {
-          this.checkIfRoomCreated(this.props.match.params.nameAndId);
-        }
-      })
-      .catch(err => console.log("error on connecting: ", err));
   }
 
   componentWillUnmount() {
     this.currentUser.disconnect();
+    this.props.updateDisconnectChat();
   }
 
   componentWillReceiveProps(newProp) {
+    if (newProp.chat) {
+      this.currentUser = newProp.chat.currentUser;
+      if (this.currentUser) {
+        this.getRooms();
+        if (this.props.match.params.nameAndId) {
+          this.checkIfRoomCreated(this.props.match.params.nameAndId);
+        }
+      }
+    }
     if (
       newProp.profile &&
       newProp.profile.profile &&
@@ -133,43 +132,81 @@ class ChatPage extends Component {
   subscribeToRoom(roomId, endPoint) {
     if (roomId !== this.state.roomId) {
       this.setState({
-        messages: []
+        messages: [],
+        roomId
       });
+
+      // if (
+      //   this.currentUser.roomSubscriptions[this.state.roomId]
+      // ) {
+
+      //   this.currentUser.roomSubscriptions[this.state.roomId].cancel();
+      // }
 
       window.history.pushState(null, "", `/chat/${endPoint}`);
 
       this.currentUser
         .subscribeToRoomMultipart({
-          messageLimit: 20,
+          messageLimit: 100,
           roomId,
           hooks: {
             onMessage: message => {
-              this.setState({
-                messages: [...this.state.messages, message]
-              });
-              this.setCursor(roomId, message.id);
+              if (this.state.roomId.toString() === message.roomId.toString()) {
+                this.setState({
+                  messages: [...this.state.messages, message]
+                });
+                const cursor = this.currentUser.readCursor({
+                  roomId
+                });
+                if (message.id > cursor.position) {
+                  this.setCursor(roomId, message.id);
+                }
+              }
             },
             onUserStartedTyping: user => {
-              this.setState({
-                info: "Typing..."
-              });
+              if (
+                this.currentUser.rooms
+                  .find(room => room.id === this.state.roomId)
+                  .userIds.indexOf(user.id.toString()) > -1
+              ) {
+                this.setState({
+                  info: "Typing..."
+                });
+              }
             },
             onUserStoppedTyping: user => {
-              this.setState({
-                info: "online"
-              });
+              if (
+                this.currentUser.rooms
+                  .find(room => room.id === this.state.roomId)
+                  .userIds.indexOf(user.id.toString()) > -1
+              ) {
+                this.setState({
+                  info: "online"
+                });
+              }
             },
             onPresenceChanged: (state, user) => {
-              const info = state.current === "online" ? state.current : "";
-              this.setState({
-                info
-              });
+              if (
+                this.currentUser.rooms
+                  .find(room => room.id === this.state.roomId)
+                  .userIds.indexOf(user.id.toString()) > -1
+              ) {
+                const info = state.current === "online" ? state.current : "";
+                this.setState({
+                  info
+                });
+              }
             }
           }
         })
         .then(room => {
+          const info =
+            room.userStore.presenceStore[endPoint.split(splitNameAndId)[1]] ===
+            "online"
+              ? "online"
+              : "";
           this.setState({
-            roomId: room.id
+            info
           });
           this.getRooms();
         })
@@ -183,9 +220,7 @@ class ChatPage extends Component {
         roomId,
         position
       })
-      .then(() => {
-        console.log("Success!");
-      })
+      .then(() => {})
       .catch(err => {
         console.log(`Error setting cursor: ${err}`);
       });
@@ -194,9 +229,7 @@ class ChatPage extends Component {
   onUserTyping() {
     this.currentUser
       .isTypingIn({ roomId: this.state.roomId })
-      .then(() => {
-        console.log("Success!");
-      })
+      .then(() => {})
       .catch(err => {
         console.log(`Error sending typing indicator: ${err}`);
       });
@@ -234,7 +267,6 @@ class ChatPage extends Component {
         <div className="container">
           <div className="row">
             <div className="col-md-3">
-              {console.log(this.state.joinedRooms)}
               {this.state.joinedRooms[0] ? (
                 <RoomList
                   user={this.props.auth.user}
@@ -276,15 +308,18 @@ class ChatPage extends Component {
 
 ChatPage.propTypes = {
   getProfileById: PropTypes.func.isRequired,
+  updateDisconnectChat: PropTypes.func.isRequired,
+  connectUserToChat: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
   auth: state.auth,
-  profile: state.profile
+  profile: state.profile,
+  chat: state.chat
 });
 
 export default connect(
   mapStateToProps,
-  { getProfileById }
+  { getProfileById, connectUserToChat, updateDisconnectChat }
 )(ChatPage);
