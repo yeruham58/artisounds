@@ -136,13 +136,6 @@ class ChatPage extends Component {
         roomId
       });
 
-      // if (
-      //   this.currentUser.roomSubscriptions[this.state.roomId]
-      // ) {
-
-      //   this.currentUser.roomSubscriptions[this.state.roomId].cancel();
-      // }
-
       window.history.pushState(null, "", `/chat/${endPoint}`);
 
       this.currentUser
