@@ -28,4 +28,5 @@ yarn-error.log*
 /config.json
 /migrations
 /TestChat.js
+/client/src/components/chat/TestChat.js
 .DS_Store
