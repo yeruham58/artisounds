@@ -207,7 +207,7 @@ router.post(
   }
 );
 
-//@ route   DELETE api/posts/comment/:id/comment_id
+//@ route   DELETE api/posts/comment/:comment_id
 //@desc     remove comment from post
 //@access   private
 router.delete(

@@ -2,6 +2,7 @@ const express = require("express");
 const users = require("./routes/api/users");
 const profile = require("./routes/api/profile");
 const posts = require("./routes/api/posts");
+const projects = require("./routes/api/projects");
 const uploadProfileImg = require("./routes/api/uploadProfileImg");
 const uploadPostMedia = require("./routes/api/uploadPostMedia");
 const bodyParser = require("body-parser");
@@ -34,6 +35,7 @@ require("./config/passport")(passport);
 app.use("/api/users", users);
 app.use("/api/profile", profile);
 app.use("/api/posts", posts);
+app.use("/api/projects", projects);
 app.use("/api/upload", uploadProfileImg);
 app.use("/api/upload", uploadPostMedia.router);
 
