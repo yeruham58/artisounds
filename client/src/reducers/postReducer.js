@@ -9,8 +9,7 @@ import {
 const initialState = {
   posts: [],
   post: {},
-  loading: false,
-  imgUrl: null
+  loading: false
 };
 
 export default function(state = initialState, action) {

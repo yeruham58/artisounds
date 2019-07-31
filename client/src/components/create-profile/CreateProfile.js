@@ -44,7 +44,7 @@ class CreateProfile extends Component {
         console.log(err);
       });
 
-    // Get all art types from database
+    // Get all music genres from database
     axios
       .get("/api/profile/music-genres")
       .then(musicGenres => {
@@ -524,7 +524,7 @@ class CreateProfile extends Component {
                 <input
                   type="submit"
                   value="Submit"
-                  className="btn btn-info btn-block mt-4"
+                  className="btn btn-info btn-block mt-4 mb-4"
                 />
               </form>
             </div>

@@ -5,6 +5,7 @@ import profileReducer from "./profileReducer";
 import postReducer from "./postReducer";
 import uploadFileReducer from "./uploadFileReducer";
 import chatReducer from "./chatReducer";
+import projectReducer from "./projectReducer";
 
 export default combineReducers({
   auth: authReducer,
@@ -12,5 +13,6 @@ export default combineReducers({
   profile: profileReducer,
   post: postReducer,
   upload: uploadFileReducer,
-  chat: chatReducer
+  chat: chatReducer,
+  project: projectReducer
 });

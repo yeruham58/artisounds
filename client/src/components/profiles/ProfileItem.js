@@ -79,7 +79,7 @@ class ProfileItem extends Component {
             {this.props.isAuthenticated ? (
               <Link
                 to={`/chat/${profile.name + splitNameAndId + profile.id}`}
-                className="btn btn-outline-success"
+                className="btn btn-outline-success mb-2"
               >
                 Send a message
               </Link>

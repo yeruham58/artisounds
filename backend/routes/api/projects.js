@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 
-const validatePostInput = require("../../validation/post");
+const validateProjectInput = require("../../validation/project");
 const validateCommentInput = require("../../validation/comment");
 
 const User = require("../../classes/User");
 const ProjectInstrument = require("../../classes/ProjectInstrument");
-// const Post = require("../../classes/Project");
+const Project = require("../../classes/Project");
 // const Like = require("../../classes/Like");
 // const Dislike = require("../../classes/Dislike");
 // const Comment = require("../../classes/Comment");
@@ -47,17 +47,20 @@ router.post(
   "/",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    // const { errors, isValid } = validatePostInput(req.body);
-    // if (!isValid) {
-    //   return res.status(400).json(errors);
-    // }
+    const { errors, isValid } = validateProjectInput(req.body);
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
     const newProject = {};
-    newProject.user_id = req.body.user_id;
+    newProject.user_id = req.user.id;
     newProject.name = req.body.name;
     newProject.original = req.body.original;
+    newProject.original_by = req.body.original_by;
     newProject.bit = req.body.bit;
-    if (newProject.scale_id) newProject.scale_id = req.body.scale_id;
-    if (newProject.genere_id) newProject.genere_id = req.body.genere_id;
+    if (newProject.tempo) newProject.tempo = req.body.pempo;
+    newProject.scale_type = req.body.scale_type;
+    if (newProject.scale) newProject.scale = req.body.scale;
+    if (newProject.genre_id) newProject.genre_id = req.body.genre_id;
     if (newProject.description) newProject.description = req.body.description;
     if (newProject.comment) newProject.comment = req.body.comment;
     if (newProject.text) newProject.text = req.body.text;
@@ -65,6 +68,9 @@ router.post(
     newProject.img_or_video_url = null;
     newProject.img_or_video_key = null;
     newProject.in_action = true;
+    console.log("newProject in back end");
+    console.log(newProject);
+
     Project.create(newProject)
       .then(project => res.json(project))
       .catch(err => {
