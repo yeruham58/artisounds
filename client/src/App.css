@@ -155,3 +155,8 @@ img {
   background: #2e4ba3; /* Green background */
   cursor: pointer; /* Cursor on hover */
 }
+
+/* instrument-item */
+.instrument-item {
+  float: left;
+}

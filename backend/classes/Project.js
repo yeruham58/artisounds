@@ -4,13 +4,14 @@ const sequelize = require("../config/database");
 // const Like = require("./Like");
 // const Dislike = require("./Dislike");
 // const Comment = require("./Comment");
+const ProjectInstrument = require("./ProjectInstrument");
 const User = require("./user");
 
 const include = [
   {
     model: User,
     as: "user_detailes"
-  }
+  },
   // {
   //   model: Like,
   //   as: "likes",
@@ -35,6 +36,14 @@ const include = [
   //     as: "user_detailes"
   //   }
   // }
+  {
+    model: ProjectInstrument,
+    as: "instruments",
+    include: {
+      model: User,
+      as: "user_detailes"
+    }
+  }
 ];
 
 class Project extends Sequelize.Model {
@@ -101,6 +110,10 @@ Project.init(
 // Project.hasMany(Like, { foreignKey: "project_id", as: "likes" });
 // Project.hasMany(Dislike, { foreignKey: "project_id", as: "dislikes" });
 // Project.hasMany(Comment, { foreignKey: "project_id", as: "comments" });
+Project.hasMany(ProjectInstrument, {
+  foreignKey: "project_id",
+  as: "instruments"
+});
 Project.belongsTo(User, { foreignKey: "user_id", as: "user_detailes" });
 
 module.exports = Project;

@@ -16,15 +16,15 @@ const { deleteAwsFile } = require("./uploadPostMedia");
 //@ route   GET api/projets/test
 //@desc     test projets route
 //@access   public
-router.get("/test", (req, res) => res.json({ msg: "projets works" }));
+router.get("/test", (req, res) => res.json({ msg: "projects works" }));
 
 //@ route   GET api/projets
 //@desc     get all projets
 //@access   public
 router.get("/", (req, res) => {
-  Post.getAllProjets()
-    .then(projets => res.json(projets))
-    .catch(err => res.status(404).json({ msg: "no projet found" }));
+  Project.getAllProjects()
+    .then(projects => res.json(projects))
+    .catch(err => res.status(404).json({ msg: "no project found" }));
 });
 
 //@ route   GET api/projets/:id
@@ -35,7 +35,9 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     Project.getProjectByProjectId(req.params.id)
-      .then(project => res.json(project))
+      .then(project => {
+        res.json(project);
+      })
       .catch(err => res.status(404).json({ msg: "no project found" }));
   }
 );
@@ -68,8 +70,6 @@ router.post(
     newProject.img_or_video_url = null;
     newProject.img_or_video_key = null;
     newProject.in_action = true;
-    console.log("newProject in back end");
-    console.log(newProject);
 
     Project.create(newProject)
       .then(project => res.json(project))
@@ -260,19 +260,20 @@ router.delete(
 //@desc     add instrument to project
 //@access   private
 router.post(
-  "/instrument/:id",
+  "/instrument/:projectId",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     // const { errors, isValid } = validateCommentInput(req.body);
     // if (!isValid) {
     //   return res.status(400).json(errors);
     // }
+
     const instrumentInfo = {};
     instrumentInfo.user_id = req.user.id;
     instrumentInfo.instrument_id = req.body.instrument_id;
-    instrumentInfo.project_id = req.params.id;
+    instrumentInfo.project_id = req.params.projectId;
     instrumentInfo.original = req.body.original;
-    instrumentInfo.role = req.body.role;
+    if (req.body.role) instrumentInfo.role = req.body.role;
     instrumentInfo.characters_url = null;
     instrumentInfo.characters_key = null;
     instrumentInfo.record_url = null;
@@ -281,7 +282,7 @@ router.post(
 
     ProjectInstrument.create(instrumentInfo)
       .then(() => {
-        Project.getProjectByProjectId(req.params.id).then(project =>
+        Project.getProjectByProjectId(req.params.projectId).then(project =>
           res.json(project)
         );
       })
@@ -297,25 +298,22 @@ router.delete(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     //chack the instrument ouner
-    ProjectInstrument.findByPk(req.params.instrument_id)
-      .then(projectInstrument => {
+    ProjectInstrument.findByPk(req.params.instrument_id).then(
+      projectInstrument => {
         if (projectInstrument.user_id !== req.user.id) {
           return res
             .status(401)
-            .json({ msg: "This comment is not belong to you!" });
+            .json({ msg: "This instrument is not belong to you!" });
         } else {
           projectId = projectInstrument.project_id;
           projectInstrument.destroy().then(() => {
-            Project.getProjectByProjectId(projectId).then(post =>
+            Project.getProjectByProjectId(projectId).then(() =>
               res.json(projectId)
             );
           });
         }
-      })
-      .then(() => {
-        Post.getPostByPostId(req.params.id).then(post => res.json(post));
-      })
-      .catch(err => res.json(err));
+      }
+    );
   }
 );
 

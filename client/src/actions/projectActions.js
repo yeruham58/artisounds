@@ -1,6 +1,13 @@
 import axios from "axios";
 
-import { CREATE_PROJECT, GET_ERRORS, CLEAR_ERRORS } from "./types";
+import {
+  CREATE_PROJECT,
+  GET_PROJECT,
+  GET_PROJECTS,
+  GET_ERRORS,
+  CLEAR_ERRORS,
+  ADD_INSTRUMENT_TO_PROJECT
+} from "./types";
 
 // create project
 export const createProject = projectData => dispatch => {
@@ -28,43 +35,43 @@ export const createProject = projectData => dispatch => {
 //   });
 // };
 
-// // Get posts
-// export const getPosts = () => dispatch => {
-//   dispatch(setPostLoading());
-//   axios
-//     .get("/api/posts")
-//     .then(res =>
-//       dispatch({
-//         type: GET_POSTS,
-//         payload: res.data
-//       })
-//     )
-//     .catch(err =>
-//       dispatch({
-//         type: GET_POSTS,
-//         payload: null
-//       })
-//     );
-// };
+// // Get porojects
+export const getProjects = () => dispatch => {
+  // dispatch(setPostLoading());
+  axios
+    .get("/api/projects")
+    .then(res =>
+      dispatch({
+        type: GET_PROJECTS,
+        payload: res.data
+      })
+    )
+    .catch(err =>
+      dispatch({
+        type: GET_PROJECTS,
+        payload: null
+      })
+    );
+};
 
-// // Get post
-// export const getPost = postId => dispatch => {
-//   dispatch(setPostLoading());
-//   axios
-//     .get(`/api/posts/${postId}`)
-//     .then(res =>
-//       dispatch({
-//         type: GET_POST,
-//         payload: res.data
-//       })
-//     )
-//     .catch(err =>
-//       dispatch({
-//         type: GET_POST,
-//         payload: null
-//       })
-//     );
-// };
+// // Get project
+export const getProject = projectId => dispatch => {
+  // dispatch(setPostLoading());
+  axios
+    .get(`/api/projects/${projectId}`)
+    .then(res =>
+      dispatch({
+        type: GET_PROJECT,
+        payload: res.data
+      })
+    )
+    .catch(err =>
+      dispatch({
+        type: GET_PROJECT,
+        payload: null
+      })
+    );
+};
 
 // // Delete post
 // export const deletePost = postId => dispatch => {
@@ -152,6 +159,42 @@ export const createProject = projectData => dispatch => {
 //     type: POST_LOADING
 //   };
 // };
+
+// Add instrument
+export const addInstrument = (projectId, instrumentData) => dispatch => {
+  axios
+    .post(`/api/projects/instrument/${projectId}`, instrumentData)
+    .then(res =>
+      dispatch({
+        type: ADD_INSTRUMENT_TO_PROJECT,
+        payload: res.data
+      })
+    )
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      });
+    });
+};
+
+// Delete comment
+export const deleteInstrument = instrumentId => dispatch => {
+  axios
+    .delete(`/api/projects/instrument/${instrumentId}`)
+    .then(res =>
+      dispatch({
+        type: GET_PROJECT,
+        payload: res.data
+      })
+    )
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      });
+    });
+};
 
 //Clear errors
 export const clearErrors = errToClear => {

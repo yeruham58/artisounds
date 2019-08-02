@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { getCurrentProfile, deleteAccount } from "../../actions/profileActions";
 import Spiner from "../common/Spinner";
 import ProfileActions from "./ProfileActions";
+import ProjectFeed from "../projects/projects/ProjectFeed";
 
 class Dashboard extends Component {
   componentDidMount() {
@@ -33,6 +34,7 @@ class Dashboard extends Component {
               <Link to={`/profile/${profile.id}`}> {user.name}</Link>
             </p>
             <ProfileActions />
+            <ProjectFeed />
             <div style={{ marginTop: "60px" }}>
               {/* this button is not gonna work becouse there is no api iet for delete account */}
               {/* <button

@@ -45,7 +45,7 @@ const RadioButtenGroup = ({
 
 RadioButtenGroup.propTypes = {
   name: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.string,
   error: PropTypes.string,
   info: PropTypes.string,
   onChange: PropTypes.func.isRequired,

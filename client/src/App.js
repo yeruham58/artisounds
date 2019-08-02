@@ -24,6 +24,7 @@ import Post from "./components/post/Post";
 import Chat from "./components/chat/ChatPage";
 import TestChat from "./components/chat/TestChat";
 import CreateProject from "./components/projects/create-project/CreateProject";
+import AddInstrument from "./components/projects/project/AddInstrument";
 
 import "./App.css";
 
@@ -84,6 +85,13 @@ function App() {
                 exact
                 path="/create-project"
                 component={CreateProject}
+              />
+            </Switch>
+            <Switch>
+              <PrivateRoute
+                exact
+                path="/project/add-instrument/:projectId"
+                component={AddInstrument}
               />
             </Switch>
             <Switch>
