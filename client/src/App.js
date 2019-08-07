@@ -24,7 +24,7 @@ import Post from "./components/post/Post";
 import Chat from "./components/chat/ChatPage";
 import TestChat from "./components/chat/TestChat";
 import CreateProject from "./components/projects/create-project/CreateProject";
-import AddInstrument from "./components/projects/project/AddInstrument";
+import ProjectView from "./components/projects/project/ProjectView";
 
 import "./App.css";
 
@@ -90,8 +90,8 @@ function App() {
             <Switch>
               <PrivateRoute
                 exact
-                path="/project/add-instrument/:projectId"
-                component={AddInstrument}
+                path="/project/project-view/:projectId"
+                component={ProjectView}
               />
             </Switch>
             <Switch>

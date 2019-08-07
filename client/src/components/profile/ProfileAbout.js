@@ -16,7 +16,7 @@ class ProfileAbout extends Component {
     let singelCategoryArtSrt = "";
 
     profile.art_types
-      .filter(artType => !artType.art_practics[0])
+      .filter(artType => !artType.art_practics[1])
       .map(
         artType =>
           (singelCategoryArtSrt +=
@@ -32,7 +32,7 @@ class ProfileAbout extends Component {
     );
 
     const artsList = profile.art_types
-      .filter(artType => artType.art_practics[0])
+      .filter(artType => artType.art_practics[1])
       .map((artType, index) => (
         <div key={index} className="p-3">
           <h5>

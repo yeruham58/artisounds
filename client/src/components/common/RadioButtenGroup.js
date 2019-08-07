@@ -37,7 +37,7 @@ const RadioButtenGroup = ({
       <div name={name} value={value}>
         {selectOptions}
       </div>
-      {error && <div className="invalid-feedback">{error}</div>}
+      {error && <div style={{ color: "red", fontSize: "13px" }}>{error}</div>}
       {info && <small className="form-text text-muted">{info}</small>}
     </div>
   );

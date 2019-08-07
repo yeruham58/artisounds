@@ -6,7 +6,9 @@ import {
   GET_PROJECTS,
   GET_ERRORS,
   CLEAR_ERRORS,
-  ADD_INSTRUMENT_TO_PROJECT
+  ADD_INSTRUMENT_TO_PROJECT,
+  PROJECT_LOADING,
+  UPDATE_INSTRUMENT
 } from "./types";
 
 // create project
@@ -37,7 +39,7 @@ export const createProject = projectData => dispatch => {
 
 // // Get porojects
 export const getProjects = () => dispatch => {
-  // dispatch(setPostLoading());
+  dispatch(setProjectLoading());
   axios
     .get("/api/projects")
     .then(res =>
@@ -56,7 +58,7 @@ export const getProjects = () => dispatch => {
 
 // // Get project
 export const getProject = projectId => dispatch => {
-  // dispatch(setPostLoading());
+  dispatch(setProjectLoading());
   axios
     .get(`/api/projects/${projectId}`)
     .then(res =>
@@ -153,13 +155,6 @@ export const getProject = projectId => dispatch => {
 //     });
 // };
 
-// //Post loading state
-// export const setPostLoading = () => {
-//   return {
-//     type: POST_LOADING
-//   };
-// };
-
 // Add instrument
 export const addInstrument = (projectId, instrumentData) => dispatch => {
   axios
@@ -178,7 +173,27 @@ export const addInstrument = (projectId, instrumentData) => dispatch => {
     });
 };
 
-// Delete comment
+// Update instrument
+export const updateInstrument = (instrumentId, newData) => dispatch => {
+  console.log("here i m");
+  console.log(newData);
+  axios
+    .patch(`/api/projects/instrument/${instrumentId}`, newData)
+    .then(res =>
+      dispatch({
+        type: UPDATE_INSTRUMENT,
+        payload: res.data
+      })
+    )
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      });
+    });
+};
+
+// Delete instrument
 export const deleteInstrument = instrumentId => dispatch => {
   axios
     .delete(`/api/projects/instrument/${instrumentId}`)
@@ -194,6 +209,13 @@ export const deleteInstrument = instrumentId => dispatch => {
         payload: err.response.data
       });
     });
+};
+
+//Project loading state
+export const setProjectLoading = () => {
+  return {
+    type: PROJECT_LOADING
+  };
 };
 
 //Clear errors

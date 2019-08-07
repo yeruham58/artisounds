@@ -5,12 +5,18 @@ const sequelize = require("../config/database");
 // const Dislike = require("./Dislike");
 // const Comment = require("./Comment");
 const ProjectInstrument = require("./ProjectInstrument");
+const MusicGenre = require("./MusicGenre");
 const User = require("./user");
+const ArtPractic = require("./ArtPractic");
 
 const include = [
   {
     model: User,
     as: "user_detailes"
+  },
+  {
+    model: MusicGenre,
+    as: "genre"
   },
   // {
   //   model: Like,
@@ -39,10 +45,16 @@ const include = [
   {
     model: ProjectInstrument,
     as: "instruments",
-    include: {
-      model: User,
-      as: "user_detailes"
-    }
+    include: [
+      {
+        model: User,
+        as: "user_detailes"
+      },
+      {
+        model: ArtPractic,
+        as: "instrument_detailes"
+      }
+    ]
   }
 ];
 
@@ -113,6 +125,10 @@ Project.init(
 Project.hasMany(ProjectInstrument, {
   foreignKey: "project_id",
   as: "instruments"
+});
+Project.belongsTo(MusicGenre, {
+  foreignKey: "genre_id",
+  as: "genre"
 });
 Project.belongsTo(User, { foreignKey: "user_id", as: "user_detailes" });
 

@@ -160,3 +160,19 @@ img {
 .instrument-item {
   float: left;
 }
+
+/* genre style */
+.genre {
+  color: white;
+  padding: 3px;
+  display: inline;
+  background-color: orange;
+  border-radius: 10px;
+}
+
+/* project details */
+.project-details {
+  padding: 3px;
+  background-color: white;
+  border-radius: 8px;
+}

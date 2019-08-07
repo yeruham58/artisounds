@@ -6,6 +6,7 @@ const validateProjectInput = require("../../validation/project");
 const validateCommentInput = require("../../validation/comment");
 
 const User = require("../../classes/User");
+const ArtPractic = require("../../classes/ArtPractic");
 const ProjectInstrument = require("../../classes/ProjectInstrument");
 const Project = require("../../classes/Project");
 // const Like = require("../../classes/Like");
@@ -18,13 +19,27 @@ const { deleteAwsFile } = require("./uploadPostMedia");
 //@access   public
 router.get("/test", (req, res) => res.json({ msg: "projects works" }));
 
-//@ route   GET api/projets
-//@desc     get all projets
+//@ route   GET api/projects/instruments
+//@desc     Get all instruments
+//@access   public
+router.get("/instruments", (req, res) => {
+  ArtPractic.getAllInstruments()
+    .then(instruments => res.status(200).json(instruments))
+    .catch(err => res.status(404).json(err));
+});
+
+//@ route   GET api/projects
+//@desc     get all projects
 //@access   public
 router.get("/", (req, res) => {
   Project.getAllProjects()
-    .then(projects => res.json(projects))
-    .catch(err => res.status(404).json({ msg: "no project found" }));
+    .then(projects => {
+      res.json(projects);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(404).json({ msg: "no project found" });
+    });
 });
 
 //@ route   GET api/projets/:id
@@ -59,13 +74,13 @@ router.post(
     newProject.original = req.body.original;
     newProject.original_by = req.body.original_by;
     newProject.bit = req.body.bit;
-    if (newProject.tempo) newProject.tempo = req.body.pempo;
+    if (req.body.tempo) newProject.tempo = req.body.tempo;
     newProject.scale_type = req.body.scale_type;
-    if (newProject.scale) newProject.scale = req.body.scale;
-    if (newProject.genre_id) newProject.genre_id = req.body.genre_id;
-    if (newProject.description) newProject.description = req.body.description;
-    if (newProject.comment) newProject.comment = req.body.comment;
-    if (newProject.text) newProject.text = req.body.text;
+    if (req.body.scale) newProject.scale = req.body.scale;
+    if (req.body.genre_id) newProject.genre_id = req.body.genre_id;
+    if (req.body.description) newProject.description = req.body.description;
+    if (req.body.comment) newProject.comment = req.body.comment;
+    if (req.body.text) newProject.text = req.body.text;
     newProject.public = req.body.public;
     newProject.img_or_video_url = null;
     newProject.img_or_video_key = null;
@@ -269,7 +284,7 @@ router.post(
     // }
 
     const instrumentInfo = {};
-    instrumentInfo.user_id = req.user.id;
+    instrumentInfo.user_id = null;
     instrumentInfo.instrument_id = req.body.instrument_id;
     instrumentInfo.project_id = req.params.projectId;
     instrumentInfo.original = req.body.original;
@@ -287,6 +302,50 @@ router.post(
         );
       })
       .catch(err => res.json(err));
+  }
+);
+
+//@ route   UPDATE api/projects/instrument/:instrument_id
+//@desc     Update instrument in project
+//@access   private
+router.patch(
+  "/instrument/:instrument_id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    //chack the instrument ouner
+    ProjectInstrument.findByPk(req.params.instrument_id).then(
+      projectInstrument => {
+        const projectId = projectInstrument.project_id;
+        Project.getProjectByProjectId(projectId).then(project => {
+          if (
+            projectInstrument.user_id !== req.user.id &&
+            project.user_id !== req.user.id
+          ) {
+            return res
+              .status(401)
+              .json({ msg: "This instrument is not belong to you!" });
+          } else {
+            updatedInstrument = {};
+            if (req.body.user_id) updatedInstrument.user_id = req.body.user_id;
+            updatedInstrument.instrument_id = req.body.instrument_id;
+            if (req.body.original)
+              updatedInstrument.original = req.body.original;
+            if (req.body.role) updatedInstrument.role = req.body.role;
+            // updatedInstrument.characters_url = null;
+            // updatedInstrument.characters_key = null;
+            // updatedInstrument.record_url = null;
+            // updatedInstrument.record_key = null;
+            if (req.body.comments)
+              updatedInstrument.comments = req.body.comments;
+            projectInstrument.update(updatedInstrument).then(() => {
+              Project.getProjectByProjectId(projectId).then(project =>
+                res.json(project)
+              );
+            });
+          }
+        });
+      }
+    );
   }
 );
 

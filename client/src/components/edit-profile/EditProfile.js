@@ -245,35 +245,31 @@ class CreateProfile extends Component {
     });
   }
 
-  createListToCheckbox(listType, artType, listToEdit) {
+  createListToCheckbox(artType, listToEdit) {
     const objList = this.state.allArtTypes.find(
       art_type => art_type.art_type_name === artType
-    )[listType];
-    const subDitailName =
-      listType === "sub_art_types" ? "sub_art_type_name" : "art_practic_name";
+    ).art_practics;
     for (var checkbox in objList) {
       listToEdit.push({
-        name: objList[checkbox][subDitailName],
+        name: objList[checkbox].art_practic_name,
         value: objList[checkbox].id,
         id: objList[checkbox].id,
-        checked: this.state[listType].indexOf(objList[checkbox].id) > -1
+        checked: this.state.art_practics.indexOf(objList[checkbox].id) > -1
       });
     }
   }
 
-  createMarkupListToAddedCechkbox(listType, artTypeId, listToEdit) {
+  createMarkupListToAddedCechkbox(artTypeId, listToEdit) {
     const fullArtType = this.state.allArtTypes.find(
       artType => artType.id === artTypeId
     );
-    const objList = fullArtType[listType].filter(
-      details => this.state[listType + "_to_send"].indexOf(details.id) > -1
+    const objList = fullArtType.art_practics.filter(
+      details => this.state.art_practics_to_send.indexOf(details.id) > -1
     );
-    const subDitailName =
-      listType === "sub_art_types" ? "sub_art_type_name" : "art_practic_name";
     for (var subart in objList) {
       listToEdit.push(
         <li key={subart} id={subart}>
-          {objList[subart][subDitailName]}
+          {objList[subart].art_practic_name}
         </li>
       );
     }
@@ -332,7 +328,7 @@ class CreateProfile extends Component {
     ];
 
     const filterdArtTypes = allArtTypes
-      .filter(artType => artType.art_practics[0])
+      .filter(artType => artType.art_practics[1])
       .filter(artType => this.state.art_types_to_send.indexOf(artType.id) < 0);
     for (var artType in filterdArtTypes) {
       artTypesOptions.push({
@@ -344,7 +340,7 @@ class CreateProfile extends Component {
     let checkboxArtTypeOptions = [];
 
     const filterdArtTypesToCheckbox = allArtTypes.filter(
-      artType => !artType.art_practics[0]
+      artType => !artType.art_practics[1]
     );
 
     for (var checkboxArtType in filterdArtTypesToCheckbox) {
@@ -406,7 +402,7 @@ class CreateProfile extends Component {
         artType => artType.id === parseInt(this.state.art_types)
       ).art_type_name;
 
-      this.createListToCheckbox("art_practics", artType, checkboxArtPractics);
+      this.createListToCheckbox(artType, checkboxArtPractics);
 
       artPractics = (
         <div>
@@ -444,7 +440,7 @@ class CreateProfile extends Component {
       addedArtTypes = [];
       for (const [index, artTypeId] of art_types_to_send
         .filter(
-          id => allArtTypes.find(artType => artType.id === id).art_practics[0]
+          id => allArtTypes.find(artType => artType.id === id).art_practics[1]
         )
         .entries()) {
         const artPractics = [];
@@ -452,11 +448,7 @@ class CreateProfile extends Component {
           artType => artType.id === artTypeId
         );
         if (this.state.art_types_to_send[0] && this.state.allArtTypes[0]) {
-          this.createMarkupListToAddedCechkbox(
-            "art_practics",
-            artTypeId,
-            artPractics
-          );
+          this.createMarkupListToAddedCechkbox(artTypeId, artPractics);
         }
 
         editButton = !displayArtPractics ? (

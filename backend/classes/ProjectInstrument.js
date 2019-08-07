@@ -2,6 +2,7 @@ const Sequelize = require("sequelize");
 const sequelize = require("../config/database");
 
 const User = require("./user");
+const ArtPractic = require("./ArtPractic");
 
 class ProjectInstrument extends Sequelize.Model {
   static associate(models) {}
@@ -30,6 +31,10 @@ ProjectInstrument.init(
 ProjectInstrument.belongsTo(User, {
   foreignKey: "user_id",
   as: "user_detailes"
+});
+ProjectInstrument.belongsTo(ArtPractic, {
+  foreignKey: "instrument_id",
+  as: "instrument_detailes"
 });
 
 module.exports = ProjectInstrument;

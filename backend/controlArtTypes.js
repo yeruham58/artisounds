@@ -135,4 +135,4 @@ const musicPractics = [
 
 // insertArtTypes(artTypes);
 // insertMusicGenres(musicGenersList);
-// insertArtPractics();
+// insertArtPractics(["Write Songs"], 36);

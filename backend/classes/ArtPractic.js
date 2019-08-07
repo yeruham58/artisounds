@@ -3,7 +3,9 @@ const sequelize = require("../config/database");
 
 class ArtPractic extends Sequelize.Model {
   static associate(models) {}
-  // someMethod() {}
+  static getAllInstruments() {
+    return ArtPractic.findAll();
+  }
 }
 ArtPractic.init(
   {

@@ -1,8 +1,10 @@
 import {
+  PROJECT_LOADING,
   CREATE_PROJECT,
   GET_PROJECTS,
   GET_PROJECT,
-  ADD_INSTRUMENT_TO_PROJECT
+  ADD_INSTRUMENT_TO_PROJECT,
+  UPDATE_INSTRUMENT
 } from "../actions/types";
 
 const initialState = {
@@ -13,6 +15,11 @@ const initialState = {
 
 export default function(state = initialState, action) {
   switch (action.type) {
+    case PROJECT_LOADING:
+      return {
+        ...state,
+        loading: true
+      };
     case CREATE_PROJECT:
       return {
         ...state,
@@ -21,14 +28,21 @@ export default function(state = initialState, action) {
     case GET_PROJECTS:
       return {
         ...state,
-        projects: action.payload
+        projects: action.payload,
+        loading: false
       };
     case GET_PROJECT:
       return {
         ...state,
-        project: action.payload
+        project: action.payload,
+        loading: false
       };
     case ADD_INSTRUMENT_TO_PROJECT:
+      return {
+        ...state,
+        project: action.payload
+      };
+    case UPDATE_INSTRUMENT:
       return {
         ...state,
         project: action.payload

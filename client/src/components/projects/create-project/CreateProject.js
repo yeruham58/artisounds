@@ -34,16 +34,6 @@ class CreateProject extends Component {
       errors: {}
     };
 
-    // // Get all art types from database
-    // axios
-    //   .get("/api/profile/art-types")
-    //   .then(artTypes => {
-    //     this.setState({ allArtTypes: artTypes.data });
-    //   })
-    //   .catch(err => {
-    //     console.log(err);
-    //   });
-
     // Get all music genres from database
     axios
       .get("/api/profile/music-genres")
@@ -65,6 +55,11 @@ class CreateProject extends Component {
       this.setState({
         errors: nextProp.errors
       });
+    }
+    if (nextProp.project && nextProp.project.project) {
+      this.props.history.push(
+        `/project/project-view/${nextProp.project.project.id}`
+      );
     }
   }
 
@@ -101,7 +96,7 @@ class CreateProject extends Component {
     slider.oninput = function() {
       output.innerHTML = this.value;
     };
-    this.setState({ tempo: this.value });
+    this.setState({ tempo: slider.value });
   }
 
   scaleOnChange(e) {
@@ -123,7 +118,7 @@ class CreateProject extends Component {
       newProject.name = this.state.name;
       newProject.original = this.state.original;
       newProject.original_by = this.state.original_by;
-      newProject.tempo = this.state.tempo;
+      newProject.tempo = parseInt(this.state.tempo);
       newProject.bit = this.state.bit;
       newProject.scale = this.state.scale;
       newProject.scale_type = this.state.major ? "Major" : "Minor";
@@ -299,11 +294,13 @@ class CreateProject extends Component {
 CreateProject.propTypes = {
   createProject: PropTypes.func.isRequired,
   clearErrors: PropTypes.func.isRequired,
-  errors: PropTypes.object.isRequired
+  errors: PropTypes.object.isRequired,
+  project: PropTypes.object
 };
 
 const mapStateToProps = state => ({
-  errors: state.errors
+  errors: state.errors,
+  project: state.project
 });
 
 export default connect(

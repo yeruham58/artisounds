@@ -5,9 +5,13 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 
 import ProjectItem from "../projects/ProjectItem";
-import InstrumentsFeed from "../project/InstrumentsFeed";
+import InstrumentsFeed from "./InstrumentsFeed";
 import Spinner from "../../common/Spinner";
-import { getProject, addInstrument } from "../../../actions/projectActions";
+import {
+  getProject,
+  addInstrument,
+  updateInstrument
+} from "../../../actions/projectActions";
 import SelectListGroup from "../../common/SelectListGroup";
 import RadioButtenGroup from "../../common/RadioButtenGroup";
 import TextFieldGroup from "../../common/TextFieldGroup";
@@ -39,6 +43,7 @@ class AddInstrument extends Component {
 
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.updateInstrument = this.updateInstrument.bind(this);
     this.categoryOnChange = this.categoryOnChange.bind(this);
     this.radioButtonOnChange = this.radioButtonOnChange.bind(this);
     this.componentWillReceiveProps = this.componentWillReceiveProps.bind(this);
@@ -49,15 +54,23 @@ class AddInstrument extends Component {
   }
 
   componentWillReceiveProps(nextProp) {
-    if (nextProp.project) {
-      console.log("project");
-      console.log(nextProp.project);
+    if (
+      nextProp.project &&
+      nextProp.project.project &&
+      !nextProp.project.loading
+    ) {
       this.setState({
         project_id: nextProp.project.project.id
       });
     }
     if (nextProp.instrument_category) {
-      this.setState({ instrument_category: nextProp.instrument_category });
+      this.setState({
+        instrument_category: nextProp.instrument_category,
+        instrument_id: null
+      });
+    }
+    if (nextProp.errors) {
+      this.setState({ errors: nextProp.errors });
     }
   }
 
@@ -73,14 +86,36 @@ class AddInstrument extends Component {
     this.setState({
       errors: {
         ...this.state.errors,
-        instrument_category: ""
+        instrument_category: "",
+        instrument: null
       }
     });
-    this.componentWillReceiveProps({ instrument_category: e.target.value });
+    this.componentWillReceiveProps({
+      instrument_category: e.target.value
+    });
+
+    const instrumentsList = this.state.allArtTypes.find(
+      list => list.id === parseInt(e.target.value)
+    );
+
+    if (instrumentsList && instrumentsList.art_practics) {
+      const filterdInstrumentsList = instrumentsList.art_practics;
+      if (filterdInstrumentsList.length === 1) {
+        this.setState({
+          instrument_id: filterdInstrumentsList[0].id.toString()
+        });
+      }
+    }
   }
 
   radioButtonOnChange(e) {
     if (e.target.name === "instrument") {
+      this.setState({
+        errors: {
+          ...this.state.errors,
+          instrument: null
+        }
+      });
       this.setState({
         instrument_id: e.target.id
       });
@@ -89,6 +124,11 @@ class AddInstrument extends Component {
 
   onSubmit(e) {
     e.preventDefault();
+    if (!this.state.instrument_id) {
+      return this.componentWillReceiveProps({
+        errors: { instrument: "This field is required" }
+      });
+    }
     const newInstrument = {};
     newInstrument.instrument_id = parseInt(this.state.instrument_id);
     newInstrument.project_id = this.state.project_id;
@@ -97,20 +137,30 @@ class AddInstrument extends Component {
     newInstrument.comments = this.state.comments;
 
     this.props.addInstrument(this.state.project_id, newInstrument);
+
+    this.setState({
+      instrument_category: "",
+      instrument_id: null,
+      role: "",
+      comments: "",
+      errors: {}
+    });
+  }
+
+  updateInstrument(instrumentId, data) {
+    this.props.updateInstrument(instrumentId, data);
   }
 
   render() {
     const { project, loading } = this.props.project;
+
     let projectContant;
     if (project === null || loading || Object.keys(project).length === 0) {
       projectContant = <Spinner />;
     } else {
       projectContant = (
         <div>
-          <ProjectItem project={project} showActions={false} />
-          {project.instruments && project.instruments[0] ? (
-            <InstrumentsFeed instruments={project.instruments} />
-          ) : null}
+          <ProjectItem project={project} />
         </div>
       );
     }
@@ -151,6 +201,9 @@ class AddInstrument extends Component {
     }
 
     const { errors } = this.state;
+    if (this.props.project.loading || !this.props.project.project) {
+      return <Spinner />;
+    }
     return (
       <div className="project">
         <div className="container">
@@ -205,6 +258,15 @@ class AddInstrument extends Component {
                   </div>
                 ) : null}
               </form>
+              {project.instruments && project.instruments[0] ? (
+                <InstrumentsFeed
+                  instruments={project.instruments}
+                  projectOwner={this.props.auth.user.id === project.user_id}
+                  projectOwnerId={project.user_id}
+                  updateInstrument={this.updateInstrument}
+                  logedInUserId={this.props.auth.user.id}
+                />
+              ) : null}
             </div>
           </div>
         </div>
@@ -216,14 +278,17 @@ class AddInstrument extends Component {
 AddInstrument.propTypes = {
   getProject: PropTypes.func.isRequired,
   addInstrument: PropTypes.func.isRequired,
-  project: PropTypes.object.isRequired
+  updateInstrument: PropTypes.func.isRequired,
+  project: PropTypes.object.isRequired,
+  auth: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
-  project: state.project
+  project: state.project,
+  auth: state.auth
 });
 
 export default connect(
   mapStateToProps,
-  { getProject, addInstrument }
+  { getProject, addInstrument, updateInstrument }
 )(AddInstrument);
