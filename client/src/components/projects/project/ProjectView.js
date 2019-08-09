@@ -9,6 +9,7 @@ import InstrumentsFeed from "./InstrumentsFeed";
 import Spinner from "../../common/Spinner";
 import {
   getProject,
+  deleteProject,
   updateInstrument,
   deleteInstrument
 } from "../../../actions/projectActions";
@@ -22,6 +23,7 @@ class ProjectView extends Component {
   }
 
   componentDidMount() {
+    this.props.project.project = null;
     this.props.getProject(this.props.match.params.projectId);
     this.props.getCurrentProfile();
   }
@@ -59,6 +61,7 @@ class ProjectView extends Component {
               this.props.auth.user &&
               this.props.auth.user.id === project.user_id
             }
+            deleteProject={this.props.deleteProject}
           />
         </div>
       );
@@ -115,6 +118,7 @@ class ProjectView extends Component {
 
 ProjectView.propTypes = {
   getProject: PropTypes.func.isRequired,
+  deleteProject: PropTypes.func.isRequired,
   updateInstrument: PropTypes.func.isRequired,
   deleteInstrument: PropTypes.func.isRequired,
   project: PropTypes.object.isRequired,
@@ -130,5 +134,11 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { getProject, updateInstrument, deleteInstrument, getCurrentProfile }
+  {
+    getProject,
+    deleteProject,
+    updateInstrument,
+    deleteInstrument,
+    getCurrentProfile
+  }
 )(ProjectView);

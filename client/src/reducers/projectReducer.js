@@ -3,6 +3,7 @@ import {
   CREATE_PROJECT,
   GET_PROJECTS,
   GET_PROJECT,
+  DELETE_PROJECT,
   ADD_INSTRUMENT_TO_PROJECT,
   UPDATE_INSTRUMENT,
   DELETE_INSTRUMENT
@@ -24,7 +25,8 @@ export default function(state = initialState, action) {
     case CREATE_PROJECT:
       return {
         ...state,
-        project: action.payload
+        project: action.payload,
+        loading: false
       };
     case GET_PROJECTS:
       return {
@@ -36,6 +38,12 @@ export default function(state = initialState, action) {
       return {
         ...state,
         project: action.payload,
+        loading: false
+      };
+    case DELETE_PROJECT:
+      return {
+        ...state,
+        projects: action.payload,
         loading: false
       };
     case ADD_INSTRUMENT_TO_PROJECT:

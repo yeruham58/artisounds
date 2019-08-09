@@ -3,9 +3,9 @@ const router = express.Router();
 const passport = require("passport");
 
 const validateProjectInput = require("../../validation/project");
-const validateCommentInput = require("../../validation/comment");
+// const validateCommentInput = require("../../validation/comment");
 
-const User = require("../../classes/User");
+// const User = require("../../classes/User");
 const ArtPractic = require("../../classes/ArtPractic");
 const ProjectInstrument = require("../../classes/ProjectInstrument");
 const Project = require("../../classes/Project");
@@ -83,7 +83,11 @@ router.post(
     newProject.in_action = true;
 
     Project.create(newProject)
-      .then(project => res.json(project))
+      .then(project => {
+        Project.getProjectByProjectId(project.id).then(newProject => {
+          res.json(newProject);
+        });
+      })
       .catch(err => {
         errors.error = "Some error with upload your post, please try again";
         return res.status(400).json(errors);
@@ -91,15 +95,15 @@ router.post(
   }
 );
 
-//@ route   DELETE api/projects/:id
+//@ route   DELETE api/projects/:projectId
 //@desc     delete project
 //@access   private
 router.delete(
-  "/:id",
+  "/:projectId",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     //chack the post ouner
-    Project.findByPk(req.params.id)
+    Project.findByPk(req.params.projectId)
       .then(project => {
         if (project.user_id !== req.user.id) {
           return res
@@ -116,17 +120,37 @@ router.delete(
           // }).then(dislikes => {
           //   dislikes.map(dislike => dislike.destroy());
           // });
-          ProjectInstrument.findAll({
-            where: { project_id: project.id, user_id: req.user.id }
-          }).then(projectInstrument => {
-            projectInstrument.map(projectInstrument =>
-              projectInstrument.destroy()
-            );
-          });
-          if (project.img_or_video_key) {
-            deleteAwsFile(project.img_or_video_key, "projectimgorvideo");
+          if (
+            project.instruments &&
+            project.instruments[0] &&
+            project.instruments.find(
+              instrument => instrument.user_id !== project.user_id
+            )
+          ) {
+            project.update({
+              user_id: project.instruments.find(
+                instrument => instrument.user_id !== project.user_id
+              ).user_id
+            });
+          } else {
+            ProjectInstrument.findAll({
+              where: { project_id: project.id }
+            }).then(projectInstrument => {
+              projectInstrument.map(projectInstrument =>
+                //TODO: delete instrument record
+                projectInstrument.destroy()
+              );
+            });
+            if (project.img_or_video_key) {
+              deleteAwsFile(project.img_or_video_key, "projectimgorvideo");
+            }
+            project.destroy().then(() => {
+              Project.getProjectsByUserId(req.user.id).then(projects => {
+                res.json({ projects });
+                console.log(projects);
+              });
+            });
           }
-          post.destroy().then(() => res.json({ succuss: true }));
         }
       })
       .catch(err => res.json({ msg: "project not found" }));

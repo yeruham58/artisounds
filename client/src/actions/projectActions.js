@@ -4,6 +4,7 @@ import {
   CREATE_PROJECT,
   GET_PROJECT,
   GET_PROJECTS,
+  DELETE_PROJECT,
   GET_ERRORS,
   CLEAR_ERRORS,
   ADD_INSTRUMENT_TO_PROJECT,
@@ -14,14 +15,15 @@ import {
 
 // create project
 export const createProject = projectData => dispatch => {
+  dispatch(setProjectLoading());
   axios
     .post("/api/projects", projectData)
-    .then(res =>
+    .then(res => {
       dispatch({
         type: CREATE_PROJECT,
         payload: res.data
-      })
-    )
+      });
+    })
     .catch(err => {
       dispatch({
         type: GET_ERRORS,
@@ -76,23 +78,24 @@ export const getProject = projectId => dispatch => {
     );
 };
 
-// // Delete post
-// export const deletePost = postId => dispatch => {
-//   axios
-//     .delete(`/api/posts/${postId}`)
-//     .then(res =>
-//       dispatch({
-//         type: DELETE_POST,
-//         payload: postId
-//       })
-//     )
-//     .catch(err => {
-//       dispatch({
-//         type: GET_ERRORS,
-//         payload: err.response.data
-//       });
-//     });
-// };
+// Delete project
+export const deleteProject = projectId => dispatch => {
+  dispatch(setProjectLoading());
+  axios
+    .delete(`/api/projects/${projectId}`)
+    .then(res => {
+      dispatch({
+        type: DELETE_PROJECT,
+        payload: res.data.projects
+      });
+    })
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response
+      });
+    });
+};
 
 // //Add and remove like
 // export const addAndRemoveLike = (postId, likeData) => dispatch => {

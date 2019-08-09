@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
-import CreateProject from "../create-project/CreateProject";
 import projectDefaultImg from "../../../img/musicGif.gif";
 import InstrumentDefaultImg from "../../../img/stillNoBodyImg.jpeg";
 
@@ -15,6 +14,7 @@ class ProjectItem extends Component {
     };
 
     this.moreDetailesControl = this.moreDetailesControl.bind(this);
+    this.deleteProject = this.deleteProject.bind(this);
   }
 
   moreDetailesControl() {
@@ -24,8 +24,25 @@ class ProjectItem extends Component {
     });
   }
 
+  deleteProject() {
+    if (
+      window.confirm(
+        "Are you sure?\nBy delete this project you gonna give other artist in this group to be the manager!\nIf you have any records for this project, you can access this project thrue your records (if thre is another artist in this project) but not like a manager!"
+      )
+    ) {
+      this.props.deleteProject(this.props.project.id);
+      if (window.location.href.indexOf("dashboard") < 0) {
+        this.props.history.push("/dashboard");
+      }
+    }
+  }
+
   render() {
     const { project } = this.props;
+    if (!project || project === undefined) {
+      return null;
+    }
+
     const moreDetailes1 = (
       <div>
         {project.scale ? (
@@ -85,8 +102,6 @@ class ProjectItem extends Component {
         <br />
       </div>
     );
-    console.log("project");
-    console.log(project);
 
     return (
       <div className="card card-body bg-light mb-3">
@@ -235,7 +250,7 @@ class ProjectItem extends Component {
                 </button>
 
                 <button
-                  // onClick={() => this.onDeleteClick(project)}
+                  onClick={this.deleteProject}
                   type="button"
                   className="btn btn-light mt-2 float-right"
                 >
@@ -272,6 +287,7 @@ ProjectItem.defaultProps = {
 
 ProjectItem.propTypes = {
   project: PropTypes.object.isRequired,
+  deleteProject: PropTypes.func.isRequired,
   projectOwner: PropTypes.bool
 };
 

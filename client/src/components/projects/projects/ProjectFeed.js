@@ -2,17 +2,22 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
+import Spinner from "../../common/Spinner";
 import ProjectItem from "./ProjectItem";
-import { getProjects } from "../../../actions/projectActions";
+import { getProjects, deleteProject } from "../../../actions/projectActions";
 
 class ProjectFeed extends Component {
   componentDidMount() {
     this.props.getProjects();
   }
   render() {
-    const { projects } = this.props.project;
-    if (!projects) {
+    const { projects, loading } = this.props.project;
+    if (!projects && !loading) {
       return <div>You stiil dont have any projects</div>;
+    }
+
+    if (loading) {
+      return <Spinner />;
     }
 
     return projects.map(project => (
@@ -22,6 +27,8 @@ class ProjectFeed extends Component {
         projectOwner={
           this.props.auth.user && this.props.auth.user.id === project.user_id
         }
+        deleteProject={this.props.deleteProject}
+        history={this.props.history}
       />
     ));
   }
@@ -29,7 +36,8 @@ class ProjectFeed extends Component {
 
 ProjectFeed.propTypes = {
   project: PropTypes.object.isRequired,
-  getProjects: PropTypes.func.isRequired
+  getProjects: PropTypes.func.isRequired,
+  deleteProject: PropTypes.func.isRequired
 };
 
 // export default ProjectFeed;
@@ -40,5 +48,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { getProjects }
+  { getProjects, deleteProject }
 )(ProjectFeed);
