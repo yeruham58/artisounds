@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
 
 import PostItem from "../posts/PostItem";
 import CommentForm from "./CommentForm";
@@ -33,9 +32,13 @@ class Post extends Component {
         <div className="container">
           <div className="row">
             <div className="col-md-12">
-              <Link to="/feed" className="btn btn-light mb-3">
-                Back to feed
-              </Link>
+              <button
+                type="button"
+                className="btn btn-light mb-3"
+                onClick={() => window.history.back()}
+              >
+                Back
+              </button>
               {postContant}
             </div>
           </div>

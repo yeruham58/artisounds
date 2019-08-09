@@ -25,6 +25,7 @@ import Chat from "./components/chat/ChatPage";
 import TestChat from "./components/chat/TestChat";
 import CreateProject from "./components/projects/create-project/CreateProject";
 import ProjectView from "./components/projects/project/ProjectView";
+import ProjectFeed from "./components/projects/projects/ProjectFeed";
 
 import "./App.css";
 
@@ -62,6 +63,12 @@ function App() {
             <Route exact path="/login" component={Login} />
             <Route exact path="/profiles" component={Profiles} />
             <Route exact path="/profile/:id" component={Profile} />
+            <Route exact path="/projects" component={ProjectFeed} />
+            <Route
+              exact
+              path="/project/project-view/:projectId"
+              component={ProjectView}
+            />
             <Switch>
               <PrivateRoute exact path="/feed" component={Posts} />
             </Switch>
@@ -87,13 +94,13 @@ function App() {
                 component={CreateProject}
               />
             </Switch>
-            <Switch>
+            {/* <Switch>
               <PrivateRoute
                 exact
                 path="/project/project-view/:projectId"
                 component={ProjectView}
               />
-            </Switch>
+            </Switch> */}
             <Switch>
               <PrivateRoute
                 exact

@@ -110,6 +110,16 @@ class CreateProfile extends Component {
           parseInt(e.target.value)
         ]
       });
+      if (e.target.name === "art_types_to_send") {
+        this.setState({
+          art_practics_to_send: [
+            ...this.state.art_practics_to_send,
+            this.state.allArtTypes.find(
+              artType => artType.id.toString() === e.target.value
+            ).art_practics[0].id
+          ]
+        });
+      }
     } else {
       this.setState({
         [e.target.name]: this.state[e.target.name].filter(
@@ -117,6 +127,17 @@ class CreateProfile extends Component {
             i !== this.state[e.target.name].indexOf(parseInt(e.target.value))
         )
       });
+      if (e.target.name === "art_types_to_send") {
+        this.setState({
+          art_practics_to_send: this.state.art_practics_to_send.filter(
+            artPracticId =>
+              artPracticId !==
+              this.state.allArtTypes.find(
+                artType => artType.id.toString() === e.target.value
+              ).art_practics[0].id
+          )
+        });
+      }
     }
   }
 

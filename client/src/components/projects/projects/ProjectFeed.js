@@ -16,19 +16,24 @@ class ProjectFeed extends Component {
     }
 
     return projects.map(project => (
-      <ProjectItem key={project.id} project={project} />
+      <ProjectItem
+        key={project.id}
+        project={project}
+        projectOwner={
+          this.props.auth.user && this.props.auth.user.id === project.user_id
+        }
+      />
     ));
   }
 }
 
 ProjectFeed.propTypes = {
-  // projects: PropTypes.array.isRequired,
+  project: PropTypes.object.isRequired,
   getProjects: PropTypes.func.isRequired
 };
 
 // export default ProjectFeed;
 const mapStateToProps = state => ({
-  profile: state.profile,
   auth: state.auth,
   project: state.project
 });

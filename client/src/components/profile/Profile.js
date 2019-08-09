@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import ProfileHeader from "./ProfileHeader";
 import ProfileAbout from "./ProfileAbout";
@@ -28,9 +27,13 @@ class Profile extends Component {
           <div>
             <div className="row">
               <div className="col-md-6">
-                <Link to="/profiles" className="btn btn-light mb-3 float-left">
-                  Back to profiles
-                </Link>
+                <button
+                  type="button"
+                  className="btn btn-light mb-3"
+                  onClick={() => window.history.back()}
+                >
+                  Back
+                </button>
               </div>
               <div className="col-md-6" />
             </div>

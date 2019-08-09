@@ -35,15 +35,6 @@ class Dashboard extends Component {
             </p>
             <ProfileActions />
             <ProjectFeed />
-            <div style={{ marginTop: "60px" }}>
-              {/* this button is not gonna work becouse there is no api iet for delete account */}
-              {/* <button
-                onClick={this.onDeleteClick.bind(this)}
-                className="btn btn-danger"
-              >
-                Delete my account
-              </button> */}
-            </div>
           </div>
         );
       } else {

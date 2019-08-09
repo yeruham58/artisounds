@@ -8,7 +8,8 @@ import {
   CLEAR_ERRORS,
   ADD_INSTRUMENT_TO_PROJECT,
   PROJECT_LOADING,
-  UPDATE_INSTRUMENT
+  UPDATE_INSTRUMENT,
+  DELETE_INSTRUMENT
 } from "./types";
 
 // create project
@@ -175,8 +176,6 @@ export const addInstrument = (projectId, instrumentData) => dispatch => {
 
 // Update instrument
 export const updateInstrument = (instrumentId, newData) => dispatch => {
-  console.log("here i m");
-  console.log(newData);
   axios
     .patch(`/api/projects/instrument/${instrumentId}`, newData)
     .then(res =>
@@ -199,7 +198,7 @@ export const deleteInstrument = instrumentId => dispatch => {
     .delete(`/api/projects/instrument/${instrumentId}`)
     .then(res =>
       dispatch({
-        type: GET_PROJECT,
+        type: DELETE_INSTRUMENT,
         payload: res.data
       })
     )

@@ -1,7 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
-import defaultImg from "../../../img/musicGif.gif";
+
+import CreateProject from "../create-project/CreateProject";
+import projectDefaultImg from "../../../img/musicGif.gif";
+import InstrumentDefaultImg from "../../../img/stillNoBodyImg.jpeg";
 
 class ProjectItem extends Component {
   constructor(props) {
@@ -17,7 +20,7 @@ class ProjectItem extends Component {
   moreDetailesControl() {
     this.setState({
       moreDetails: !this.state.moreDetails,
-      instrumentsList: this.state.moreDetails ? 2 : 6
+      instrumentsList: this.state.moreDetails ? 2 : 4
     });
   }
 
@@ -95,7 +98,7 @@ class ProjectItem extends Component {
                   src={
                     project.img_or_video_url
                       ? project.img_or_video_url
-                      : defaultImg
+                      : projectDefaultImg
                   }
                   alt=""
                   className="rounded mb-4"
@@ -115,40 +118,131 @@ class ProjectItem extends Component {
                 </h6>
 
                 {project.genre ? (
-                  <p>
+                  <p className="mt-4">
                     <span className="genre">
                       {"#" + project.genre.music_genre_name}
                     </span>
                   </p>
                 ) : null}
-                {this.state.moreDetails ? moreDetailes1 : null}
+                {this.state.moreDetails ||
+                (project.instruments && project.instruments[0])
+                  ? moreDetailes1
+                  : null}
               </div>
             </div>
             {this.state.moreDetails ? <div>{moreDetailes2}</div> : null}
           </div>
-          {project.instruments && project.instruments[0] ? (
-            <div className="col-md-5 d-none d-md-block col-4">
-              <h4>Instruments</h4>
-              <ul className="list-group">
-                {project.instruments
-                  .slice(0, this.state.instrumentsList)
-                  .map((instrument, index) => (
-                    <li key={index} className="list-group-item">
-                      <i className="fa fa-check pr-1" />
-                      {instrument.instrument_detailes.art_practic_name}
-                    </li>
-                  ))}
-                {project.instruments.length > this.state.instrumentsList ? (
-                  <li key={2} className="list-group-item">
-                    More...
+
+          <div className="col-md-5 d-none d-md-block col-4">
+            {this.state.moreDetails ||
+            !project.instruments ||
+            !project.instruments[0] ? (
+              <div>
+                <h4>Project Manager:</h4>
+                <ul className="list-group">
+                  <li className="list-group-item">
+                    <div className="row">
+                      <div className="col-3 col-lg-2">
+                        <img
+                          alt=""
+                          src={project.user_detailes.avatar}
+                          style={{ height: "35px", width: "35px" }}
+                          className="rounded-circle mt-1"
+                          onClick={() => {
+                            this.props.history.push(
+                              `/profile/${project.user_id}`
+                            );
+                          }}
+                        />
+                      </div>
+
+                      <div className="col-8">
+                        <div className="mt-2">
+                          <strong>{project.user_detailes.name}</strong>
+                        </div>
+                      </div>
+                    </div>
                   </li>
-                ) : null}
-              </ul>
-            </div>
-          ) : null}
+                </ul>
+              </div>
+            ) : null}
+            {project.instruments && project.instruments[0] ? (
+              <div>
+                <h4>Instruments:</h4>
+                <ul className="list-group">
+                  {project.instruments
+                    .slice(0, this.state.instrumentsList)
+                    .map((instrument, index) => (
+                      <li key={index} className="list-group-item">
+                        <div className="row">
+                          <div className="col-3 col-lg-2">
+                            <img
+                              alt=""
+                              src={
+                                instrument.user_detailes
+                                  ? instrument.user_detailes.avatar
+                                  : InstrumentDefaultImg
+                              }
+                              style={{ height: "35px", width: "35px" }}
+                              className="rounded-circle mt-1"
+                              onClick={() => {
+                                if (instrument.user_detailes) {
+                                  this.props.history.push(
+                                    `/profile/${instrument.user_id}`
+                                  );
+                                }
+                              }}
+                            />
+                          </div>
+
+                          <div className="col-8">
+                            <strong>
+                              {instrument.instrument_detailes.art_practic_name}
+                            </strong>
+                            <div
+                              style={
+                                !instrument.user_id ? { color: "green" } : null
+                              }
+                            >
+                              {instrument.user_detailes
+                                ? instrument.user_detailes.name
+                                : "Still open"}
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  {project.instruments.length > this.state.instrumentsList ? (
+                    <li key={2} className="list-group-item">
+                      More...
+                    </li>
+                  ) : null}
+                </ul>
+              </div>
+            ) : null}
+          </div>
         </div>
         <div className="row">
           <div className="col-12">
+            {this.props.projectOwner ? (
+              <div>
+                <button
+                  // onClick={() => this.onDeleteClick(project)}
+                  type="button"
+                  className="btn btn-light mt-2 float-right"
+                >
+                  <i className="fas fa-pencil-alt" />
+                </button>
+
+                <button
+                  // onClick={() => this.onDeleteClick(project)}
+                  type="button"
+                  className="btn btn-light mt-2 float-right"
+                >
+                  <i className="far fa-trash-alt" />
+                </button>
+              </div>
+            ) : null}
             <div
               className="btn btn-outline-primary mr-2 mb-2"
               onClick={this.moreDetailesControl}
@@ -160,7 +254,9 @@ class ProjectItem extends Component {
                 to={`/project/project-view/${project.id}`}
                 className="btn btn-info mr-2 mb-2"
               >
-                Manage indtruments
+                {this.props.projectOwner
+                  ? "Manage indtruments"
+                  : "View project"}
               </Link>
             ) : null}
           </div>
@@ -175,7 +271,8 @@ ProjectItem.defaultProps = {
 };
 
 ProjectItem.propTypes = {
-  project: PropTypes.object.isRequired
+  project: PropTypes.object.isRequired,
+  projectOwner: PropTypes.bool
 };
 
 export default ProjectItem;

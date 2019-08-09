@@ -4,7 +4,8 @@ import {
   GET_PROJECTS,
   GET_PROJECT,
   ADD_INSTRUMENT_TO_PROJECT,
-  UPDATE_INSTRUMENT
+  UPDATE_INSTRUMENT,
+  DELETE_INSTRUMENT
 } from "../actions/types";
 
 const initialState = {
@@ -43,6 +44,11 @@ export default function(state = initialState, action) {
         project: action.payload
       };
     case UPDATE_INSTRUMENT:
+      return {
+        ...state,
+        project: action.payload
+      };
+    case DELETE_INSTRUMENT:
       return {
         ...state,
         project: action.payload

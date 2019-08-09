@@ -45,17 +45,13 @@ router.get("/", (req, res) => {
 //@ route   GET api/projets/:id
 //@desc     get projet by id
 //@access   private
-router.get(
-  "/:id",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    Project.getProjectByProjectId(req.params.id)
-      .then(project => {
-        res.json(project);
-      })
-      .catch(err => res.status(404).json({ msg: "no project found" }));
-  }
-);
+router.get("/:id", (req, res) => {
+  Project.getProjectByProjectId(req.params.id)
+    .then(project => {
+      res.json(project);
+    })
+    .catch(err => res.status(404).json({ msg: "no project found" }));
+});
 
 //@ route   POST api/projects
 //@desc     create project
@@ -278,11 +274,6 @@ router.post(
   "/instrument/:projectId",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    // const { errors, isValid } = validateCommentInput(req.body);
-    // if (!isValid) {
-    //   return res.status(400).json(errors);
-    // }
-
     const instrumentInfo = {};
     instrumentInfo.user_id = null;
     instrumentInfo.instrument_id = req.body.instrument_id;
@@ -359,18 +350,20 @@ router.delete(
     //chack the instrument ouner
     ProjectInstrument.findByPk(req.params.instrument_id).then(
       projectInstrument => {
-        if (projectInstrument.user_id !== req.user.id) {
-          return res
-            .status(401)
-            .json({ msg: "This instrument is not belong to you!" });
-        } else {
-          projectId = projectInstrument.project_id;
-          projectInstrument.destroy().then(() => {
-            Project.getProjectByProjectId(projectId).then(() =>
-              res.json(projectId)
-            );
-          });
-        }
+        Project.findByPk(projectInstrument.project_id).then(project => {
+          if (project.user_id !== req.user.id) {
+            return res
+              .status(401)
+              .json({ msg: "This project is not belong to you!" });
+          } else {
+            projectId = projectInstrument.project_id;
+            projectInstrument.destroy().then(() => {
+              Project.getProjectByProjectId(projectId).then(project =>
+                res.json(project)
+              );
+            });
+          }
+        });
       }
     );
   }

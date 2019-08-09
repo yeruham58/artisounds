@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import Popup from "reactjs-popup";
 
 import defaultImg from "../../../img/stillNoBodyImg.jpeg";
+import InstrumentForm from "./InstrumentForm";
 
 class InstrumentItem extends Component {
   constructor(props) {
@@ -10,7 +12,37 @@ class InstrumentItem extends Component {
     this.state = {
       moreDetailes: false
     };
+    this.onDeleteClick = this.onDeleteClick.bind(this);
   }
+
+  onDeleteClick(instrument) {
+    if (
+      instrument.user_id &&
+      instrument.user_id !== this.props.projectOwnerId
+    ) {
+      if (
+        window.confirm(
+          "Are you sure? \n By confirm you gonna delete all your info connected to this instrument including your access to this project thrue this instrument"
+        )
+      ) {
+        this.props.updateInstrument(instrument.id, { user_id: null });
+      }
+    }
+
+    if (
+      instrument.user_id === this.props.projectOwnerId ||
+      !instrument.record_url
+    ) {
+      if (
+        window.confirm(
+          "Are you sure? \nBy confirm you gonna delete all your info connected to this instrument"
+        )
+      ) {
+        this.props.deleteInstrument(instrument.id);
+      }
+    }
+  }
+
   render() {
     const { instrument } = this.props;
     const imgInTop =
@@ -36,28 +68,72 @@ class InstrumentItem extends Component {
       />
     );
 
+    const doImgLink =
+      instrument.user_detailes && instrument.user_detailes.avatar;
+
+    const joinDisabled =
+      !this.props.userArtTypes ||
+      this.props.userArtTypes.find(artType =>
+        artType.art_practics.find(
+          artPractic =>
+            artPractic.art_practic_details.id ===
+            instrument.instrument_detailes.id
+        )
+      ) === undefined;
+
     return (
-      <div className="card card-body bg-light mb-3">
-        {imgInTop && <div className="text-center">{img}</div>}
+      <div
+        className="card card-body bg-light mb-3"
+        style={{ minHeight: imgInTop ? "280px" : "170px" }}
+      >
+        {imgInTop && (
+          <div className="text-center">
+            {doImgLink ? (
+              <Link to={`/profile/${instrument.user_id}`}>{img}</Link>
+            ) : (
+              <div>{img}</div>
+            )}
+          </div>
+        )}
         <div className="row">
-          <div className={imgInTop ? null : "col-3"}>{!imgInTop && img}</div>
+          <div className={imgInTop ? null : "col-3"}>
+            {!imgInTop ? (
+              doImgLink ? (
+                <Link to={`/profile/${instrument.user_id}`}>{img}</Link>
+              ) : (
+                <div>{img}</div>
+              )
+            ) : null}
+          </div>
           <div className={imgInTop ? "col-5" : "col-4"}>
             <div>
               <strong>{instrument.instrument_detailes.art_practic_name}</strong>
             </div>
             <div style={instrument.user_detailes ? null : { color: "green" }}>
-              {instrument.user_detailes
-                ? instrument.user_detailes.name
-                : "Still open"}
+              {instrument.user_detailes ? (
+                <Link to={`/profile/${instrument.user_id}`}>
+                  {instrument.user_detailes.name}
+                </Link>
+              ) : (
+                "Still open"
+              )}
             </div>
           </div>
           <div className={imgInTop ? "col-7" : "col-5"}>
             <div>
+              {instrument.role &&
+              instrument.user_id &&
+              !this.state.moreDetailes ? (
+                <div className="mb-2">
+                  <strong>Roll: </strong> {instrument.role}
+                </div>
+              ) : null}
               {instrument.user_detailes &&
               this.props.logedInUserId === instrument.user_detailes.id ? (
                 <Link
                   to={`/project/add-instrument/${instrument.id}`}
                   className="btn btn-outline-warning mb-2"
+                  style={{ width: "100%" }}
                 >
                   Work on it
                 </Link>
@@ -66,14 +142,32 @@ class InstrumentItem extends Component {
                 <Link
                   to={`/project/add-instrument/${instrument.id}`}
                   className="btn btn-outline-success mb-2"
+                  style={{ width: "100%" }}
                 >
                   Invite a freind
+                </Link>
+              ) : null}
+
+              {!this.props.projectOwner && !instrument.user_detailes ? (
+                <Link to={`/project/add-instrument/${instrument.id}`}>
+                  <button
+                    disabled={joinDisabled}
+                    className={
+                      joinDisabled
+                        ? "btn btn btn-success mb-2"
+                        : "btn btn-outline-success mb-2"
+                    }
+                    style={{ width: "100%" }}
+                  >
+                    Join project
+                  </button>
                 </Link>
               ) : null}
               {this.props.projectOwner && !instrument.user_detailes ? (
                 <button
                   type="button"
                   className="btn btn-outline-primary mb-2"
+                  style={{ width: "100%" }}
                   onClick={() => {
                     this.props.updateInstrument(instrument.id, {
                       user_id: this.props.projectOwnerId
@@ -83,42 +177,10 @@ class InstrumentItem extends Component {
                   Il'l do it
                 </button>
               ) : null}
-              <div>
-                <button
-                  // onClick={this.onDeleteClick.bind(this, post.id)}
-                  type="button"
-                  className="btn btn-light mb-2"
-                >
-                  <i className="fas fa-pencil-alt" />
-                </button>
-                <button
-                  // onClick={this.onDeleteClick.bind(this, post.id)}
-                  type="button"
-                  className="btn btn-light mb-2"
-                >
-                  <i className="far fa-trash-alt" />
-                </button>
-                {instrument.comments || instrument.role ? (
-                  <button
-                    onClick={() =>
-                      this.setState({
-                        moreDetailes: !this.state.moreDetailes
-                      })
-                    }
-                    type="button"
-                    className="btn btn-light mb-2"
-                  >
-                    {this.state.moreDetailes ? (
-                      <i className="fas fa-minus" />
-                    ) : (
-                      <i className="fas fa-plus" />
-                    )}
-                  </button>
-                ) : null}
-              </div>
             </div>
           </div>
         </div>
+
         {instrument.role && this.state.moreDetailes ? (
           <div className="mt-3">
             <strong>Roll: </strong> {instrument.role}
@@ -132,16 +194,70 @@ class InstrumentItem extends Component {
             <div className="project-details">{instrument.comments}</div>
           </div>
         ) : null}
+        <div>
+          {instrument.comments || (instrument.role && !instrument.user_id) ? (
+            <button
+              onClick={() =>
+                this.setState({
+                  moreDetailes: !this.state.moreDetailes
+                })
+              }
+              type="button"
+              className="btn btn-light mt-2 float-right "
+            >
+              {this.state.moreDetailes ? (
+                <i className="fas fa-minus" />
+              ) : (
+                <i className="fas fa-plus" />
+              )}
+            </button>
+          ) : null}
+
+          {this.props.projectOwnerId === this.props.logedInUserId ||
+          (instrument.user_detailes &&
+            instrument.user_detailes.id === this.props.logedInUserId) ? (
+            <div>
+              <Popup
+                modal
+                trigger={
+                  <button
+                    type="button"
+                    className="btn btn-light mt-2 float-right"
+                  >
+                    <i className="fas fa-pencil-alt" />
+                  </button>
+                }
+              >
+                {close => (
+                  <InstrumentForm
+                    project_id={instrument.project_id}
+                    instrument={instrument}
+                    close={close}
+                  />
+                )}
+              </Popup>
+
+              <button
+                onClick={() => this.onDeleteClick(instrument)}
+                type="button"
+                className="btn btn-light mt-2 float-right"
+              >
+                <i className="far fa-trash-alt" />
+              </button>
+            </div>
+          ) : null}
+        </div>
       </div>
     );
   }
 }
 
 InstrumentItem.propTypes = {
-  projectOwner: PropTypes.bool.isRequired,
+  projectOwner: PropTypes.bool,
   updateInstrument: PropTypes.func.isRequired,
-  projectOwnerId: PropTypes.number.isRequired,
-  logedInUserId: PropTypes.number.isRequired
+  projectOwnerId: PropTypes.number,
+  logedInUserId: PropTypes.number,
+  userArtTypes: PropTypes.array
 };
 
 export default InstrumentItem;

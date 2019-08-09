@@ -14,8 +14,10 @@ class InstrumentsFeed extends Component {
           instrument={instrument}
           projectOwner={this.props.projectOwner}
           updateInstrument={this.props.updateInstrument}
+          deleteInstrument={this.props.deleteInstrument}
           projectOwnerId={this.props.projectOwnerId}
           logedInUserId={this.props.logedInUserId}
+          userArtTypes={this.props.userArtTypes}
         />
       </span>
     ));
@@ -24,10 +26,12 @@ class InstrumentsFeed extends Component {
 
 InstrumentsFeed.propTypes = {
   instruments: PropTypes.array.isRequired,
-  projectOwner: PropTypes.bool.isRequired,
+  projectOwner: PropTypes.bool,
   projectOwnerId: PropTypes.number.isRequired,
-  logedInUserId: PropTypes.number.isRequired,
-  updateInstrument: PropTypes.func.isRequired
+  logedInUserId: PropTypes.number,
+  userArtTypes: PropTypes.array,
+  updateInstrument: PropTypes.func.isRequired,
+  deleteInstrument: PropTypes.func.isRequired
 };
 
 export default InstrumentsFeed;
