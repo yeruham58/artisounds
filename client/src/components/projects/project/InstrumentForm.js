@@ -197,7 +197,10 @@ class AddInstrument extends Component {
     const { errors } = this.state;
 
     return (
-      <div className="container">
+      <div
+        className="container"
+        style={{ maxHeight: window.innerHeight, overflowY: "scroll" }}
+      >
         <div className="row">
           <div className="col-md-12">
             <form onSubmit={this.onSubmit}>

@@ -1,8 +1,9 @@
 import axios from "axios";
 
 import {
-  CREATE_PROJECT,
   GET_PROJECT,
+  UPDATE_PROJECT,
+  CLEAR_PROJECT,
   GET_PROJECTS,
   DELETE_PROJECT,
   GET_ERRORS,
@@ -14,15 +15,12 @@ import {
 } from "./types";
 
 // create project
-export const createProject = projectData => dispatch => {
+export const createProject = (projectData, history) => dispatch => {
   dispatch(setProjectLoading());
   axios
     .post("/api/projects", projectData)
     .then(res => {
-      dispatch({
-        type: CREATE_PROJECT,
-        payload: res.data
-      });
+      history.push(`/project/project-view/${res.data.id}`);
     })
     .catch(err => {
       dispatch({
@@ -39,6 +37,29 @@ export const createProject = projectData => dispatch => {
 //     payload: postData
 //   });
 // };
+
+// Update project
+export const updateProject = (projectId, projectData, history) => dispatch => {
+  dispatch(setProjectLoading());
+  axios
+    .patch(`/api/projects/${projectId}`, projectData)
+    .then(res => {
+      if (window.location.href.indexOf("project-view") < 0) {
+        history.push(`/project/project-view/${res.data.id}`);
+      } else {
+        dispatch({
+          type: UPDATE_PROJECT,
+          payload: res.data
+        });
+      }
+    })
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response
+      });
+    });
+};
 
 // // Get porojects
 export const getProjects = () => dispatch => {
@@ -76,6 +97,11 @@ export const getProject = projectId => dispatch => {
         payload: null
       })
     );
+};
+
+//clear project
+export const clearProject = () => {
+  return { type: CLEAR_PROJECT };
 };
 
 // Delete project

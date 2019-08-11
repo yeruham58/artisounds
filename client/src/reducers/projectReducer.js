@@ -1,8 +1,9 @@
 import {
   PROJECT_LOADING,
-  CREATE_PROJECT,
   GET_PROJECTS,
   GET_PROJECT,
+  UPDATE_PROJECT,
+  CLEAR_PROJECT,
   DELETE_PROJECT,
   ADD_INSTRUMENT_TO_PROJECT,
   UPDATE_INSTRUMENT,
@@ -22,19 +23,24 @@ export default function(state = initialState, action) {
         ...state,
         loading: true
       };
-    case CREATE_PROJECT:
+    case CLEAR_PROJECT:
+      return {
+        ...state,
+        project: null
+      };
+    case GET_PROJECTS:
+      return {
+        ...state,
+        projects: action.payload.reverse(),
+        loading: false
+      };
+    case GET_PROJECT:
       return {
         ...state,
         project: action.payload,
         loading: false
       };
-    case GET_PROJECTS:
-      return {
-        ...state,
-        projects: action.payload,
-        loading: false
-      };
-    case GET_PROJECT:
+    case UPDATE_PROJECT:
       return {
         ...state,
         project: action.payload,

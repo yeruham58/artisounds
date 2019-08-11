@@ -11,7 +11,11 @@ import RadioButtenGroup from "../../common/RadioButtenGroup";
 import RangeSlider from "../../common/RangeSlider";
 import { scalesList } from "./ScalesList";
 import { projectBitValidation } from "../../../validation/projectBitValidation";
-import { createProject, clearErrors } from "../../../actions/projectActions";
+import {
+  createProject,
+  updateProject,
+  clearErrors
+} from "../../../actions/projectActions";
 
 class CreateProject extends Component {
   constructor(props) {
@@ -19,18 +23,44 @@ class CreateProject extends Component {
     this.state = {
       allArtTypes: [],
       musicGenres: [],
-      name: "",
-      original: false,
-      original_by: "",
-      tempo: null,
-      bit: "4/4",
-      scale: "",
-      major: true,
-      genre_id: null,
-      description: "",
-      comment: "",
-      text: "",
-      public: true,
+      name: this.props.project ? this.props.project.name : "",
+      original: this.props.project ? this.props.project.original : false,
+      original_by:
+        this.props.project && this.props.project.original_by
+          ? this.props.project.original_by
+          : "",
+      tempo:
+        this.props.project && this.props.project.tempo
+          ? this.props.project.tempo.toString()
+          : "80",
+      bit:
+        this.props.project && this.props.project.bit
+          ? this.props.project.bit
+          : "4/4",
+      scale:
+        this.props.project && this.props.project.scale
+          ? this.props.project.scale
+          : "",
+      major: this.props.project
+        ? this.props.project.scale_type === "Major"
+        : true,
+      genre_id:
+        this.props.project && this.props.project.genre_id
+          ? this.props.project.genre_id.toString()
+          : null,
+      description:
+        this.props.project && this.props.project.description
+          ? this.props.project.description
+          : "",
+      comment:
+        this.props.project && this.props.project.comment
+          ? this.props.project.comment
+          : "",
+      text:
+        this.props.project && this.props.project.text
+          ? this.props.project.text
+          : "",
+      public: this.props.project ? this.props.project.public : true,
       errors: {}
     };
 
@@ -55,11 +85,6 @@ class CreateProject extends Component {
       this.setState({
         errors: nextProp.errors
       });
-    }
-    if (nextProp.project && nextProp.project.project) {
-      this.props.history.push(
-        `/project/project-view/${nextProp.project.project.id}`
-      );
     }
   }
 
@@ -91,11 +116,6 @@ class CreateProject extends Component {
 
   onTempoChange(e) {
     var slider = document.getElementById("myRange");
-    var output = document.getElementById("demo");
-    output.innerHTML = slider.value;
-    slider.oninput = function() {
-      output.innerHTML = this.value;
-    };
     this.setState({ tempo: slider.value });
   }
 
@@ -128,13 +148,21 @@ class CreateProject extends Component {
       newProject.text = this.state.text;
       newProject.public = this.state.public;
 
-      this.props.createProject(newProject);
+      if (this.props.project) {
+        this.props.updateProject(
+          this.props.project.id,
+          newProject,
+          this.props.history
+        );
+      } else {
+        this.props.createProject(newProject, this.props.history);
+      }
     }
   }
 
   render() {
     const { errors, musicGenres } = this.state;
-
+    const { project } = this.props;
     const genresList = [];
     musicGenres.map((genre, index) => {
       genresList.push({
@@ -146,12 +174,21 @@ class CreateProject extends Component {
     });
 
     return (
-      <div className="container">
+      <div
+        className="container"
+        style={
+          project
+            ? { maxHeight: window.innerHeight, overflowY: "scroll" }
+            : null
+        }
+      >
         <div className="row">
           <div className="col-md-8 m-auto">
-            <p className="display-4 text-center">
-              <strong>Create Your New Project</strong>
-            </p>
+            {!project ? (
+              <p className="display-4 text-center">
+                <strong>Create Your New Project</strong>
+              </p>
+            ) : null}
             <small className="d-block pb-3">* = required field</small>
             <form onSubmit={this.onSubmit}>
               <TextFieldGroup
@@ -218,6 +255,7 @@ class CreateProject extends Component {
               </div>
 
               <RangeSlider
+                value={this.state.tempo}
                 onChange={this.onTempoChange}
                 error={errors.tempo}
                 info="Please config the tempo of your project"
@@ -280,7 +318,7 @@ class CreateProject extends Component {
               />
               <input
                 type="submit"
-                value="Create project"
+                value={project ? "Update" : "Create project"}
                 className="btn btn-info btn-block mt-4 mb-4"
               />
             </form>
@@ -292,18 +330,18 @@ class CreateProject extends Component {
 }
 
 CreateProject.propTypes = {
+  project: PropTypes.object,
   createProject: PropTypes.func.isRequired,
+  updateProject: PropTypes.func.isRequired,
   clearErrors: PropTypes.func.isRequired,
-  errors: PropTypes.object.isRequired,
-  project: PropTypes.object
+  errors: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
-  errors: state.errors,
-  project: state.project
+  errors: state.errors
 });
 
 export default connect(
   mapStateToProps,
-  { createProject, clearErrors }
+  { createProject, updateProject, clearErrors }
 )(withRouter(CreateProject));

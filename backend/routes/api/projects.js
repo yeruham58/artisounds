@@ -95,6 +95,52 @@ router.post(
   }
 );
 
+//@ route   PATCH api/projects/projectId
+//@desc     update project
+//@access   private
+router.patch(
+  "/:projectId",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const { errors, isValid } = validateProjectInput(req.body);
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
+    const updatedProject = {};
+    updatedProject.user_id = req.user.id;
+    updatedProject.name = req.body.name;
+    updatedProject.original = req.body.original;
+    updatedProject.original_by = req.body.original_by;
+    updatedProject.bit = req.body.bit;
+    if (req.body.tempo) updatedProject.tempo = req.body.tempo;
+    updatedProject.scale_type = req.body.scale_type;
+    if (req.body.scale) updatedProject.scale = req.body.scale;
+    if (req.body.genre_id) updatedProject.genre_id = req.body.genre_id;
+    if (req.body.description) updatedProject.description = req.body.description;
+    if (req.body.comment) updatedProject.comment = req.body.comment;
+    if (req.body.text) updatedProject.text = req.body.text;
+    updatedProject.public = req.body.public;
+    updatedProject.img_or_video_url = null;
+    updatedProject.img_or_video_key = null;
+    updatedProject.in_action = true;
+
+    Project.getProjectByProjectId(req.params.projectId)
+      .then(project => {
+        project.update(updatedProject).then(() => {
+          Project.getProjectByProjectId(req.params.projectId).then(
+            updatedProject => {
+              res.json(updatedProject);
+            }
+          );
+        });
+      })
+      .catch(err => {
+        errors.error = "Some error with upload your post, please try again";
+        return res.status(400).json(errors);
+      });
+  }
+);
+
 //@ route   DELETE api/projects/:projectId
 //@desc     delete project
 //@access   private
@@ -147,7 +193,6 @@ router.delete(
             project.destroy().then(() => {
               Project.getProjectsByUserId(req.user.id).then(projects => {
                 res.json({ projects });
-                console.log(projects);
               });
             });
           }

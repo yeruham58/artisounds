@@ -4,6 +4,7 @@ const RangeSlider = (value, onChange, info, error) => {
   return (
     <div className="slidecontainer">
       <input
+        value={value.value}
         type="range"
         min="40"
         max="260"
@@ -14,7 +15,7 @@ const RangeSlider = (value, onChange, info, error) => {
         }}
       />
       <p>
-        Tempo:
+        Tempo: {value.value}
         <span id="demo" />
       </p>
       {value.error && <div className="invalid-feedback">{value.error}</div>}

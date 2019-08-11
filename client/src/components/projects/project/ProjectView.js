@@ -9,6 +9,7 @@ import InstrumentsFeed from "./InstrumentsFeed";
 import Spinner from "../../common/Spinner";
 import {
   getProject,
+  clearProject,
   deleteProject,
   updateInstrument,
   deleteInstrument
@@ -23,13 +24,12 @@ class ProjectView extends Component {
   }
 
   componentDidMount() {
-    this.props.project.project = null;
     this.props.getProject(this.props.match.params.projectId);
     this.props.getCurrentProfile();
   }
 
   componentWillUnmount() {
-    this.props.project.project = null;
+    this.props.clearProject();
   }
 
   updateInstrument(instrumentId, data) {
@@ -118,6 +118,7 @@ class ProjectView extends Component {
 
 ProjectView.propTypes = {
   getProject: PropTypes.func.isRequired,
+  clearProject: PropTypes.func.isRequired,
   deleteProject: PropTypes.func.isRequired,
   updateInstrument: PropTypes.func.isRequired,
   deleteInstrument: PropTypes.func.isRequired,
@@ -134,8 +135,10 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
+
   {
     getProject,
+    clearProject,
     deleteProject,
     updateInstrument,
     deleteInstrument,

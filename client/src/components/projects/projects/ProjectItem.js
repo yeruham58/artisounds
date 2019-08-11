@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import Popup from "reactjs-popup";
 
+import CreateProject from "../create-project/CreateProject";
 import projectDefaultImg from "../../../img/musicGif.gif";
 import InstrumentDefaultImg from "../../../img/stillNoBodyImg.jpeg";
 
@@ -241,13 +243,19 @@ class ProjectItem extends Component {
           <div className="col-12">
             {this.props.projectOwner ? (
               <div>
-                <button
-                  // onClick={() => this.onDeleteClick(project)}
-                  type="button"
-                  className="btn btn-light mt-2 float-right"
+                <Popup
+                  modal
+                  trigger={
+                    <button
+                      type="button"
+                      className="btn btn-light mt-2 float-right"
+                    >
+                      <i className="fas fa-pencil-alt" />
+                    </button>
+                  }
                 >
-                  <i className="fas fa-pencil-alt" />
-                </button>
+                  {close => <CreateProject project={project} close={close} />}
+                </Popup>
 
                 <button
                   onClick={this.deleteProject}
@@ -267,7 +275,7 @@ class ProjectItem extends Component {
             {this.props.showActions ? (
               <Link
                 to={`/project/project-view/${project.id}`}
-                className="btn btn-info mr-2 mb-2"
+                className="btn btn-outline-success mr-2 mb-2"
               >
                 {this.props.projectOwner
                   ? "Manage indtruments"
