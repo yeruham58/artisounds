@@ -9,6 +9,7 @@ import {
 } from "../../../actions/projectActions";
 import {
   deleteNotificationsByInstrumentId,
+  deleteNotificationsById,
   sendNotification
 } from "../../../actions/notificationActions";
 
@@ -189,7 +190,7 @@ class InstrumentItem extends Component {
                       joinDisabled
                         ? `btn btn btn-success mb-2`
                         : alreadySent
-                        ? "btn btn-outline-primary mb-2"
+                        ? "btn btn-primary mb-2"
                         : "btn btn-outline-success mb-2"
                     }
                     onClick={this.sendJoinProjectReq}
@@ -199,6 +200,24 @@ class InstrumentItem extends Component {
                   </button>
                 </div>
               ) : null}
+              {alreadySent && (
+                <div>
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary mb-2"
+                    onClick={() => {
+                      console.log("this.props.notification.id");
+                      console.log(this.props.notification.id);
+                      this.props.deleteNotificationsById(
+                        this.props.notification.id
+                      );
+                    }}
+                    style={{ width: "100%" }}
+                  >
+                    Cancle
+                  </button>
+                </div>
+              )}
               {this.props.projectOwner && !instrument.user_detailes ? (
                 <button
                   type="button"
@@ -298,6 +317,7 @@ InstrumentItem.propTypes = {
   deleteInstrument: PropTypes.func.isRequired,
   sendNotification: PropTypes.func.isRequired,
   deleteNotificationsByInstrumentId: PropTypes.func.isRequired,
+  deleteNotificationsById: PropTypes.func.isRequired,
 
   notification: PropTypes.object,
   instrument: PropTypes.object.isRequired,
@@ -319,6 +339,7 @@ export default connect(
     updateInstrument,
     deleteInstrument,
     deleteNotificationsByInstrumentId,
+    deleteNotificationsById,
     sendNotification
   }
 )(InstrumentItem);

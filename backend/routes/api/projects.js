@@ -198,10 +198,7 @@ router.delete(
               deleteAwsFile(project.img_or_video_key, "projectimgorvideo");
             }
             project.destroy().then(() => {
-              console.log("at least here");
               Project.getAllProjects(req.user.id).then(projects => {
-                console.log("projects in server");
-                console.log(projects);
                 res.json(projects);
               });
             });

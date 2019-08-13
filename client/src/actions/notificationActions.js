@@ -64,7 +64,7 @@ export const deleteNotificationsByProjectId = projectId => dispatch => {
   axios
     .delete(`/api/projectNotifications/projectId/${projectId}`)
     .then(res => {
-      console.log("res.data");
+      console.log("res");
       console.log(res);
       dispatch({
         type: GET_NOTIFICATIONS,
@@ -83,12 +83,12 @@ export const deleteNotificationsByProjectId = projectId => dispatch => {
 export const deleteNotificationsById = notificationId => dispatch => {
   axios
     .delete(`/api/projectNotifications/${notificationId}`)
-    .then(res =>
+    .then(res => {
       dispatch({
         type: GET_NOTIFICATIONS,
         payload: res.data
-      })
-    )
+      });
+    })
     .catch(err => {
       dispatch({
         type: GET_ERRORS,

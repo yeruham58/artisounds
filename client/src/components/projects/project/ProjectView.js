@@ -12,6 +12,12 @@ import { getNotificationsByUserId } from "../../../actions/notificationActions";
 import { getCurrentProfile } from "../../../actions/profileActions";
 
 class ProjectView extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      notifications: null
+    };
+  }
   componentDidMount() {
     this.props.getProject(this.props.match.params.projectId);
     this.props.getCurrentProfile();
@@ -20,6 +26,14 @@ class ProjectView extends Component {
 
   componentWillUnmount() {
     this.props.clearProject();
+  }
+
+  componentWillReceiveProps(nextProp) {
+    if (nextProp.notifications) {
+      this.setState({
+        notifications: nextProp.notifications.notifications
+      });
+    }
   }
 
   render() {
@@ -72,11 +86,12 @@ class ProjectView extends Component {
 
               {project.instruments && project.instruments[0] ? (
                 <InstrumentsFeed
-                  notifications={
-                    this.props.notifications.notifications
-                      ? this.props.notifications.notifications
-                      : null
-                  }
+                  // notifications={
+                  //   this.state.notifications.notifications
+                  //     ? this.state.notifications.notifications
+                  //     : null
+                  // }
+                  notifications={this.state.notifications}
                   instruments={project.instruments}
                   projectOwner={
                     this.props.auth.user &&

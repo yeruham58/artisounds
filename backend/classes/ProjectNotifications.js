@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/database");
 const Op = Sequelize.Op;
+const Promise = require("promise");
 
 const Project = require("./Project");
 const User = require("./User");
@@ -38,27 +39,44 @@ class ProjectNotifications extends Sequelize.Model {
 
   // Delete notifications by instrument id
   static deleteNotificationsByInstrumentId(instrumentId) {
-    return ProjectNotifications.findAll({
-      where: { project_instrument_id: instrumentId }
-    }).then(notifications => {
-      notifications.map(notification => notification.destroy());
+    return new Promise(function(resolve, reject) {
+      // return ProjectNotifications.findAll({
+      ProjectNotifications.findAll({
+        where: { project_instrument_id: instrumentId }
+      }).then(notifications => {
+        notifications.map(notification => {
+          const end =
+            notifications.indexOf(notification) === notifications.length - 1;
+          notification.destroy();
+          if (end) {
+            resolve("deleted");
+          }
+        });
+      });
     });
   }
 
   // Delete notifications by project id
   static deleteNotificationsByProjectId(projectId) {
-    return ProjectNotifications.findAll({
-      where: { project_id: projectId }
-    }).then(notifications => {
-      notifications.map(notification => notification.destroy());
+    return new Promise(function(resolve, reject) {
+      ProjectNotifications.findAll({
+        where: { project_id: projectId }
+      }).then(notifications => {
+        notifications.map(notification => {
+          const end =
+            notifications.indexOf(notification) === notifications.length - 1;
+          notification.destroy();
+          if (end) {
+            resolve("deleted");
+          }
+        });
+      });
     });
   }
 
   // Delete notification by notification id
   static deleteNotificationById(notificationId) {
-    return ProjectNotifications.findByPk({
-      where: { id: notificationId }
-    }).then(notification => {
+    return ProjectNotifications.findByPk(notificationId).then(notification => {
       notification.destroy();
     });
   }

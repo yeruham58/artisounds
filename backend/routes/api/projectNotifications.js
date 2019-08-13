@@ -62,7 +62,13 @@ router.delete(
       req.params.projectInstrumentId
     )
       .then(() => {
-        res.json(ProjectNotifications.getNotificationsByUserId(res.user.id));
+        ProjectNotifications.getNotificationsByUserId(req.user.id)
+          .then(notifications => {
+            res.json(notifications);
+          })
+          .catch(err =>
+            res.status(404).json({ data: "no notifications found" })
+          );
       })
       .catch(err => res.status(404).json({ data: "no notifications found" }));
   }
@@ -77,8 +83,13 @@ router.delete(
   (req, res) => {
     ProjectNotifications.deleteNotificationsByProjectId(req.params.projectId)
       .then(() => {
-        console.log("gonna sdend the new");
-        res.json(ProjectNotifications.getNotificationsByUserId(res.user.id));
+        ProjectNotifications.getNotificationsByUserId(req.user.id)
+          .then(notifications => {
+            res.json(notifications);
+          })
+          .catch(err =>
+            res.status(404).json({ data: "no notifications found" })
+          );
       })
       .catch(err => res.status(404).json({ data: "no notifications found" }));
   }
@@ -93,7 +104,13 @@ router.delete(
   (req, res) => {
     ProjectNotifications.deleteNotificationById(req.params.notificationId)
       .then(() => {
-        res.json(ProjectNotifications.getNotificationsByUserId(res.user.id));
+        ProjectNotifications.getNotificationsByUserId(req.user.id)
+          .then(notifications => {
+            res.json(notifications);
+          })
+          .catch(err =>
+            res.status(404).json({ data: "no notifications found" })
+          );
       })
       .catch(err => res.status(404).json({ data: "no notifications found" }));
   }

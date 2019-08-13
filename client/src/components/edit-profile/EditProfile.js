@@ -236,7 +236,7 @@ class CreateProfile extends Component {
         errors: {
           ...errors,
           art_practics:
-            "To add an art type to your profile, you shold check at list one art practic"
+            "To add an art type to your profile, you shold check at least one art practic"
         }
       });
     } else {

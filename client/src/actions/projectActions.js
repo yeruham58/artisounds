@@ -5,7 +5,6 @@ import {
   UPDATE_PROJECT,
   CLEAR_PROJECT,
   GET_PROJECTS,
-  DELETE_PROJECT,
   GET_ERRORS,
   CLEAR_ERRORS,
   ADD_INSTRUMENT_TO_PROJECT,
@@ -110,8 +109,6 @@ export const deleteProject = projectId => dispatch => {
   axios
     .delete(`/api/projects/${projectId}`)
     .then(res => {
-      console.log("res.data");
-      console.log(res);
       dispatch({
         type: GET_PROJECTS,
         payload: res.data
