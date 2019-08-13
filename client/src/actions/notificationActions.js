@@ -39,38 +39,60 @@ export const getNotificationsByUserId = () => dispatch => {
     );
 };
 
-// // Update instrument
-// export const updateInstrument = (instrumentId, newData) => dispatch => {
-//   axios
-//     .patch(`/api/projects/instrument/${instrumentId}`, newData)
-//     .then(res =>
-//       dispatch({
-//         type: UPDATE_INSTRUMENT,
-//         payload: res.data
-//       })
-//     )
-//     .catch(err => {
-//       dispatch({
-//         type: GET_ERRORS,
-//         payload: err.response.data
-//       });
-//     });
-// };
+// Delete notifications
 
-// // Delete instrument
-// export const deleteInstrument = instrumentId => dispatch => {
-//   axios
-//     .delete(`/api/projects/instrument/${instrumentId}`)
-//     .then(res =>
-//       dispatch({
-//         type: DELETE_INSTRUMENT,
-//         payload: res.data
-//       })
-//     )
-//     .catch(err => {
-//       dispatch({
-//         type: GET_ERRORS,
-//         payload: err.response.data
-//       });
-//     });
-// };
+//Delete by instrument id
+export const deleteNotificationsByInstrumentId = instrumentId => dispatch => {
+  axios
+    .delete(`/api/projectNotifications/instrumentId/${instrumentId}`)
+    .then(res =>
+      dispatch({
+        type: GET_NOTIFICATIONS,
+        payload: res.data
+      })
+    )
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response
+      });
+    });
+};
+
+//Delete by project id
+export const deleteNotificationsByProjectId = projectId => dispatch => {
+  axios
+    .delete(`/api/projectNotifications/projectId/${projectId}`)
+    .then(res => {
+      console.log("res.data");
+      console.log(res);
+      dispatch({
+        type: GET_NOTIFICATIONS,
+        payload: res.data
+      });
+    })
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response
+      });
+    });
+};
+
+//Delete by notification id
+export const deleteNotificationsById = notificationId => dispatch => {
+  axios
+    .delete(`/api/projectNotifications/${notificationId}`)
+    .then(res =>
+      dispatch({
+        type: GET_NOTIFICATIONS,
+        payload: res.data
+      })
+    )
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response
+      });
+    });
+};

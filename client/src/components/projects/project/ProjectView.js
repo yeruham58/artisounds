@@ -7,27 +7,11 @@ import ProjectItem from "../projects/ProjectItem";
 import InstrumentForm from "./InstrumentForm";
 import InstrumentsFeed from "./InstrumentsFeed";
 import Spinner from "../../common/Spinner";
-import {
-  getProject,
-  clearProject,
-  deleteProject,
-  updateInstrument,
-  deleteInstrument
-} from "../../../actions/projectActions";
-import {
-  sendNotification,
-  getNotificationsByUserId
-} from "../../../actions/notificationActions";
+import { getProject, clearProject } from "../../../actions/projectActions";
+import { getNotificationsByUserId } from "../../../actions/notificationActions";
 import { getCurrentProfile } from "../../../actions/profileActions";
 
 class ProjectView extends Component {
-  constructor(props) {
-    super(props);
-    this.updateInstrument = this.updateInstrument.bind(this);
-    this.deleteInstrument = this.deleteInstrument.bind(this);
-    this.sendNotification = this.sendNotification.bind(this);
-  }
-
   componentDidMount() {
     this.props.getProject(this.props.match.params.projectId);
     this.props.getCurrentProfile();
@@ -36,19 +20,6 @@ class ProjectView extends Component {
 
   componentWillUnmount() {
     this.props.clearProject();
-  }
-
-  updateInstrument(instrumentId, data) {
-    this.props.updateInstrument(instrumentId, data);
-  }
-
-  deleteInstrument(instrumentId) {
-    this.props.deleteInstrument(instrumentId);
-  }
-
-  sendNotification(notificationInfo) {
-    console.log("gonna send!");
-    this.props.sendNotification(notificationInfo);
   }
 
   render() {
@@ -72,7 +43,6 @@ class ProjectView extends Component {
               this.props.auth.user &&
               this.props.auth.user.id === project.user_id
             }
-            deleteProject={this.props.deleteProject}
           />
         </div>
       );
@@ -102,7 +72,6 @@ class ProjectView extends Component {
 
               {project.instruments && project.instruments[0] ? (
                 <InstrumentsFeed
-                  sendNotification={this.sendNotification}
                   notifications={
                     this.props.notifications.notifications
                       ? this.props.notifications.notifications
@@ -114,8 +83,6 @@ class ProjectView extends Component {
                     this.props.auth.user.id === project.user_id
                   }
                   projectOwnerId={project.user_id}
-                  updateInstrument={this.updateInstrument}
-                  deleteInstrument={this.deleteInstrument}
                   logedInUserId={
                     this.props.auth.user ? this.props.auth.user.id : null
                   }
@@ -135,13 +102,9 @@ class ProjectView extends Component {
 }
 
 ProjectView.propTypes = {
-  sendNotification: PropTypes.func.isRequired,
   getNotificationsByUserId: PropTypes.func.isRequired,
   getProject: PropTypes.func.isRequired,
   clearProject: PropTypes.func.isRequired,
-  deleteProject: PropTypes.func.isRequired,
-  updateInstrument: PropTypes.func.isRequired,
-  deleteInstrument: PropTypes.func.isRequired,
   project: PropTypes.object.isRequired,
   auth: PropTypes.object.isRequired,
   profile: PropTypes.object
@@ -160,11 +123,7 @@ export default connect(
   {
     getProject,
     clearProject,
-    deleteProject,
-    updateInstrument,
-    deleteInstrument,
     getCurrentProfile,
-    sendNotification,
     getNotificationsByUserId
   }
 )(ProjectView);

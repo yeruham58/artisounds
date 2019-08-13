@@ -35,6 +35,33 @@ class ProjectNotifications extends Sequelize.Model {
       ]
     });
   }
+
+  // Delete notifications by instrument id
+  static deleteNotificationsByInstrumentId(instrumentId) {
+    return ProjectNotifications.findAll({
+      where: { project_instrument_id: instrumentId }
+    }).then(notifications => {
+      notifications.map(notification => notification.destroy());
+    });
+  }
+
+  // Delete notifications by project id
+  static deleteNotificationsByProjectId(projectId) {
+    return ProjectNotifications.findAll({
+      where: { project_id: projectId }
+    }).then(notifications => {
+      notifications.map(notification => notification.destroy());
+    });
+  }
+
+  // Delete notification by notification id
+  static deleteNotificationById(notificationId) {
+    return ProjectNotifications.findByPk({
+      where: { id: notificationId }
+    }).then(notification => {
+      notification.destroy();
+    });
+  }
 }
 
 ProjectNotifications.init(

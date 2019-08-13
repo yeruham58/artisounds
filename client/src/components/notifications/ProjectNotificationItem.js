@@ -6,6 +6,7 @@ import { withRouter } from "react-router-dom";
 
 import { splitNameAndId } from "../../config/chatConfig";
 import { updateInstrument } from "../../actions/projectActions";
+import { deleteNotificationsByInstrumentId } from "../../actions/notificationActions";
 
 class ProjectNotificationItem extends Component {
   constructor(props) {
@@ -21,6 +22,9 @@ class ProjectNotificationItem extends Component {
         user_id: this.props.notification.sender_id
       },
       this.props.history
+    );
+    this.props.deleteNotificationsByInstrumentId(
+      this.props.notification.project_instrument_id
     );
   }
 
@@ -145,7 +149,8 @@ class ProjectNotificationItem extends Component {
 
 ProjectNotificationItem.propTypes = {
   notification: PropTypes.object.isRequired,
-  updateInstrument: PropTypes.func.isRequired
+  updateInstrument: PropTypes.func.isRequired,
+  deleteNotificationsByInstrumentId: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -154,5 +159,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { updateInstrument }
+  { updateInstrument, deleteNotificationsByInstrumentId }
 )(withRouter(ProjectNotificationItem));

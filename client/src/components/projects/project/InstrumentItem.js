@@ -1,7 +1,16 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import Popup from "reactjs-popup";
+import {
+  updateInstrument,
+  deleteInstrument
+} from "../../../actions/projectActions";
+import {
+  deleteNotificationsByInstrumentId,
+  sendNotification
+} from "../../../actions/notificationActions";
 
 import defaultImg from "../../../img/stillNoBodyImg.jpeg";
 import InstrumentForm from "./InstrumentForm";
@@ -108,7 +117,7 @@ class InstrumentItem extends Component {
     return (
       <div
         className="card card-body bg-light mb-3"
-        style={{ minHeight: imgInTop ? "280px" : "170px" }}
+        style={{ minHeight: imgInTop ? "280px" : "190px" }}
       >
         {imgInTop && (
           <div className="text-center">
@@ -203,6 +212,7 @@ class InstrumentItem extends Component {
                       },
                       this.props.history
                     );
+                    this.props.deleteNotificationsByInstrumentId(instrument.id);
                   }}
                 >
                   Il'l do it
@@ -284,14 +294,31 @@ class InstrumentItem extends Component {
 }
 
 InstrumentItem.propTypes = {
+  updateInstrument: PropTypes.func.isRequired,
+  deleteInstrument: PropTypes.func.isRequired,
+  sendNotification: PropTypes.func.isRequired,
+  deleteNotificationsByInstrumentId: PropTypes.func.isRequired,
+
   notification: PropTypes.object,
   instrument: PropTypes.object.isRequired,
   projectOwner: PropTypes.bool,
-  updateInstrument: PropTypes.func.isRequired,
+
   projectOwnerId: PropTypes.number,
   logedInUserId: PropTypes.number,
-  userArtTypes: PropTypes.array,
-  sendNotification: PropTypes.func.isRequired
+  userArtTypes: PropTypes.array
 };
 
-export default InstrumentItem;
+// export default InstrumentItem;
+const mapStateToProps = state => ({
+  auth: state.auth
+});
+
+export default connect(
+  mapStateToProps,
+  {
+    updateInstrument,
+    deleteInstrument,
+    deleteNotificationsByInstrumentId,
+    sendNotification
+  }
+)(InstrumentItem);

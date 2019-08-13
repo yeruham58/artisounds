@@ -21,12 +21,9 @@ class InstrumentsFeed extends Component {
               : null
           }
           projectOwner={this.props.projectOwner}
-          updateInstrument={this.props.updateInstrument}
-          deleteInstrument={this.props.deleteInstrument}
           projectOwnerId={this.props.projectOwnerId}
           logedInUserId={this.props.logedInUserId}
           userArtTypes={this.props.userArtTypes}
-          sendNotification={this.props.sendNotification}
         />
       </span>
     ));
@@ -39,10 +36,7 @@ InstrumentsFeed.propTypes = {
   projectOwner: PropTypes.bool,
   projectOwnerId: PropTypes.number.isRequired,
   logedInUserId: PropTypes.number,
-  userArtTypes: PropTypes.array,
-  updateInstrument: PropTypes.func.isRequired,
-  deleteInstrument: PropTypes.func.isRequired,
-  sendNotification: PropTypes.func.isRequired
+  userArtTypes: PropTypes.array
 };
 
 export default InstrumentsFeed;

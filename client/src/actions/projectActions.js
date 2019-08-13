@@ -110,9 +110,11 @@ export const deleteProject = projectId => dispatch => {
   axios
     .delete(`/api/projects/${projectId}`)
     .then(res => {
+      console.log("res.data");
+      console.log(res);
       dispatch({
-        type: DELETE_PROJECT,
-        payload: res.data.projects
+        type: GET_PROJECTS,
+        payload: res.data
       });
     })
     .catch(err => {
@@ -213,7 +215,6 @@ export const updateInstrument = (
     .patch(`/api/projects/instrument/${instrumentId}`, newData)
     .then(res => {
       if (window.location.href.indexOf("project-view") < 0) {
-        console.log(history);
         history.push(`/project/project-view/${res.data.id}`);
       } else {
         dispatch({

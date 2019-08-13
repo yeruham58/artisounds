@@ -25,7 +25,6 @@ router.post(
 
     ProjectNotifications.create(newNotification)
       .then(() => {
-        console.log("here!!!!!!!!!!");
         ProjectNotifications.getNotificationsByUserId(req.user.id).then(
           notifications => res.json(notifications)
         );
@@ -37,7 +36,7 @@ router.post(
   }
 );
 
-//@ route   GET api/projectNotifications/:userId
+//@ route   GET api/projectNotifications
 //@desc     get notifications by user id
 //@access   private
 router.get(
@@ -47,6 +46,54 @@ router.get(
     ProjectNotifications.getNotificationsByUserId(req.user.id)
       .then(notifications => {
         res.json(notifications);
+      })
+      .catch(err => res.status(404).json({ data: "no notifications found" }));
+  }
+);
+
+//@ route   DELETE api/projectNotifications/instrumentId/:projectInstrumentId
+//@desc     delete notifications by project_instrument_id
+//@access   private
+router.delete(
+  "/instrumentId/:projectInstrumentId",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    ProjectNotifications.deleteNotificationsByInstrumentId(
+      req.params.projectInstrumentId
+    )
+      .then(() => {
+        res.json(ProjectNotifications.getNotificationsByUserId(res.user.id));
+      })
+      .catch(err => res.status(404).json({ data: "no notifications found" }));
+  }
+);
+
+//@ route   DELETE api/projectNotifications/projectId/:projectId
+//@desc     delete notifications by project_id
+//@access   private
+router.delete(
+  "/projectId/:projectId",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    ProjectNotifications.deleteNotificationsByProjectId(req.params.projectId)
+      .then(() => {
+        console.log("gonna sdend the new");
+        res.json(ProjectNotifications.getNotificationsByUserId(res.user.id));
+      })
+      .catch(err => res.status(404).json({ data: "no notifications found" }));
+  }
+);
+
+//@ route   DELETE api/projectNotifications/:notificationId
+//@desc     delete notifications by notification id
+//@access   private
+router.delete(
+  "/:notificationId",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    ProjectNotifications.deleteNotificationById(req.params.notificationId)
+      .then(() => {
+        res.json(ProjectNotifications.getNotificationsByUserId(res.user.id));
       })
       .catch(err => res.status(404).json({ data: "no notifications found" }));
   }

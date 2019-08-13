@@ -1,8 +1,11 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import Popup from "reactjs-popup";
 
+import { deleteProject } from "../../../actions/projectActions";
+import { deleteNotificationsByProjectId } from "../../../actions/notificationActions";
 import CreateProject from "../create-project/CreateProject";
 import projectDefaultImg from "../../../img/musicGif.gif";
 import InstrumentDefaultImg from "../../../img/stillNoBodyImg.jpeg";
@@ -33,6 +36,8 @@ class ProjectItem extends Component {
       )
     ) {
       this.props.deleteProject(this.props.project.id);
+      this.props.deleteNotificationsByProjectId(this.props.project.id);
+
       if (window.location.href.indexOf("dashboard") < 0) {
         this.props.history.push("/dashboard");
       }
@@ -296,7 +301,19 @@ ProjectItem.defaultProps = {
 ProjectItem.propTypes = {
   project: PropTypes.object.isRequired,
   deleteProject: PropTypes.func.isRequired,
+  deleteNotificationsByProjectId: PropTypes.func.isRequired,
   projectOwner: PropTypes.bool
 };
 
-export default ProjectItem;
+// export default ProjectItem;
+const mapStateToProps = state => ({
+  auth: state.auth
+});
+
+export default connect(
+  mapStateToProps,
+  {
+    deleteProject,
+    deleteNotificationsByProjectId
+  }
+)(ProjectItem);

@@ -170,14 +170,21 @@ router.delete(
             project.instruments &&
             project.instruments[0] &&
             project.instruments.find(
-              instrument => instrument.user_id !== project.user_id
+              instrument =>
+                instrument.user_id && instrument.user_id !== project.user_id
             )
           ) {
-            project.update({
-              user_id: project.instruments.find(
-                instrument => instrument.user_id !== project.user_id
-              ).user_id
-            });
+            project
+              .update({
+                user_id: project.instruments.find(
+                  instrument => instrument.user_id !== project.user_id
+                ).user_id
+              })
+              .then(() => {
+                Project.getAllProjects(req.user.id).then(projects => {
+                  res.json(projects);
+                });
+              });
           } else {
             ProjectInstrument.findAll({
               where: { project_id: project.id }
@@ -191,8 +198,11 @@ router.delete(
               deleteAwsFile(project.img_or_video_key, "projectimgorvideo");
             }
             project.destroy().then(() => {
-              Project.getProjectsByUserId(req.user.id).then(projects => {
-                res.json({ projects });
+              console.log("at least here");
+              Project.getAllProjects(req.user.id).then(projects => {
+                console.log("projects in server");
+                console.log(projects);
+                res.json(projects);
               });
             });
           }
