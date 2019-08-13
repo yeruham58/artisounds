@@ -204,19 +204,29 @@ export const addInstrument = (projectId, instrumentData) => dispatch => {
 };
 
 // Update instrument
-export const updateInstrument = (instrumentId, newData) => dispatch => {
+export const updateInstrument = (
+  instrumentId,
+  newData,
+  history
+) => dispatch => {
   axios
     .patch(`/api/projects/instrument/${instrumentId}`, newData)
-    .then(res =>
-      dispatch({
-        type: UPDATE_INSTRUMENT,
-        payload: res.data
-      })
-    )
+    .then(res => {
+      if (window.location.href.indexOf("project-view") < 0) {
+        console.log(history);
+        history.push(`/project/project-view/${res.data.id}`);
+      } else {
+        dispatch({
+          type: UPDATE_INSTRUMENT,
+          payload: res.data
+        });
+      }
+    })
     .catch(err => {
+      console.log(err);
       dispatch({
         type: GET_ERRORS,
-        payload: err.response.data
+        payload: err
       });
     });
 };

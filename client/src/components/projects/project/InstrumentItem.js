@@ -10,9 +10,11 @@ class InstrumentItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      moreDetailes: false
+      moreDetailes: false,
+      joinProjectMsg: ""
     };
     this.onDeleteClick = this.onDeleteClick.bind(this);
+    this.sendJoinProjectReq = this.sendJoinProjectReq.bind(this);
   }
 
   onDeleteClick(instrument) {
@@ -25,7 +27,11 @@ class InstrumentItem extends Component {
           "Are you sure? \n By confirm you gonna delete all your info connected to this instrument including your access to this project thrue this instrument"
         )
       ) {
-        this.props.updateInstrument(instrument.id, { user_id: null });
+        this.props.updateInstrument(
+          instrument.id,
+          { user_id: null },
+          this.props.history
+        );
       }
     }
 
@@ -41,6 +47,20 @@ class InstrumentItem extends Component {
         this.props.deleteInstrument(instrument.id);
       }
     }
+  }
+
+  sendJoinProjectReq() {
+    const notificationInfo = {};
+    notificationInfo.project_id = this.props.instrument.project_id;
+    notificationInfo.project_owner_id = this.props.projectOwnerId;
+    notificationInfo.project_instrument_id = this.props.instrument.id;
+    notificationInfo.sender_id = this.props.logedInUserId;
+    notificationInfo.sent_to_id = this.props.projectOwnerId;
+    notificationInfo.message_text = this.state.joinProjectMsg;
+    notificationInfo.unread = true;
+    notificationInfo.need_action = true;
+    notificationInfo.deleted = false;
+    this.props.sendNotification(notificationInfo);
   }
 
   render() {
@@ -80,6 +100,10 @@ class InstrumentItem extends Component {
             instrument.instrument_detailes.id
         )
       ) === undefined;
+
+    const alreadySent =
+      this.props.notification &&
+      this.props.notification.sender_id === this.props.logedInUserId;
 
     return (
       <div
@@ -147,21 +171,24 @@ class InstrumentItem extends Component {
                   Invite a freind
                 </Link>
               ) : null}
-
               {!this.props.projectOwner && !instrument.user_detailes ? (
-                <Link to={`/project/add-instrument/${instrument.id}`}>
+                <div>
                   <button
-                    disabled={joinDisabled}
+                    type="button"
+                    disabled={joinDisabled || alreadySent}
                     className={
                       joinDisabled
-                        ? "btn btn btn-success mb-2"
+                        ? `btn btn btn-success mb-2`
+                        : alreadySent
+                        ? "btn btn-outline-primary mb-2"
                         : "btn btn-outline-success mb-2"
                     }
+                    onClick={this.sendJoinProjectReq}
                     style={{ width: "100%" }}
                   >
-                    Join project
+                    {alreadySent ? "Already sent" : "Join project"}
                   </button>
-                </Link>
+                </div>
               ) : null}
               {this.props.projectOwner && !instrument.user_detailes ? (
                 <button
@@ -169,9 +196,13 @@ class InstrumentItem extends Component {
                   className="btn btn-outline-primary mb-2"
                   style={{ width: "100%" }}
                   onClick={() => {
-                    this.props.updateInstrument(instrument.id, {
-                      user_id: this.props.projectOwnerId
-                    });
+                    this.props.updateInstrument(
+                      instrument.id,
+                      {
+                        user_id: this.props.projectOwnerId
+                      },
+                      this.props.history
+                    );
                   }}
                 >
                   Il'l do it
@@ -253,11 +284,14 @@ class InstrumentItem extends Component {
 }
 
 InstrumentItem.propTypes = {
+  notification: PropTypes.object,
+  instrument: PropTypes.object.isRequired,
   projectOwner: PropTypes.bool,
   updateInstrument: PropTypes.func.isRequired,
   projectOwnerId: PropTypes.number,
   logedInUserId: PropTypes.number,
-  userArtTypes: PropTypes.array
+  userArtTypes: PropTypes.array,
+  sendNotification: PropTypes.func.isRequired
 };
 
 export default InstrumentItem;

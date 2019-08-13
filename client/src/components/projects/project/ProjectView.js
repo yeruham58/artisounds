@@ -14,6 +14,10 @@ import {
   updateInstrument,
   deleteInstrument
 } from "../../../actions/projectActions";
+import {
+  sendNotification,
+  getNotificationsByUserId
+} from "../../../actions/notificationActions";
 import { getCurrentProfile } from "../../../actions/profileActions";
 
 class ProjectView extends Component {
@@ -21,11 +25,13 @@ class ProjectView extends Component {
     super(props);
     this.updateInstrument = this.updateInstrument.bind(this);
     this.deleteInstrument = this.deleteInstrument.bind(this);
+    this.sendNotification = this.sendNotification.bind(this);
   }
 
   componentDidMount() {
     this.props.getProject(this.props.match.params.projectId);
     this.props.getCurrentProfile();
+    this.props.getNotificationsByUserId();
   }
 
   componentWillUnmount() {
@@ -38,6 +44,11 @@ class ProjectView extends Component {
 
   deleteInstrument(instrumentId) {
     this.props.deleteInstrument(instrumentId);
+  }
+
+  sendNotification(notificationInfo) {
+    console.log("gonna send!");
+    this.props.sendNotification(notificationInfo);
   }
 
   render() {
@@ -70,6 +81,7 @@ class ProjectView extends Component {
     if (this.props.project.loading || !this.props.project.project) {
       return <Spinner />;
     }
+
     return (
       <div className="project">
         <div className="container">
@@ -90,6 +102,12 @@ class ProjectView extends Component {
 
               {project.instruments && project.instruments[0] ? (
                 <InstrumentsFeed
+                  sendNotification={this.sendNotification}
+                  notifications={
+                    this.props.notifications.notifications
+                      ? this.props.notifications.notifications
+                      : null
+                  }
                   instruments={project.instruments}
                   projectOwner={
                     this.props.auth.user &&
@@ -117,6 +135,8 @@ class ProjectView extends Component {
 }
 
 ProjectView.propTypes = {
+  sendNotification: PropTypes.func.isRequired,
+  getNotificationsByUserId: PropTypes.func.isRequired,
   getProject: PropTypes.func.isRequired,
   clearProject: PropTypes.func.isRequired,
   deleteProject: PropTypes.func.isRequired,
@@ -128,6 +148,7 @@ ProjectView.propTypes = {
 };
 
 const mapStateToProps = state => ({
+  notifications: state.notifications,
   project: state.project,
   auth: state.auth,
   profile: state.profile
@@ -142,6 +163,8 @@ export default connect(
     deleteProject,
     updateInstrument,
     deleteInstrument,
-    getCurrentProfile
+    getCurrentProfile,
+    sendNotification,
+    getNotificationsByUserId
   }
 )(ProjectView);

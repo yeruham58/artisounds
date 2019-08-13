@@ -6,6 +6,7 @@ import postReducer from "./postReducer";
 import uploadFileReducer from "./uploadFileReducer";
 import chatReducer from "./chatReducer";
 import projectReducer from "./projectReducer";
+import notificationReducer from "./notificationReducer";
 
 export default combineReducers({
   auth: authReducer,
@@ -14,5 +15,6 @@ export default combineReducers({
   post: postReducer,
   upload: uploadFileReducer,
   chat: chatReducer,
-  project: projectReducer
+  project: projectReducer,
+  notifications: notificationReducer
 });
