@@ -42,9 +42,27 @@ router.get("/", (req, res) => {
     });
 });
 
+//@ route   GET api/projects/user/:userId
+//@desc     get all user projects
+//@access   private
+router.get(
+  "/user",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Project.getProjectsByUserId(req.user.id)
+      .then(projects => {
+        res.json(projects);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(404).json({ msg: "no project found" });
+      });
+  }
+);
+
 //@ route   GET api/projets/:id
 //@desc     get projet by id
-//@access   private
+//@access   public
 router.get("/:id", (req, res) => {
   Project.getProjectByProjectId(req.params.id)
     .then(project => {

@@ -60,11 +60,30 @@ export const updateProject = (projectId, projectData, history) => dispatch => {
     });
 };
 
-// // Get porojects
+// Get porojects
 export const getProjects = () => dispatch => {
   dispatch(setProjectLoading());
   axios
     .get("/api/projects")
+    .then(res =>
+      dispatch({
+        type: GET_PROJECTS,
+        payload: res.data
+      })
+    )
+    .catch(err =>
+      dispatch({
+        type: GET_PROJECTS,
+        payload: null
+      })
+    );
+};
+
+// Get user porojects
+export const getUserProjects = () => dispatch => {
+  dispatch(setProjectLoading());
+  axios
+    .get("/api/projects/user")
     .then(res =>
       dispatch({
         type: GET_PROJECTS,
@@ -100,7 +119,6 @@ export const getProject = projectId => dispatch => {
 
 //clear project
 export const clearProject = () => {
-  console.log("clear now");
   return { type: CLEAR_PROJECT };
 };
 

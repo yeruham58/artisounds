@@ -8,19 +8,27 @@ import { getProjects, deleteProject } from "../../../actions/projectActions";
 
 class ProjectFeed extends Component {
   componentDidMount() {
-    this.props.getProjects();
+    if (!this.props.filterdProjects) this.props.getProjects();
   }
   render() {
     const { projects, loading } = this.props.project;
-    if (!projects && !loading) {
-      return <div>You stiil dont have any projects</div>;
+    const { filterdProjects } = this.props;
+    if (
+      (!projects && !loading && !filterdProjects) ||
+      (filterdProjects && filterdProjects.length < 1)
+    ) {
+      return (
+        <div className="text-center mt-4">
+          <strong>You still dont have any projects here</strong>
+        </div>
+      );
     }
 
     if (loading) {
       return <Spinner />;
     }
-
-    return projects.map(project => (
+    const projectsListToShow = filterdProjects ? filterdProjects : projects;
+    return projectsListToShow.map(project => (
       <ProjectItem
         key={project.id}
         project={project}
@@ -36,6 +44,7 @@ class ProjectFeed extends Component {
 
 ProjectFeed.propTypes = {
   project: PropTypes.object.isRequired,
+  finishedProjects: PropTypes.object,
   getProjects: PropTypes.func.isRequired,
   deleteProject: PropTypes.func.isRequired
 };

@@ -1,5 +1,7 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/database");
+const Op = Sequelize.Op;
+const Promise = require("promise");
 
 // const Like = require("./Like");
 // const Dislike = require("./Dislike");
@@ -69,15 +71,25 @@ class Project extends Sequelize.Model {
   }
 
   static getProjectsByUserId(userId) {
-    return Project.findAll({
-      where: { user_id: userId },
-      order: ["updatedAt"],
-      include: include
+    return new Promise(function(resolve, reject) {
+      ProjectInstrument.getUserInstruments(userId).then(instruments => {
+        const projectsIdis = instruments.map(
+          instrument => instrument.project_id
+        );
+        Project.findAll({
+          [Op.or]: [{ user_id: userId }, { id: { [Op.in]: projectsIdis } }],
+          order: ["updatedAt"],
+          include: include
+        }).then(projects => {
+          resolve(projects);
+        });
+      });
     });
   }
 
   static getAllProjects() {
     return Project.findAll({
+      where: { public: true },
       limit: 100,
       order: ["updatedAt"],
       include: include
@@ -122,6 +134,7 @@ Project.init(
 // Project.hasMany(Like, { foreignKey: "project_id", as: "likes" });
 // Project.hasMany(Dislike, { foreignKey: "project_id", as: "dislikes" });
 // Project.hasMany(Comment, { foreignKey: "project_id", as: "comments" });
+
 Project.hasMany(ProjectInstrument, {
   foreignKey: "project_id",
   as: "instruments"

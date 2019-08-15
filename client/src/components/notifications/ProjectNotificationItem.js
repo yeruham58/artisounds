@@ -137,7 +137,6 @@ class ProjectNotificationItem extends Component {
       }
     }
 
-    console.log(notification);
     return (
       <div className="card card-body mb-3">
         <div className="row">

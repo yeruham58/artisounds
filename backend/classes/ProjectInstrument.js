@@ -10,6 +10,13 @@ class ProjectInstrument extends Sequelize.Model {
   static createProjectInstrument(projectInstrumentInfo) {
     return ProjectInstrument.create(projectInstrumentInfo);
   }
+
+  static getUserInstruments(userId) {
+    return ProjectInstrument.findAll({
+      where: { user_id: userId },
+      attributes: ["project_id"]
+    });
+  }
 }
 
 ProjectInstrument.init(

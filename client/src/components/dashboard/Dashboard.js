@@ -4,16 +4,45 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
 import Spiner from "../common/Spinner";
-import { getCurrentProfile, deleteAccount } from "../../actions/profileActions";
+import { getCurrentProfile } from "../../actions/profileActions";
 import ProfileActions from "./ProfileActions";
 import ProjectFeed from "../projects/projects/ProjectFeed";
+import { getUserProjects } from "../../actions/projectActions";
 import { getNotificationsByUserId } from "../../actions/notificationActions";
 import ProjectNotificationsFeed from "../notifications/ProjectNotificationsFeed";
 
 class Dashboard extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      projectsYouManage: null,
+      projectsYouWorkOn: null,
+      finishedProjects: null
+    };
+  }
+
   componentDidMount() {
     this.props.getCurrentProfile();
     this.props.getNotificationsByUserId();
+    this.props.getUserProjects();
+  }
+
+  componentWillReceiveProps(nextProp) {
+    if (nextProp.project && nextProp.project.projects) {
+      this.setState({
+        finishedProjects: nextProp.project.projects.filter(
+          project => !project.in_action
+        ),
+        projectsYouManage: nextProp.project.projects.filter(
+          project =>
+            project.user_id === this.props.auth.user.id && project.in_action
+        ),
+        projectsYouWorkOn: nextProp.project.projects.filter(
+          project =>
+            project.user_id !== this.props.auth.user.id && project.in_action
+        )
+      });
+    }
   }
 
   render() {
@@ -26,6 +55,8 @@ class Dashboard extends Component {
       dashboardContent = <Spiner />;
     } else {
       // Chack if logged in user has profile data
+      localStorage.removeItem("test");
+
       if (Object.keys(profile).length > 0) {
         dashboardContent = (
           <div>
@@ -37,52 +68,89 @@ class Dashboard extends Component {
             <ul className="nav nav-tabs mb-3" id="myTab" role="tablist">
               <li className="nav-item">
                 <div
-                  className="nav-link active"
+                  className={`nav-link ${
+                    localStorage.getItem("dashboardTab") ===
+                      "projects-you-manage" ||
+                    !localStorage.getItem("dashboardTab")
+                      ? "active"
+                      : null
+                  }`}
                   id="projects-you-manage-tab"
                   data-toggle="tab"
                   href="#projects-you-manage"
                   role="tab"
                   aria-controls="projects-you-manage"
                   aria-selected="true"
+                  onClick={() =>
+                    localStorage.setItem("dashboardTab", "projects-you-manage")
+                  }
                 >
                   Projects you manage
                 </div>
               </li>
               <li className="nav-item">
                 <div
-                  className="nav-link"
-                  id="profile-tab"
+                  className={`nav-link ${
+                    localStorage.getItem("dashboardTab") ===
+                    "projects-you-work-on"
+                      ? "active"
+                      : null
+                  }`}
+                  id="projects-you-work-on-tab"
                   data-toggle="tab"
-                  href="#profile"
+                  href="#projects-you-work-on"
                   role="tab"
-                  aria-controls="profile"
+                  aria-controls="projects-you-work-on"
                   aria-selected="false"
+                  onClick={() => {
+                    localStorage.setItem(
+                      "dashboardTab",
+                      "projects-you-work-on"
+                    );
+                    this.props.getUserProjects();
+                  }}
                 >
                   Projects you work on
                 </div>
               </li>
               <li className="nav-item">
                 <div
-                  className="nav-link"
-                  id="profile-tab"
+                  className={`nav-link ${
+                    localStorage.getItem("dashboardTab") === "finished-projects"
+                      ? "active"
+                      : null
+                  }`}
+                  id="finished-projects-tab"
                   data-toggle="tab"
-                  href="#profile1"
+                  href="#finished-projects"
                   role="tab"
-                  aria-controls="profile1"
+                  aria-controls="finished-projects"
                   aria-selected="false"
+                  onClick={() => {
+                    localStorage.setItem("dashboardTab", "finished-projects");
+                    this.props.getUserProjects();
+                  }}
                 >
                   Finished projects
                 </div>
               </li>
               <li className="nav-item">
                 <div
-                  className="nav-link"
-                  id="contact-tab"
+                  className={`nav-link ${
+                    localStorage.getItem("dashboardTab") === "notifications"
+                      ? "active"
+                      : null
+                  }`}
+                  id="notifications-tab"
                   data-toggle="tab"
-                  href="#contact"
+                  href="#notifications"
                   role="tab"
-                  aria-controls="contact"
+                  aria-controls="notifications"
                   aria-selected="false"
+                  onClick={() => {
+                    localStorage.setItem("dashboardTab", "notifications");
+                    this.props.getNotificationsByUserId();
+                  }}
                 >
                   Notifications
                 </div>
@@ -95,29 +163,29 @@ class Dashboard extends Component {
                 role="tabpanel"
                 aria-labelledby="projects-you-manage-tab"
               >
-                <ProjectFeed />
+                <ProjectFeed filterdProjects={this.state.projectsYouManage} />
               </div>
               <div
                 className="tab-pane fade"
-                id="profile"
+                id="projects-you-work-on"
                 role="tabpanel"
-                aria-labelledby="profile-tab"
+                aria-labelledby="projects-you-work-on-tab"
               >
-                profile test
+                <ProjectFeed filterdProjects={this.state.projectsYouWorkOn} />
               </div>
               <div
                 className="tab-pane fade"
-                id="profile1"
+                id="finished-projects"
                 role="tabpanel"
-                aria-labelledby="profile1-tab"
+                aria-labelledby="finished-projects-tab"
               >
-                profile1 test
+                <ProjectFeed filterdProjects={this.state.finishedProjects} />
               </div>
               <div
                 className="tab-pane fade"
-                id="contact"
+                id="notifications"
                 role="tabpanel"
-                aria-labelledby="contact-tab"
+                aria-labelledby="notifications-tab"
               >
                 <ProjectNotificationsFeed
                   notifications={this.props.notifications}
@@ -156,9 +224,9 @@ class Dashboard extends Component {
 }
 
 Dashboard.propTypes = {
-  deleteAccount: PropTypes.func.isRequired,
   getCurrentProfile: PropTypes.func.isRequired,
   getNotificationsByUserId: PropTypes.func.isRequired,
+  getUserProjects: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
   profile: PropTypes.object.isRequired,
   notifications: PropTypes.object.isRequired
@@ -166,11 +234,12 @@ Dashboard.propTypes = {
 
 const mapStateToProps = state => ({
   notifications: state.notifications,
+  project: state.project,
   profile: state.profile,
   auth: state.auth
 });
 
 export default connect(
   mapStateToProps,
-  { getCurrentProfile, deleteAccount, getNotificationsByUserId }
+  { getCurrentProfile, getNotificationsByUserId, getUserProjects }
 )(Dashboard);
