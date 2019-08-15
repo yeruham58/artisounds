@@ -55,8 +55,6 @@ class Dashboard extends Component {
       dashboardContent = <Spiner />;
     } else {
       // Chack if logged in user has profile data
-      localStorage.removeItem("test");
-
       if (Object.keys(profile).length > 0) {
         dashboardContent = (
           <div>
