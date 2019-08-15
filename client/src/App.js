@@ -70,6 +70,13 @@ function App() {
               component={ProjectView}
             />
             <Switch>
+              <Route
+                exact
+                path="/profiles/:projectId/:instrumentId"
+                component={Profiles}
+              />
+            </Switch>
+            <Switch>
               <PrivateRoute exact path="/feed" component={Posts} />
             </Switch>
             <Switch>

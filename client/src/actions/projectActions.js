@@ -100,6 +100,7 @@ export const getProject = projectId => dispatch => {
 
 //clear project
 export const clearProject = () => {
+  console.log("clear now");
   return { type: CLEAR_PROJECT };
 };
 

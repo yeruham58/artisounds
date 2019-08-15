@@ -64,8 +64,6 @@ export const deleteNotificationsByProjectId = projectId => dispatch => {
   axios
     .delete(`/api/projectNotifications/projectId/${projectId}`)
     .then(res => {
-      console.log("res");
-      console.log(res);
       dispatch({
         type: GET_NOTIFICATIONS,
         payload: res.data

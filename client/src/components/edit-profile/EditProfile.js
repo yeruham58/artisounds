@@ -182,6 +182,7 @@ class CreateProfile extends Component {
             ).art_practics[0].id
           ]
         });
+        this.restartArtTypes();
       }
     } else {
       this.setState({
@@ -200,6 +201,7 @@ class CreateProfile extends Component {
               ).art_practics[0].id
           )
         });
+        this.restartArtTypes();
       }
     }
   }

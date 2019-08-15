@@ -386,7 +386,9 @@ router.patch(
         Project.getProjectByProjectId(projectId).then(project => {
           if (
             projectInstrument.user_id !== req.user.id &&
-            project.user_id !== req.user.id
+            project.user_id !== req.user.id &&
+            (Object.keys(req.body).length > 1 ||
+              Object.keys(req.body)[0] !== "user_id")
           ) {
             return res
               .status(401)

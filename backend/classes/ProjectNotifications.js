@@ -76,8 +76,12 @@ class ProjectNotifications extends Sequelize.Model {
 
   // Delete notification by notification id
   static deleteNotificationById(notificationId) {
-    return ProjectNotifications.findByPk(notificationId).then(notification => {
-      notification.destroy();
+    return new Promise(function(resolve, reject) {
+      ProjectNotifications.findByPk(notificationId).then(notification => {
+        notification.destroy().then(() => {
+          resolve("deleted");
+        });
+      });
     });
   }
 }

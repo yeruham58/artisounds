@@ -112,8 +112,10 @@ class InstrumentItem extends Component {
       ) === undefined;
 
     const alreadySent =
-      this.props.notification &&
-      this.props.notification.sender_id === this.props.logedInUserId;
+      this.props.notifications &&
+      this.props.notifications.find(
+        notification => notification.sender_id === this.props.logedInUserId
+      );
 
     return (
       <div
@@ -174,7 +176,7 @@ class InstrumentItem extends Component {
               ) : null}
               {this.props.projectOwner && !instrument.user_detailes ? (
                 <Link
-                  to={`/project/add-instrument/${instrument.id}`}
+                  to={`/profiles/${instrument.project_id}/${instrument.id}`}
                   className="btn btn-outline-success mb-2"
                   style={{ width: "100%" }}
                 >
@@ -200,16 +202,17 @@ class InstrumentItem extends Component {
                   </button>
                 </div>
               ) : null}
-              {alreadySent && (
+              {alreadySent && !this.props.projectOwner && (
                 <div>
                   <button
                     type="button"
                     className="btn btn-outline-primary mb-2"
                     onClick={() => {
-                      console.log("this.props.notification.id");
-                      console.log(this.props.notification.id);
                       this.props.deleteNotificationsById(
-                        this.props.notification.id
+                        this.props.notifications.find(
+                          notification =>
+                            notification.sender_id === this.props.logedInUserId
+                        ).id
                       );
                     }}
                     style={{ width: "100%" }}

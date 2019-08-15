@@ -8,7 +8,6 @@ const MusicGenre = require("./MusicGenre");
 const UserMusicGenre = require("./UserMusicGenre");
 const UserArtType = require("./UserArtType");
 const UserArtPractic = require("./UserArtPractic");
-// const UserSubArtType = require("./UserSubArtType");
 
 const Post = require("./Post");
 
@@ -88,21 +87,32 @@ class User extends Sequelize.Model {
       // return User.findAll({
       const users = User.findAll({
         include: [
+          // {
+          //   model: UserArtType,
+          //   as: "art_types",
+          //   attributes: ["art_type_id"],
+          //   include: [
+          //     {
+          //       model: ArtType,
+          //       as: "art_type_details",
+          //       attributes: ["art_type_name", "id"]
+          //     }
+          //   ]
+          // }
           {
-            model: UserArtType,
-            as: "art_types",
-            attributes: ["art_type_id"],
-            include: [
-              {
-                model: ArtType,
-                as: "art_type_details",
-                attributes: ["art_type_name", "id"]
-              }
-            ]
+            model: UserArtPractic,
+            as: "art_practics",
+            attributes: ["is_active"],
+            where: { is_active: true },
+            include: {
+              model: ArtPractic,
+              as: "art_practic_details",
+              attributes: ["art_practic_name", "id"]
+            }
           }
         ],
         attributes: ["name", "avatar", "id"]
-      }).filter(user => user.art_types[0]);
+      }).filter(user => user.art_practics[0]);
       // add user score to every user
       users.then(users =>
         users.map((user, index) => {

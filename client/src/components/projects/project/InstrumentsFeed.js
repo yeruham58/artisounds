@@ -12,9 +12,9 @@ class InstrumentsFeed extends Component {
       <span className={"col-md-6 col-12 instrument-item"} key={instrument.id}>
         <InstrumentItem
           instrument={instrument}
-          notification={
+          notifications={
             this.props.notifications
-              ? this.props.notifications.find(
+              ? this.props.notifications.filter(
                   notification =>
                     notification.project_instrument_id === instrument.id
                 )

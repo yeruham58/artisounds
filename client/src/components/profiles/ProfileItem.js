@@ -8,9 +8,11 @@ class ProfileItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      imgHeight: ""
+      imgHeight: "",
+      joinProjectMsg: ""
     };
     this.onImgLoad = this.onImgLoad.bind(this);
+    this.sendInvitation = this.sendInvitation.bind(this);
   }
 
   componentWillReceiveProps(newProps) {
@@ -34,6 +36,20 @@ class ProfileItem extends Component {
 
   componentWillUnmount() {
     window.removeEventListener("resize", this.onImgLoad);
+  }
+
+  sendInvitation() {
+    const notificationInfo = {};
+    notificationInfo.project_id = this.props.instrument.project_id;
+    notificationInfo.project_owner_id = this.props.logedInUserId;
+    notificationInfo.project_instrument_id = this.props.instrument.id;
+    notificationInfo.sender_id = this.props.logedInUserId;
+    notificationInfo.sent_to_id = this.props.profile.id;
+    notificationInfo.message_text = this.state.joinProjectMsg;
+    notificationInfo.unread = true;
+    notificationInfo.need_action = true;
+    notificationInfo.deleted = false;
+    this.props.sendNotification(notificationInfo);
   }
 
   render() {
@@ -72,30 +88,50 @@ class ProfileItem extends Component {
             </p>
             <Link
               to={`/profile/${profile.id}`}
-              className="btn btn-info  mr-2 mb-2"
+              className="btn btn-primary mr-2 mb-2"
             >
               View profile
             </Link>
             {this.props.isAuthenticated ? (
               <Link
                 to={`/chat/${profile.name + splitNameAndId + profile.id}`}
-                className="btn btn-outline-success mb-2"
+                className="btn btn-outline-success mb-2 mr-2"
               >
                 Send a message
               </Link>
             ) : null}
+            {this.props.instrument && !this.props.notification && (
+              <button
+                className="btn btn-outline-primary  mr-2 mb-2"
+                onClick={this.sendInvitation}
+              >
+                Invite
+              </button>
+            )}
+            {this.props.instrument && this.props.notification && (
+              <button
+                className="btn btn-outline-primary  mr-2 mb-2"
+                onClick={() => {
+                  this.props.deleteNotificationsById(
+                    this.props.notification.id
+                  );
+                }}
+              >
+                Cancle invitation
+              </button>
+            )}
           </div>
 
           <div className="col-md-4 d-none d-md-block">
-            <h4>Art types</h4>
+            <h4>Instruments</h4>
             <ul className="list-group">
-              {profile.art_types.slice(0, 2).map((artType, index) => (
+              {profile.art_practics.slice(0, 2).map((instrument, index) => (
                 <li key={index} className="list-group-item">
                   <i className="fa fa-check pr-1" />
-                  {artType.art_type_details.art_type_name}
+                  {instrument.art_practic_details.art_practic_name}
                 </li>
               ))}
-              {profile.art_types.length > 2 ? (
+              {profile.art_practics.length > 2 ? (
                 <li key={2} className="list-group-item">
                   More...
                 </li>
@@ -109,7 +145,12 @@ class ProfileItem extends Component {
 }
 
 ProfileItem.propTypes = {
-  profile: PropTypes.object.isRequired
+  profile: PropTypes.object.isRequired,
+  sendNotification: PropTypes.func.isRequired,
+  deleteNotificationsById: PropTypes.func.isRequired,
+  instrument: PropTypes.object,
+  notification: PropTypes.object,
+  logedInUserId: PropTypes.number
 };
 
 export default ProfileItem;

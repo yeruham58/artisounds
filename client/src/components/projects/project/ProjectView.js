@@ -19,7 +19,14 @@ class ProjectView extends Component {
     };
   }
   componentDidMount() {
-    this.props.getProject(this.props.match.params.projectId);
+    if (
+      !this.props.project.project ||
+      this.props.project.project.id.toString() !==
+        this.props.match.params.projectId
+    ) {
+      this.props.getProject(this.props.match.params.projectId);
+    }
+
     this.props.getCurrentProfile();
     this.props.getNotificationsByUserId();
   }
@@ -86,11 +93,6 @@ class ProjectView extends Component {
 
               {project.instruments && project.instruments[0] ? (
                 <InstrumentsFeed
-                  // notifications={
-                  //   this.state.notifications.notifications
-                  //     ? this.state.notifications.notifications
-                  //     : null
-                  // }
                   notifications={this.state.notifications}
                   instruments={project.instruments}
                   projectOwner={

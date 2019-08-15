@@ -130,7 +130,8 @@ class ProjectNotificationItem extends Component {
               {senderLink}
               asked you to join his {projectLink} project
             </div>
-            <div>{acceptButton}</div>
+            <span>{acceptButton}</span>
+            <span>{sendMessageButton}</span>
           </div>
         );
       }
