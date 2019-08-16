@@ -4,8 +4,9 @@ const Op = Sequelize.Op;
 const Promise = require("promise");
 
 const Project = require("./Project");
+const ProjectInstrument = require("./ProjectInstrument");
 const User = require("./User");
-// const ArtPractic = require("./ArtPractic");
+const ArtPractic = require("./ArtPractic");
 
 class ProjectNotifications extends Sequelize.Model {
   static associate(models) {}
@@ -23,7 +24,15 @@ class ProjectNotifications extends Sequelize.Model {
       include: [
         {
           model: Project,
-          as: "project"
+          as: "project",
+          include: {
+            model: ProjectInstrument,
+            as: "instruments",
+            include: {
+              model: ArtPractic,
+              as: "instrument_detailes"
+            }
+          }
         },
         {
           model: User,

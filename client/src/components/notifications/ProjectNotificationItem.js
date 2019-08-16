@@ -59,8 +59,7 @@ class ProjectNotificationItem extends Component {
         <strong style={{ color: "black" }}>{sendToName} </strong>
       </Link>
     );
-    console.log("notification");
-    console.log(notification);
+
     const acceptButton = (
       <button
         type="button"
@@ -80,6 +79,16 @@ class ProjectNotificationItem extends Component {
       </Link>
     );
 
+    const instrumentName = (
+      <strong>
+        {
+          notification.project.instruments.find(
+            instrument => instrument.id === notification.project_instrument_id
+          ).instrument_detailes.art_practic_name
+        }
+      </strong>
+    );
+
     let msgContant;
     if (
       notification.project_owner_id &&
@@ -91,8 +100,8 @@ class ProjectNotificationItem extends Component {
       ) {
         msgContant = (
           <div className="ml-3">
-            You have sent to {sendToLink}
-            an invitation, to join your project {projectLink}
+            You have sent an invitation to {sendToLink}, to play{" "}
+            {instrumentName} in your project {projectLink}
           </div>
         );
       }
@@ -105,7 +114,7 @@ class ProjectNotificationItem extends Component {
           <div>
             <div className="ml-3">
               {senderLink}
-              want to join your {projectLink} project
+              want to play {instrumentName} in your {projectLink} project
             </div>
             <span>{acceptButton}</span>
             <span>{sendMessageButton}</span>
@@ -124,7 +133,7 @@ class ProjectNotificationItem extends Component {
         msgContant = (
           <div className="ml-3">
             You asked {sendToLink}
-            to join his {projectLink} project
+            to play {instrumentName} in {projectLink} project
           </div>
         );
       }
@@ -136,7 +145,7 @@ class ProjectNotificationItem extends Component {
           <div>
             <div className="ml-3">
               {senderLink}
-              asked you to join his {projectLink} project
+              asked you to play {instrumentName} in {projectLink} project
             </div>
             <span>{acceptButton}</span>
             <span>{sendMessageButton}</span>
@@ -152,9 +161,11 @@ class ProjectNotificationItem extends Component {
       >
         <div
           className="row"
-          onClick={() =>
-            this.props.updateNotification(notification.id, { unread: false })
-          }
+          onClick={() => {
+            if (notification.unread) {
+              this.props.updateNotification(notification.id, { unread: false });
+            }
+          }}
         >
           <div className="col-md-10 col-8">{msgContant}</div>
           {notification.unread &&
