@@ -46,8 +46,9 @@ class InstrumentItem extends Component {
     }
 
     if (
-      instrument.user_id === this.props.projectOwnerId ||
-      !instrument.record_url
+      (instrument.user_id === this.props.projectOwnerId &&
+        !instrument.record_url) ||
+      !instrument.user_id
     ) {
       if (
         window.confirm(

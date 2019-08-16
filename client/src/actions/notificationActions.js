@@ -20,6 +20,27 @@ export const sendNotification = notificationData => dispatch => {
     });
 };
 
+// Update notification
+export const updateNotification = (
+  notificationId,
+  notificationData
+) => dispatch => {
+  axios
+    .patch(`/api/projectNotifications/${notificationId}`, notificationData)
+    .then(res =>
+      dispatch({
+        type: SEND_NOTIFICATION,
+        payload: res.data
+      })
+    )
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      });
+    });
+};
+
 // Get notifications
 export const getNotificationsByUserId = () => dispatch => {
   // dispatch(setPostLoading());

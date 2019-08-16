@@ -413,16 +413,19 @@ router.patch(
               .json({ msg: "This instrument is not belong to you!" });
           } else {
             updatedInstrument = {};
-            if (req.body.user_id) updatedInstrument.user_id = req.body.user_id;
-            updatedInstrument.instrument_id = req.body.instrument_id;
+            if (Object.keys(req.body).indexOf("user_id") >= 0)
+              updatedInstrument.user_id = req.body.user_id;
+            if (req.body.instrument_id)
+              updatedInstrument.instrument_id = req.body.instrument_id;
             if (req.body.original)
               updatedInstrument.original = req.body.original;
-            if (req.body.role) updatedInstrument.role = req.body.role;
+            if (Object.keys(req.body).indexOf("role") >= 0)
+              updatedInstrument.role = req.body.role;
             // updatedInstrument.characters_url = null;
             // updatedInstrument.characters_key = null;
             // updatedInstrument.record_url = null;
             // updatedInstrument.record_key = null;
-            if (req.body.comments)
+            if (Object.keys(req.body).indexOf("comments") >= 0)
               updatedInstrument.comments = req.body.comments;
             projectInstrument.update(updatedInstrument).then(() => {
               Project.getProjectByProjectId(projectId).then(project =>

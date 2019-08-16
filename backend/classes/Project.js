@@ -73,11 +73,14 @@ class Project extends Sequelize.Model {
   static getProjectsByUserId(userId) {
     return new Promise(function(resolve, reject) {
       ProjectInstrument.getUserInstruments(userId).then(instruments => {
-        const projectsIdis = instruments.map(
-          instrument => instrument.project_id
+        const projectsIdis = instruments.map(instrument =>
+          instrument.project_id.toString()
         );
+
         Project.findAll({
-          [Op.or]: [{ user_id: userId }, { id: { [Op.in]: projectsIdis } }],
+          where: {
+            [Op.or]: [{ user_id: userId }, { id: projectsIdis }]
+          },
           order: ["updatedAt"],
           include: include
         }).then(projects => {

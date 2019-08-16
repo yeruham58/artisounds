@@ -170,6 +170,15 @@ img {
   border-radius: 10px;
 }
 
+/* genre style */
+.new-notification {
+  color: white;
+  padding: 2px;
+  display: inline;
+  background-color: red;
+  border-radius: 8px;
+}
+
 /* project details */
 .project-details {
   padding: 3px;

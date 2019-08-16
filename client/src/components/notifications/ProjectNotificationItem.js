@@ -6,7 +6,10 @@ import { withRouter } from "react-router-dom";
 
 import { splitNameAndId } from "../../config/chatConfig";
 import { updateInstrument } from "../../actions/projectActions";
-import { deleteNotificationsByInstrumentId } from "../../actions/notificationActions";
+import {
+  deleteNotificationsByInstrumentId,
+  updateNotification
+} from "../../actions/notificationActions";
 
 class ProjectNotificationItem extends Component {
   constructor(props) {
@@ -19,7 +22,10 @@ class ProjectNotificationItem extends Component {
     this.props.updateInstrument(
       this.props.notification.project_instrument_id,
       {
-        user_id: this.props.notification.sender_id
+        user_id:
+          this.props.notification.project_owner_id === this.props.auth.user.id
+            ? this.props.notification.sender_id
+            : this.props.auth.user.id
       },
       this.props.history
     );
@@ -49,10 +55,12 @@ class ProjectNotificationItem extends Component {
     );
     const sendToName = notification.send_to_detailes.name;
     const sendToLink = (
-      <Link to={`/profile/${notification.send_to_id}`}>
+      <Link to={`/profile/${notification.sent_to_id}`}>
         <strong style={{ color: "black" }}>{sendToName} </strong>
       </Link>
     );
+    console.log("notification");
+    console.log(notification);
     const acceptButton = (
       <button
         type="button"
@@ -138,9 +146,23 @@ class ProjectNotificationItem extends Component {
     }
 
     return (
-      <div className="card card-body mb-3">
-        <div className="row">
-          <div>{msgContant}</div>
+      <div
+        className="card card-body mb-3"
+        style={notification.unread ? { background: "#F5F5F5" } : null}
+      >
+        <div
+          className="row"
+          onClick={() =>
+            this.props.updateNotification(notification.id, { unread: false })
+          }
+        >
+          <div className="col-md-10 col-8">{msgContant}</div>
+          {notification.unread &&
+          notification.sender_id !== this.props.auth.user.id ? (
+            <div className="col-md-2 col-4 text-center">
+              <span className="new-notification">#new</span>
+            </div>
+          ) : null}
         </div>
       </div>
     );
@@ -149,6 +171,7 @@ class ProjectNotificationItem extends Component {
 
 ProjectNotificationItem.propTypes = {
   notification: PropTypes.object.isRequired,
+  updateNotification: PropTypes.func.isRequired,
   updateInstrument: PropTypes.func.isRequired,
   deleteNotificationsByInstrumentId: PropTypes.func.isRequired
 };
@@ -159,5 +182,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { updateInstrument, deleteNotificationsByInstrumentId }
+  { updateInstrument, deleteNotificationsByInstrumentId, updateNotification }
 )(withRouter(ProjectNotificationItem));

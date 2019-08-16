@@ -15,10 +15,12 @@ class Dashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      projectsYouManage: null,
-      projectsYouWorkOn: null,
-      finishedProjects: null
+      opendTab: localStorage.getItem("dashboardTab")
+        ? localStorage.getItem("dashboardTab")
+        : "projects-you-manage"
     };
+
+    this.pageContantChange = this.pageContantChange.bind(this);
   }
 
   componentDidMount() {
@@ -28,26 +30,71 @@ class Dashboard extends Component {
   }
 
   componentWillReceiveProps(nextProp) {
-    if (nextProp.project && nextProp.project.projects) {
-      this.setState({
-        finishedProjects: nextProp.project.projects.filter(
-          project => !project.in_action
-        ),
-        projectsYouManage: nextProp.project.projects.filter(
-          project =>
-            project.user_id === this.props.auth.user.id && project.in_action
-        ),
-        projectsYouWorkOn: nextProp.project.projects.filter(
-          project =>
-            project.user_id !== this.props.auth.user.id && project.in_action
-        )
-      });
-    }
+    this.setState({
+      opendTab: localStorage.getItem("dashboardTab")
+        ? localStorage.getItem("dashboardTab")
+        : "projects-you-manage"
+    });
+  }
+
+  pageContantChange(newTab) {
+    localStorage.setItem("dashboardTab", newTab);
+    this.setState({
+      opendTab: newTab
+    });
   }
 
   render() {
+    const unreadMsgNumber =
+      this.props.notifications && this.props.notifications.notifications
+        ? this.props.notifications.notifications.filter(
+            not => not.unread && not.sender_id !== this.props.auth.user.id
+          ).length
+        : null;
     const { user } = this.props.auth;
     const { profile, loading } = this.props.profile;
+    const { projects } = this.props.project;
+    const { opendTab } = this.state;
+
+    let pageContant;
+    let filterdProjects;
+
+    if (!projects || projects.length <= 0) {
+      pageContant = (
+        <div className="text-center">
+          <strong>You still dont have any projects</strong>
+        </div>
+      );
+    } else {
+      if (opendTab === "projects-you-manage") {
+        filterdProjects = projects.filter(
+          project =>
+            project.user_id === this.props.auth.user.id && project.in_action
+        );
+      }
+      if (opendTab === "projects-you-work-on") {
+        filterdProjects = projects.filter(
+          project =>
+            project.user_id !== this.props.auth.user.id && project.in_action
+        );
+      }
+      if (opendTab === "finished-projects") {
+        filterdProjects = projects.filter(project => !project.in_action);
+      }
+      if (opendTab === "notifications") {
+        pageContant = (
+          <ProjectNotificationsFeed notifications={this.props.notifications} />
+        );
+      }
+    }
+
+    if (this.props.project.loading) {
+      pageContant = <Spiner />;
+    }
+
+    if (filterdProjects) {
+      pageContant = <ProjectFeed filterdProjects={filterdProjects} />;
+    }
 
     let dashboardContent;
 
@@ -63,133 +110,65 @@ class Dashboard extends Component {
               <Link to={`/profile/${profile.id}`}> {user.name}</Link>
             </p>
             <ProfileActions />
-            <ul className="nav nav-tabs mb-3" id="myTab" role="tablist">
-              <li className="nav-item">
-                <div
-                  className={`nav-link ${
-                    localStorage.getItem("dashboardTab") ===
-                      "projects-you-manage" ||
-                    !localStorage.getItem("dashboardTab")
-                      ? "active"
-                      : null
-                  }`}
-                  id="projects-you-manage-tab"
-                  data-toggle="tab"
-                  href="#projects-you-manage"
-                  role="tab"
-                  aria-controls="projects-you-manage"
-                  aria-selected="true"
-                  onClick={() =>
-                    localStorage.setItem("dashboardTab", "projects-you-manage")
-                  }
+            <div className="container">
+              <div className="row">
+                <button
+                  className={`btn ${
+                    this.state.opendTab === "projects-you-manage"
+                      ? "btn-outline-dark"
+                      : "btn-light"
+                  } col-md-3 col-6 mb-3`}
+                  style={{ width: "100%" }}
+                  onClick={() => {
+                    localStorage.setItem("dashboardTab", "projects-you-manage");
+                    this.setState({
+                      opendTab: "projects-you-manage"
+                    });
+                  }}
                 >
                   Projects you manage
-                </div>
-              </li>
-              <li className="nav-item">
-                <div
-                  className={`nav-link ${
-                    localStorage.getItem("dashboardTab") ===
-                    "projects-you-work-on"
-                      ? "active"
-                      : null
-                  }`}
-                  id="projects-you-work-on-tab"
-                  data-toggle="tab"
-                  href="#projects-you-work-on"
-                  role="tab"
-                  aria-controls="projects-you-work-on"
-                  aria-selected="false"
-                  onClick={() => {
-                    localStorage.setItem(
-                      "dashboardTab",
-                      "projects-you-work-on"
-                    );
-                    this.props.getUserProjects();
-                  }}
+                </button>
+                <button
+                  className={`btn ${
+                    this.state.opendTab === "projects-you-work-on"
+                      ? "btn-outline-dark"
+                      : "btn-light"
+                  } col-md-3 col-6 mb-3`}
+                  style={{ width: "100%" }}
+                  onClick={() => this.pageContantChange("projects-you-work-on")}
                 >
                   Projects you work on
-                </div>
-              </li>
-              <li className="nav-item">
-                <div
-                  className={`nav-link ${
-                    localStorage.getItem("dashboardTab") === "finished-projects"
-                      ? "active"
-                      : null
-                  }`}
-                  id="finished-projects-tab"
-                  data-toggle="tab"
-                  href="#finished-projects"
-                  role="tab"
-                  aria-controls="finished-projects"
-                  aria-selected="false"
-                  onClick={() => {
-                    localStorage.setItem("dashboardTab", "finished-projects");
-                    this.props.getUserProjects();
-                  }}
+                </button>
+                <button
+                  className={`btn ${
+                    this.state.opendTab === "finished-projects"
+                      ? "btn-outline-dark"
+                      : "btn-light"
+                  } col-md-3 col-6 mb-3`}
+                  style={{ width: "100%" }}
+                  onClick={() => this.pageContantChange("finished-projects")}
                 >
                   Finished projects
-                </div>
-              </li>
-              <li className="nav-item">
-                <div
-                  className={`nav-link ${
-                    localStorage.getItem("dashboardTab") === "notifications"
-                      ? "active"
-                      : null
-                  }`}
-                  id="notifications-tab"
-                  data-toggle="tab"
-                  href="#notifications"
-                  role="tab"
-                  aria-controls="notifications"
-                  aria-selected="false"
-                  onClick={() => {
-                    localStorage.setItem("dashboardTab", "notifications");
-                    this.props.getNotificationsByUserId();
-                  }}
+                </button>
+                <button
+                  className={`btn ${
+                    this.state.opendTab === "notifications"
+                      ? "btn-outline-dark"
+                      : "btn-light"
+                  } col-md-3 col-6 mb-3`}
+                  style={{ width: "100%" }}
+                  onClick={() => this.pageContantChange("notifications")}
                 >
-                  Notifications
-                </div>
-              </li>
-            </ul>
-            <div className="tab-content" id="myTabContent">
-              <div
-                className="tab-pane fade show active"
-                id="projects-you-manage"
-                role="tabpanel"
-                aria-labelledby="projects-you-manage-tab"
-              >
-                <ProjectFeed filterdProjects={this.state.projectsYouManage} />
-              </div>
-              <div
-                className="tab-pane fade"
-                id="projects-you-work-on"
-                role="tabpanel"
-                aria-labelledby="projects-you-work-on-tab"
-              >
-                <ProjectFeed filterdProjects={this.state.projectsYouWorkOn} />
-              </div>
-              <div
-                className="tab-pane fade"
-                id="finished-projects"
-                role="tabpanel"
-                aria-labelledby="finished-projects-tab"
-              >
-                <ProjectFeed filterdProjects={this.state.finishedProjects} />
-              </div>
-              <div
-                className="tab-pane fade"
-                id="notifications"
-                role="tabpanel"
-                aria-labelledby="notifications-tab"
-              >
-                <ProjectNotificationsFeed
-                  notifications={this.props.notifications}
-                />
+                  Notifications{" "}
+                  {unreadMsgNumber &&
+                  unreadMsgNumber > 0 &&
+                  this.state.opendTab !== "notifications" ? (
+                    <span className="new-notification">{unreadMsgNumber}</span>
+                  ) : null}
+                </button>
               </div>
             </div>
+            {pageContant}
           </div>
         );
       } else {
@@ -211,7 +190,7 @@ class Dashboard extends Component {
         <div className="container">
           <div className="row">
             <div className="col-md-12">
-              <h1 className="display-4">Dashboard</h1>
+              <h1 className="display-6">Dashboard</h1>
               {dashboardContent}
             </div>
           </div>

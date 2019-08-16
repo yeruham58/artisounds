@@ -36,6 +36,31 @@ router.post(
   }
 );
 
+//@ route   PATCH api/projectNotifications/:notificationId
+//@desc     update project notification
+//@access   private
+router.patch(
+  "/:notificationId",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const updatedNotification = req.body;
+    ProjectNotifications.findByPk(req.params.notificationId).then(
+      notification =>
+        notification
+          .update(updatedNotification)
+          .then(() => {
+            ProjectNotifications.getNotificationsByUserId(req.user.id).then(
+              notifications => res.json(notifications)
+            );
+          })
+          .catch(err => {
+            errors.error = "Some error with update this notification";
+            return res.status(400).json(errors);
+          })
+    );
+  }
+);
+
 //@ route   GET api/projectNotifications
 //@desc     get notifications by user id
 //@access   private
