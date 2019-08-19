@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import Popup from "reactjs-popup";
+
+import TextAreaFieldGroup from "../common/TextAreaFieldGroup";
 import isEmpty from "../../validation/isEmpty";
 import { splitNameAndId } from "../../config/chatConfig";
 
@@ -18,7 +21,8 @@ class ProfileItem extends Component {
   componentWillReceiveProps(newProps) {
     if (newProps.imgHeight) {
       this.setState({
-        imgHeight: newProps.imgHeight
+        imgHeight: newProps.imgHeight,
+        invitationMsg: ""
       });
     }
   }
@@ -45,7 +49,7 @@ class ProfileItem extends Component {
     notificationInfo.project_instrument_id = this.props.instrument.id;
     notificationInfo.sender_id = this.props.logedInUserId;
     notificationInfo.sent_to_id = this.props.profile.id;
-    notificationInfo.message_text = this.state.joinProjectMsg;
+    notificationInfo.message_text = this.state.invitationMsg;
     notificationInfo.unread = true;
     notificationInfo.need_action = true;
     notificationInfo.deleted = false;
@@ -101,12 +105,57 @@ class ProfileItem extends Component {
               </Link>
             ) : null}
             {this.props.instrument && !this.props.notification && (
-              <button
-                className="btn btn-outline-primary  mr-2 mb-2"
-                onClick={this.sendInvitation}
-              >
-                Invite
-              </button>
+              // <button
+              //   className="btn btn-outline-primary  mr-2 mb-2"
+              //   onClick={this.sendInvitation}
+              // >
+              //   Invite
+              // </button>
+              <div>
+                <Popup
+                  modal
+                  trigger={
+                    <button
+                      type="button"
+                      className="btn btn-outline-primary mr-2 mb-2"
+                    >
+                      Invite
+                    </button>
+                  }
+                >
+                  {close => (
+                    <div className="mt-3">
+                      <strong>
+                        You can add some message with your invitation
+                      </strong>
+                      <div className="mt-3" />
+                      <TextAreaFieldGroup
+                        placeholder="Send some message"
+                        name="invitationMsg"
+                        value={this.state.invitationMsg}
+                        onChange={e => {
+                          this.setState({ invitationMsg: e.target.value });
+                        }}
+                        error=""
+                        info=""
+                      />
+
+                      <button
+                        type="button"
+                        className="btn btn-outline-primary mt-3 mb-3"
+                        onClick={() => {
+                          this.sendInvitation();
+                          close();
+                        }}
+                      >
+                        {this.state.invitationMsg.length > 0
+                          ? "Invite"
+                          : "Invite without a message"}
+                      </button>
+                    </div>
+                  )}
+                </Popup>
+              </div>
             )}
             {this.props.instrument && this.props.notification && (
               <button

@@ -196,14 +196,14 @@ class ChatPage extends Component {
           }
         })
         .then(room => {
-          const info =
-            room.userStore.presenceStore[endPoint.split(splitNameAndId)[1]] ===
-            "online"
-              ? "online"
-              : "";
-          this.setState({
-            info
-          });
+          // const info =
+          //   room.userStore.presenceStore[endPoint.split(splitNameAndId)[1]] ===
+          //   "online"
+          //     ? "online"
+          //     : "";
+          // this.setState({
+          //   info
+          // });
           this.getRooms();
         })
         .catch(err => console.log("error on subscribing to room: ", err));

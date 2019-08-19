@@ -27,6 +27,7 @@ class InstrumentItem extends Component {
     };
     this.onDeleteClick = this.onDeleteClick.bind(this);
     this.sendJoinProjectReq = this.sendJoinProjectReq.bind(this);
+    this.onAcceptInvitation = this.onAcceptInvitation.bind(this);
   }
 
   onDeleteClick(instrument) {
@@ -76,6 +77,19 @@ class InstrumentItem extends Component {
     this.props.sendNotification(notificationInfo);
   }
 
+  onAcceptInvitation(invitation) {
+    console.log("this.props.notification");
+    console.log(invitation);
+    this.props.updateInstrument(
+      invitation.project_instrument_id,
+      { user_id: this.props.auth.user.id },
+      this.props.history
+    );
+    this.props.deleteNotificationsByInstrumentId(
+      invitation.project_instrument_id
+    );
+  }
+
   render() {
     const { instrument } = this.props;
     const imgInTop =
@@ -118,6 +132,12 @@ class InstrumentItem extends Component {
       this.props.notifications &&
       this.props.notifications.find(
         notification => notification.sender_id === this.props.logedInUserId
+      );
+
+    const alreadyInvited =
+      this.props.notifications &&
+      this.props.notifications.find(
+        notification => notification.sent_to_id === this.props.logedInUserId
       );
 
     return (
@@ -186,7 +206,9 @@ class InstrumentItem extends Component {
                   Invite a freind
                 </Link>
               ) : null}
-              {!this.props.projectOwner && !instrument.user_detailes ? (
+              {!this.props.projectOwner &&
+              !instrument.user_detailes &&
+              !alreadyInvited ? (
                 <div>
                   <Popup
                     modal
@@ -241,6 +263,17 @@ class InstrumentItem extends Component {
                   </Popup>
                 </div>
               ) : null}
+              {alreadyInvited && (
+                <div>
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary mb-2"
+                    onClick={() => this.onAcceptInvitation(alreadyInvited)}
+                  >
+                    Accept and join
+                  </button>
+                </div>
+              )}
               {alreadySent && !this.props.projectOwner && (
                 <div>
                   <button
