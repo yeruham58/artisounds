@@ -49,7 +49,7 @@ class ChatPage extends Component {
   }
 
   componentWillReceiveProps(newProp) {
-    if (newProp.chat) {
+    if (newProp.chat && this.state.roomMember === "") {
       this.currentUser = newProp.chat.currentUser;
       if (this.currentUser) {
         this.getRooms();
@@ -61,7 +61,9 @@ class ChatPage extends Component {
     if (
       newProp.profile &&
       newProp.profile.profile &&
-      newProp.profile.profile.avatar !== this.props.auth.user.avatar
+      // newProp.profile.profile.avatar !== this.props.auth.user.avatar
+      newProp.profile.profile.id &&
+      newProp.profile.profile.id !== this.props.auth.user.id
     ) {
       this.createRoom(newProp.profile.profile.avatar);
     }
@@ -87,21 +89,24 @@ class ChatPage extends Component {
         { [this.props.auth.user.name]: this.props.auth.user.avatar }
       ]
     };
-    this.currentUser
-      .createRoom({
-        name:
-          roomMember +
-          ":" +
-          this.props.auth.user.name +
-          splitNameAndId +
-          this.props.auth.user.id,
-        customData
-      })
-      .then(room => {
-        this.addUserToRoom(roomMember.split(splitNameAndId)[1], room.id);
-        this.subscribeToRoom(room.id, roomMember);
-      })
-      .catch(err => console.log("error with createRoom: ", err));
+    if (roomMember) {
+      this.currentUser
+        .createRoom({
+          name:
+            roomMember +
+            ":" +
+            this.props.auth.user.name +
+            splitNameAndId +
+            this.props.auth.user.id,
+          customData
+        })
+        .then(room => {
+          this.getRooms();
+          this.addUserToRoom(roomMember.split(splitNameAndId)[1], room.id);
+          this.subscribeToRoom(room.id, roomMember);
+        })
+        .catch(err => console.log("error with createRoom: ", err));
+    }
   }
 
   addUserToRoom(userId, roomId) {
@@ -146,7 +151,10 @@ class ChatPage extends Component {
                 const cursor = this.currentUser.readCursor({
                   roomId
                 });
-                if (message.id > cursor.position) {
+                if (
+                  (cursor && message.id > cursor.position) ||
+                  (message.id && !cursor)
+                ) {
                   this.setCursor(roomId, message.id);
                 }
               }
@@ -234,6 +242,7 @@ class ChatPage extends Component {
     let room;
     let memberName;
     let memberId;
+
     if (this.state.joinedRooms[0] && this.state.roomId) {
       room = this.state.joinedRooms.find(room => room.id === this.state.roomId);
       memberName = room.name

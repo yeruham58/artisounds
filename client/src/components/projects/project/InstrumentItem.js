@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import Popup from "reactjs-popup";
+
+import TextAreaFieldGroup from "../../common/TextAreaFieldGroup";
 import {
   updateInstrument,
   deleteInstrument
@@ -186,21 +188,57 @@ class InstrumentItem extends Component {
               ) : null}
               {!this.props.projectOwner && !instrument.user_detailes ? (
                 <div>
-                  <button
-                    type="button"
-                    disabled={joinDisabled || alreadySent}
-                    className={
-                      joinDisabled
-                        ? `btn btn btn-success mb-2`
-                        : alreadySent
-                        ? "btn btn-primary mb-2"
-                        : "btn btn-outline-success mb-2"
+                  <Popup
+                    modal
+                    trigger={
+                      <button
+                        type="button"
+                        disabled={joinDisabled || alreadySent}
+                        className={
+                          joinDisabled
+                            ? `btn btn btn-success mb-2`
+                            : alreadySent
+                            ? "btn btn-primary mb-2"
+                            : "btn btn-outline-success mb-2"
+                        }
+                        style={{ width: "100%" }}
+                      >
+                        {alreadySent ? "Already sent" : "Join project"}
+                      </button>
                     }
-                    onClick={this.sendJoinProjectReq}
-                    style={{ width: "100%" }}
                   >
-                    {alreadySent ? "Already sent" : "Join project"}
-                  </button>
+                    {close => (
+                      <div className="mt-3">
+                        <strong>
+                          You can add some message with the Join project req
+                        </strong>
+                        <div className="mt-3" />
+                        <TextAreaFieldGroup
+                          placeholder="Send some message"
+                          name="joinProjectMsg"
+                          value={this.state.joinProjectMsg}
+                          onChange={e => {
+                            this.setState({ joinProjectMsg: e.target.value });
+                          }}
+                          error=""
+                          info=""
+                        />
+
+                        <button
+                          type="button"
+                          className="btn btn-outline-primary mt-3 mb-3"
+                          onClick={() => {
+                            this.sendJoinProjectReq();
+                            close();
+                          }}
+                        >
+                          {this.state.joinProjectMsg.length > 0
+                            ? "Send"
+                            : "Send without a message"}
+                        </button>
+                      </div>
+                    )}
+                  </Popup>
                 </div>
               ) : null}
               {alreadySent && !this.props.projectOwner && (

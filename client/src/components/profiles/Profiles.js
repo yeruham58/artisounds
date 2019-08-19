@@ -102,18 +102,19 @@ class Profiles extends Component {
                 </Link>
               )}
               <h3 className="display-5 text-center">
-                {!project
+                {!project || !this.props.match.params.projectId
                   ? "Artists"
                   : projectInstrument.instrument_detailes.art_practic_name +
                     " players "}{" "}
                 Profiles
               </h3>
 
-              {!project && (
-                <p className="lead text-center">
-                  Brouse and connect with other artists
-                </p>
-              )}
+              {!project ||
+                (!this.props.match.params.projectId && (
+                  <p className="lead text-center">
+                    Brouse and connect with other artists
+                  </p>
+                ))}
               {profileItems}
             </div>
           </div>

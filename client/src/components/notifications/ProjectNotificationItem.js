@@ -60,6 +60,14 @@ class ProjectNotificationItem extends Component {
       </Link>
     );
 
+    const message = (
+      <div className="mt-3 ml-3">
+        <strong>Message:</strong>
+        <br />
+        {notification.message_text}
+      </div>
+    );
+
     const acceptButton = (
       <button
         type="button"
@@ -99,9 +107,12 @@ class ProjectNotificationItem extends Component {
         this.props.auth.user.id === notification.sender_id
       ) {
         msgContant = (
-          <div className="ml-3">
-            You have sent an invitation to {sendToLink}, to play{" "}
-            {instrumentName} in your project {projectLink}
+          <div>
+            <div className="ml-3">
+              You have sent an invitation to {sendToLink}, to play{" "}
+              {instrumentName} in your project {projectLink}
+            </div>
+            {notification.message_text && message}
           </div>
         );
       }
@@ -116,6 +127,7 @@ class ProjectNotificationItem extends Component {
               {senderLink}
               want to play {instrumentName} in your {projectLink} project
             </div>
+            {notification.message_text && message}
             <span>{acceptButton}</span>
             <span>{sendMessageButton}</span>
           </div>
@@ -131,9 +143,12 @@ class ProjectNotificationItem extends Component {
         this.props.auth.user.id === notification.sender_id
       ) {
         msgContant = (
-          <div className="ml-3">
-            You asked {sendToLink}
-            to play {instrumentName} in {projectLink} project
+          <div>
+            <div className="ml-3">
+              You asked {sendToLink}
+              to play {instrumentName} in {projectLink} project
+            </div>
+            {notification.message_text && message}
           </div>
         );
       }
@@ -147,6 +162,7 @@ class ProjectNotificationItem extends Component {
               {senderLink}
               asked you to play {instrumentName} in {projectLink} project
             </div>
+            {notification.message_text && message}
             <span>{acceptButton}</span>
             <span>{sendMessageButton}</span>
           </div>
