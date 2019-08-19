@@ -78,8 +78,6 @@ class InstrumentItem extends Component {
   }
 
   onAcceptInvitation(invitation) {
-    console.log("this.props.notification");
-    console.log(invitation);
     this.props.updateInstrument(
       invitation.project_instrument_id,
       { user_id: this.props.auth.user.id },
