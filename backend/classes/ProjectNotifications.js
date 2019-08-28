@@ -48,20 +48,21 @@ class ProjectNotifications extends Sequelize.Model {
 
   // Delete notifications by instrument id
   static deleteNotificationsByInstrumentId(instrumentId) {
-    return new Promise(function(resolve, reject) {
-      // return ProjectNotifications.findAll({
-      ProjectNotifications.findAll({
-        where: { project_instrument_id: instrumentId }
-      }).then(notifications => {
-        notifications.map(notification => {
-          const end =
-            notifications.indexOf(notification) === notifications.length - 1;
-          notification.destroy();
-          if (end) {
-            resolve("deleted");
-          }
-        });
-      });
+    return ProjectNotifications.destroy({
+      where: {
+        project_instrument_id: instrumentId,
+        notification_type: ["join req", "join"]
+      }
+    });
+  }
+
+  // Delete notifications by instrument id
+  static deleteJoinReqByInstrumentId(instrumentId) {
+    return ProjectNotifications.destroy({
+      where: {
+        project_instrument_id: instrumentId,
+        notification_type: "join req"
+      }
     });
   }
 
@@ -103,6 +104,7 @@ ProjectNotifications.init(
     sender_id: Sequelize.INTEGER,
     sent_to_id: Sequelize.INTEGER,
     message_text: Sequelize.STRING,
+    notification_type: Sequelize.STRING,
     unread: Sequelize.BOOLEAN,
     need_action: Sequelize.BOOLEAN,
     deleted: Sequelize.BOOLEAN

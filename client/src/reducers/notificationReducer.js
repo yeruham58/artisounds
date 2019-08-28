@@ -10,12 +10,12 @@ export default function(state = initialState, action) {
     case SEND_NOTIFICATION:
       return {
         ...state,
-        notifications: action.payload
+        notifications: action.payload.reverse()
       };
     case GET_NOTIFICATIONS:
       return {
         ...state,
-        notifications: action.payload,
+        notifications: action.payload.reverse(),
         loading: false
       };
     default:

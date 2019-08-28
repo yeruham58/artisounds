@@ -12,7 +12,8 @@ import {
 import {
   deleteNotificationsByInstrumentId,
   deleteNotificationsById,
-  sendNotification
+  sendNotification,
+  updateNotification
 } from "../../../actions/notificationActions";
 
 import defaultImg from "../../../img/stillNoBodyImg.jpeg";
@@ -31,9 +32,11 @@ class InstrumentItem extends Component {
   }
 
   onDeleteClick(instrument) {
+    const notification = this.props.notifications[0];
     if (
       instrument.user_id &&
-      instrument.user_id !== this.props.projectOwnerId
+      instrument.user_id !== this.props.projectOwnerId &&
+      this.props.auth.user.id !== this.props.projectOwnerId
     ) {
       if (
         window.confirm(
@@ -45,20 +48,27 @@ class InstrumentItem extends Component {
           { user_id: null },
           this.props.history
         );
+        this.props.updateNotification(notification.id, {
+          unread: true,
+          sent_to_id: this.props.projectOwnerId,
+          sender_id: this.props.auth.user.id,
+          notification_type: "leave"
+        });
       }
-    }
-
-    if (
-      (instrument.user_id === this.props.projectOwnerId &&
-        !instrument.record_url) ||
-      !instrument.user_id
-    ) {
+    } else {
       if (
         window.confirm(
           "Are you sure? \nBy confirm you gonna delete all your info connected to this instrument"
         )
       ) {
-        this.props.deleteInstrument(instrument.id);
+        if (notification)
+          this.props.updateNotification(notification.id, {
+            unread: true,
+            sent_to_id: instrument.user_id,
+            sender_id: this.props.auth.user.id,
+            notification_type: "leave"
+          });
+        setTimeout(() => this.props.deleteInstrument(instrument.id), 100);
       }
     }
   }
@@ -83,9 +93,13 @@ class InstrumentItem extends Component {
       { user_id: this.props.auth.user.id },
       this.props.history
     );
-    this.props.deleteNotificationsByInstrumentId(
-      invitation.project_instrument_id
-    );
+
+    this.props.updateNotification(invitation.id, {
+      sender_id: this.props.auth.user.id,
+      unread: true,
+      sent_to_id: invitation.sender_id,
+      notification_type: "join"
+    });
   }
 
   render() {
@@ -129,13 +143,17 @@ class InstrumentItem extends Component {
     const alreadySent =
       this.props.notifications &&
       this.props.notifications.find(
-        notification => notification.sender_id === this.props.logedInUserId
+        notification =>
+          notification.sender_id === this.props.logedInUserId &&
+          notification.notification_type === "join req"
       );
 
     const alreadyInvited =
       this.props.notifications &&
       this.props.notifications.find(
-        notification => notification.sent_to_id === this.props.logedInUserId
+        notification =>
+          notification.sent_to_id === this.props.logedInUserId &&
+          notification.notification_type === "join req"
       );
 
     return (
@@ -204,8 +222,9 @@ class InstrumentItem extends Component {
                   Invite a freind
                 </Link>
               ) : null}
+
               {!this.props.projectOwner &&
-              !instrument.user_detailes &&
+              !instrument.user_id &&
               !alreadyInvited ? (
                 <div>
                   <Popup
@@ -287,7 +306,7 @@ class InstrumentItem extends Component {
                     }}
                     style={{ width: "100%" }}
                   >
-                    Cancle
+                    Cancel
                   </button>
                 </div>
               )}
@@ -346,7 +365,8 @@ class InstrumentItem extends Component {
             </button>
           ) : null}
 
-          {this.props.projectOwnerId === this.props.logedInUserId ||
+          {(this.props.projectOwnerId === this.props.logedInUserId &&
+            !instrument.record_url) ||
           (instrument.user_detailes &&
             instrument.user_detailes.id === this.props.logedInUserId) ? (
             <div>
@@ -389,10 +409,11 @@ InstrumentItem.propTypes = {
   updateInstrument: PropTypes.func.isRequired,
   deleteInstrument: PropTypes.func.isRequired,
   sendNotification: PropTypes.func.isRequired,
+  updateNotification: PropTypes.func.isRequired,
   deleteNotificationsByInstrumentId: PropTypes.func.isRequired,
   deleteNotificationsById: PropTypes.func.isRequired,
 
-  notification: PropTypes.object,
+  notifications: PropTypes.array,
   instrument: PropTypes.object.isRequired,
   projectOwner: PropTypes.bool,
 
@@ -413,6 +434,7 @@ export default connect(
     deleteInstrument,
     deleteNotificationsByInstrumentId,
     deleteNotificationsById,
-    sendNotification
+    sendNotification,
+    updateNotification
   }
 )(InstrumentItem);

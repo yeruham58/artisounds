@@ -104,13 +104,10 @@ class ProfileItem extends Component {
                 Send a message
               </Link>
             ) : null}
-            {this.props.instrument && !this.props.notification && (
-              // <button
-              //   className="btn btn-outline-primary  mr-2 mb-2"
-              //   onClick={this.sendInvitation}
-              // >
-              //   Invite
-              // </button>
+
+            {(this.props.instrument && !this.props.notification) ||
+            (this.props.instrument &&
+              this.props.notification.sent_to_id !== profile.id) ? (
               <div>
                 <Popup
                   modal
@@ -156,19 +153,21 @@ class ProfileItem extends Component {
                   )}
                 </Popup>
               </div>
-            )}
-            {this.props.instrument && this.props.notification && (
-              <button
-                className="btn btn-outline-primary  mr-2 mb-2"
-                onClick={() => {
-                  this.props.deleteNotificationsById(
-                    this.props.notification.id
-                  );
-                }}
-              >
-                Cancle invitation
-              </button>
-            )}
+            ) : null}
+            {this.props.instrument &&
+              this.props.notification &&
+              this.props.notification.sent_to_id === profile.id && (
+                <button
+                  className="btn btn-outline-primary  mr-2 mb-2"
+                  onClick={() => {
+                    this.props.deleteNotificationsById(
+                      this.props.notification.id
+                    );
+                  }}
+                >
+                  Cancle invitation
+                </button>
+              )}
           </div>
 
           <div className="col-md-4 d-none d-md-block">

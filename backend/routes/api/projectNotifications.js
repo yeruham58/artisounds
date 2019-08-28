@@ -3,6 +3,7 @@ const router = express.Router();
 const passport = require("passport");
 
 const ProjectNotifications = require("../../classes/ProjectNotifications");
+const Project = require("../../classes/Project");
 
 //@ route   POST api/projectNotifications
 //@desc     create project notification
@@ -19,6 +20,7 @@ router.post(
     newNotification.sent_to_id = req.body.sent_to_id;
     if (req.body.message_text)
       newNotification.message_text = req.body.message_text;
+    newNotification.notification_type = "join req";
     newNotification.unread = true;
     newNotification.need_action = req.body.need_action;
     newNotification.deleted = false;
@@ -45,18 +47,50 @@ router.patch(
   (req, res) => {
     const updatedNotification = req.body;
     ProjectNotifications.findByPk(req.params.notificationId).then(
-      notification =>
+      notification => {
         notification
           .update(updatedNotification)
-          .then(() => {
-            ProjectNotifications.getNotificationsByUserId(req.user.id).then(
-              notifications => res.json(notifications)
-            );
+          .then(notificationAfterUpdate => {
+            if (
+              updatedNotification.notification_type &&
+              updatedNotification.notification_type === "join"
+            ) {
+              ProjectNotifications.deleteJoinReqByInstrumentId(
+                notificationAfterUpdate.dataValues.project_instrument_id
+              ).then(() => {
+                let myRes = {};
+                ProjectNotifications.getNotificationsByUserId(req.user.id).then(
+                  notifications => {
+                    myRes.notifications = notifications;
+                    Project.getProjectByProjectId(
+                      notificationAfterUpdate.project_id
+                    ).then(project => {
+                      myRes.project = project;
+                      res.json(myRes);
+                    });
+                  }
+                );
+              });
+            } else {
+              let myRes = {};
+              ProjectNotifications.getNotificationsByUserId(req.user.id).then(
+                notifications => {
+                  myRes.notifications = notifications;
+                  Project.getProjectByProjectId(
+                    notificationAfterUpdate.project_id
+                  ).then(project => {
+                    myRes.project = project;
+                    res.json(myRes);
+                  });
+                }
+              );
+            }
           })
           .catch(err => {
             errors.error = "Some error with update this notification";
             return res.status(400).json(errors);
-          })
+          });
+      }
     );
   }
 );

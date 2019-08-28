@@ -1,6 +1,11 @@
 import axios from "axios";
 
-import { SEND_NOTIFICATION, GET_NOTIFICATIONS, GET_ERRORS } from "./types";
+import {
+  SEND_NOTIFICATION,
+  GET_NOTIFICATIONS,
+  GET_ERRORS,
+  GET_PROJECT
+} from "./types";
 
 // Send notification
 export const sendNotification = notificationData => dispatch => {
@@ -27,12 +32,18 @@ export const updateNotification = (
 ) => dispatch => {
   axios
     .patch(`/api/projectNotifications/${notificationId}`, notificationData)
-    .then(res =>
+    .then(res => {
       dispatch({
-        type: SEND_NOTIFICATION,
-        payload: res.data
-      })
-    )
+        type: GET_PROJECT,
+        payload: res.data.project
+      });
+      if (res.data.notifications) {
+        dispatch({
+          type: SEND_NOTIFICATION,
+          payload: res.data.notifications
+        });
+      }
+    })
     .catch(err => {
       dispatch({
         type: GET_ERRORS,

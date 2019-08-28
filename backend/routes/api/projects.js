@@ -8,6 +8,7 @@ const validateProjectInput = require("../../validation/project");
 // const User = require("../../classes/User");
 const ArtPractic = require("../../classes/ArtPractic");
 const ProjectInstrument = require("../../classes/ProjectInstrument");
+const ProjectNotifications = require("../../classes/ProjectNotifications");
 const Project = require("../../classes/Project");
 // const Like = require("../../classes/Like");
 // const Dislike = require("../../classes/Dislike");
@@ -428,9 +429,9 @@ router.patch(
             if (Object.keys(req.body).indexOf("comments") >= 0)
               updatedInstrument.comments = req.body.comments;
             projectInstrument.update(updatedInstrument).then(() => {
-              Project.getProjectByProjectId(projectId).then(project =>
-                res.json(project)
-              );
+              Project.getProjectByProjectId(projectId).then(project => {
+                res.json(project);
+              });
             });
           }
         });
@@ -446,7 +447,7 @@ router.delete(
   "/instrument/:instrument_id",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    //chack the instrument ouner
+    //chack the instrument owner
     ProjectInstrument.findByPk(req.params.instrument_id).then(
       projectInstrument => {
         Project.findByPk(projectInstrument.project_id).then(project => {
@@ -456,10 +457,14 @@ router.delete(
               .json({ msg: "This project is not belong to you!" });
           } else {
             projectId = projectInstrument.project_id;
-            projectInstrument.destroy().then(() => {
-              Project.getProjectByProjectId(projectId).then(project =>
-                res.json(project)
-              );
+            ProjectNotifications.deleteNotificationsByInstrumentId(
+              req.params.instrument_id
+            ).then(() => {
+              projectInstrument.destroy().then(() => {
+                Project.getProjectByProjectId(projectId).then(project =>
+                  res.json(project)
+                );
+              });
             });
           }
         });

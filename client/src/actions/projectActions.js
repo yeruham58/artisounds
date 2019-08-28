@@ -9,7 +9,6 @@ import {
   CLEAR_ERRORS,
   ADD_INSTRUMENT_TO_PROJECT,
   PROJECT_LOADING,
-  UPDATE_INSTRUMENT,
   DELETE_INSTRUMENT
 } from "./types";
 
@@ -234,7 +233,7 @@ export const updateInstrument = (
         history.push(`/project/project-view/${res.data.id}`);
       } else {
         dispatch({
-          type: UPDATE_INSTRUMENT,
+          type: GET_PROJECT,
           payload: res.data
         });
       }

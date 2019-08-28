@@ -12,14 +12,16 @@ class ProjectNotificationFeed extends Component {
         </div>
       );
     } else {
-      return notifications
-        .reverse()
-        .map(notification => (
-          <ProjectNotificationItem
-            key={notification.id}
-            notification={notification}
-          />
-        ));
+      return (
+        notifications
+          // .reverse()
+          .map(notification => (
+            <ProjectNotificationItem
+              key={notification.id}
+              notification={notification}
+            />
+          ))
+      );
     }
   }
 }
