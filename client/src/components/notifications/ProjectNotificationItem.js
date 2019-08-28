@@ -45,8 +45,6 @@ class ProjectNotificationItem extends Component {
   render() {
     const { notification } = this.props;
     const { user } = this.props.auth;
-    console.log("notification");
-    console.log(notification);
     const projectName = notification.project_id
       ? notification.project.name
       : null;
@@ -259,8 +257,6 @@ class ProjectNotificationItem extends Component {
       notification.unread &&
       notification.sent_to_id === this.props.auth.user.id;
 
-    console.log("unread");
-    console.log(unread);
     return (
       <div
         className="card card-body mb-3"
