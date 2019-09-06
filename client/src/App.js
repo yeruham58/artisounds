@@ -26,6 +26,7 @@ import TestChat from "./components/chat/TestChat";
 import CreateProject from "./components/projects/create-project/CreateProject";
 import ProjectView from "./components/projects/project/ProjectView";
 import ProjectFeed from "./components/projects/projects/ProjectFeed";
+import WorkZone from "./components/audio-editor/WorkZone";
 
 import "./App.css";
 
@@ -69,6 +70,14 @@ function App() {
               path="/project/project-view/:projectId"
               component={ProjectView}
             />
+            {/* ##TODO: add id's to following url */}
+            <Switch>
+              <Route
+                exact
+                path="/projects/work-zone/:projectId"
+                component={WorkZone}
+              />
+            </Switch>
             <Switch>
               <Route
                 exact

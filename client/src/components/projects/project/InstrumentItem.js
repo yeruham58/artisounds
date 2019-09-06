@@ -206,7 +206,7 @@ class InstrumentItem extends Component {
               {instrument.user_detailes &&
               this.props.logedInUserId === instrument.user_detailes.id ? (
                 <Link
-                  to={`/project/add-instrument/${instrument.id}`}
+                  to={`/projects/work-zone/${instrument.project_id}`}
                   className="btn btn-outline-warning mb-2"
                   style={{ width: "100%" }}
                 >
