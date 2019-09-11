@@ -12,6 +12,7 @@ class InstrumentRecordFeed extends Component {
         <InstrumentRecordItem
           instrument={instrument}
           setAudioFiles={this.props.setAudioFiles}
+          movePointer={this.props.movePointer}
         />
       </span>
     ));
@@ -20,7 +21,8 @@ class InstrumentRecordFeed extends Component {
 
 InstrumentRecordFeed.propTypes = {
   instruments: PropTypes.array.isRequired,
-  setAudioFiles: PropTypes.func.isRequired
+  setAudioFiles: PropTypes.func.isRequired,
+  movePointer: PropTypes.func.isRequired
 };
 
 export default InstrumentRecordFeed;

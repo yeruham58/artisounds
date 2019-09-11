@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import Crunker from "crunker";
 
 import InstrumentRecordFeed from "./InstrumentRecordFeed";
+import RecordingTopRuler from "./RecordingTopRuler";
 import Spinner from "../common/Spinner";
 import { getProject, clearProject } from "../../actions/projectActions";
 import Player from "./Player";
@@ -16,6 +17,7 @@ class WorkZone extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      movePointer: false,
       analyser: null,
       audio: null,
       context: null,
@@ -24,6 +26,7 @@ class WorkZone extends Component {
     this.setAudioFilesInPlayer = this.setAudioFilesInPlayer.bind(this);
     this.initPlayer = this.initPlayer.bind(this);
     this.setBuffersList = this.setBuffersList.bind(this);
+    this.movePointerInPlayOrRecord = this.movePointerInPlayOrRecord.bind(this);
   }
   componentDidMount() {
     this.props.getProject(this.props.match.params.projectId);
@@ -73,8 +76,6 @@ class WorkZone extends Component {
     source.connect(ac.destination);
 
     // // // start the source playing
-    // source.start();
-
     // return out;
     return source;
   }
@@ -105,15 +106,11 @@ class WorkZone extends Component {
         this.initPlayer(mergedBuffer);
       }
     }
-
-    // });
   }
 
   initPlayer(audioFile) {
     // const audio = new Audio(audioFile);
     // audio.controls = true;
-    console.log("audioFile");
-    console.log(audioFile);
     // audioFile.start();
     const audio = audioFile;
     // const context = new AudioContext();
@@ -129,6 +126,10 @@ class WorkZone extends Component {
       audio,
       context
     });
+  }
+
+  movePointerInPlayOrRecord(bool) {
+    this.setState({ movePointer: bool });
   }
 
   render() {
@@ -155,12 +156,19 @@ class WorkZone extends Component {
                   audio={this.state.audio}
                   analyser={this.state.analyser}
                   setAudioFiles={this.setAudioFilesInPlayer}
+                  movePointer={this.movePointerInPlayOrRecord}
                 />
               )}
+              <RecordingTopRuler
+                project={this.props.project.project}
+                movePointer={this.state.movePointer}
+              />
+
               {project.instruments && project.instruments[0] ? (
                 <InstrumentRecordFeed
                   instruments={project.instruments}
                   setAudioFiles={this.setAudioFilesInPlayer}
+                  movePointer={this.movePointerInPlayOrRecord}
                 />
               ) : null}
             </div>

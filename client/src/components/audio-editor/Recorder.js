@@ -21,6 +21,7 @@ class Recorder extends Component {
       const mediaRecorder = new MediaRecorder(stream);
       this.mediaRecorder = mediaRecorder;
       this.mediaRecorder.start();
+      this.props.movePointer(true);
 
       const audioChunks = this.state.audioBlob ? this.state.audioChunks : [];
       this.mediaRecorder.addEventListener("dataavailable", event => {
@@ -51,7 +52,14 @@ class Recorder extends Component {
           {this.state.audioChunks ? this.state.audioChunks.length : null}
         </div>
         <button onClick={this.startRecord}>start</button>
-        <button onClick={() => this.mediaRecorder.stop()}>stop</button>
+        <button
+          onClick={() => {
+            this.mediaRecorder.stop();
+            this.props.movePointer(false);
+          }}
+        >
+          stop
+        </button>
         <button
           onClick={() => {
             // this.state.audio.play();
@@ -69,7 +77,8 @@ class Recorder extends Component {
 }
 
 Recorder.propTypes = {
-  setAudioFiles: PropTypes.func.isRequired
+  setAudioFiles: PropTypes.func.isRequired,
+  movePointer: PropTypes.func.isRequired
 };
 
 export default Recorder;

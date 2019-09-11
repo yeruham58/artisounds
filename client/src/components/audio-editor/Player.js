@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import range from "../common/RangeSlider";
+// import range from "../common/RangeSlider";
 
 class Player extends Component {
   constructor(props) {
@@ -44,12 +44,13 @@ class Player extends Component {
 
   // Initialize the player after the page loads all of its HTML into the window
   initPlayer(newAudio) {
-    newAudio.loop = true;
+    newAudio.loop = false;
     newAudio.onended = () => {
       this.setState({
         isPlaing: false
       });
       this.props.setAudioFiles(null);
+      this.props.movePointer(false);
     };
     const canvas = document.getElementById("analyser_render");
     const ctx = canvas.getContext("2d");
@@ -105,6 +106,7 @@ class Player extends Component {
         // this.state.currentAudio.buffer.duration - 2
         ();
       this.frameLooper();
+      this.props.movePointer(true);
     }, 500);
   }
 
@@ -112,6 +114,7 @@ class Player extends Component {
     this.state.currentAudio.stop();
     this.setState({ isPlaing: false });
     this.props.setAudioFiles(null);
+    this.props.movePointer(false);
   }
 
   render() {
@@ -148,7 +151,8 @@ class Player extends Component {
 Player.propTypes = {
   audio: PropTypes.object.isRequired,
   analyser: PropTypes.object.isRequired,
-  setAudioFiles: PropTypes.func.isRequired
+  setAudioFiles: PropTypes.func.isRequired,
+  movePointer: PropTypes.func.isRequired
 };
 
 export default Player;
