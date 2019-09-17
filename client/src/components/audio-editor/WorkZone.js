@@ -10,26 +10,61 @@ import Spinner from "../common/Spinner";
 import { getProject, clearProject } from "../../actions/projectActions";
 import Player from "./Player";
 
-// import firstmp3 from "../../mp3test/lechaDodi - 4:25:19, 5.05 PM.mp3";
-// import secondmp3 from "../../mp3test/shanimDm - beforeVoice.mp3";
-
 class WorkZone extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      audioStartTime: 0,
       movePointer: false,
       analyser: null,
       audio: null,
       context: null,
-      buffersList: []
+      buffersList: [],
+      recordsDic: {}
     };
     this.setAudioFilesInPlayer = this.setAudioFilesInPlayer.bind(this);
+    this.setAudioStartTime = this.setAudioStartTime.bind(this);
     this.initPlayer = this.initPlayer.bind(this);
     this.setBuffersList = this.setBuffersList.bind(this);
     this.movePointerInPlayOrRecord = this.movePointerInPlayOrRecord.bind(this);
+    this.clearRecord = this.clearRecord.bind(this);
   }
   componentDidMount() {
     this.props.getProject(this.props.match.params.projectId);
+  }
+
+  setBuffersList(audioFile) {
+    const audioUrl = URL.createObjectURL(audioFile);
+    let audio = new Crunker();
+    audio.fetchAudio(audioUrl, audioUrl).then(buffers => {
+      const buffersList = [...this.state.buffersList, buffers[0]];
+      this.setState({
+        buffersList,
+        recordsDic: {
+          ...this.state.recordsDic,
+          [this.props.match.params.instrumentId.toString]: {
+            duration: buffers[0].duration
+          }
+        }
+      });
+      this.setAudioFilesInPlayer(null);
+    });
+  }
+
+  setAudioFilesInPlayer(audioFile) {
+    if (audioFile) {
+      this.setBuffersList(audioFile);
+    } else {
+      const mergedBuffer = this.mergeBuffers(this.state.buffersList);
+
+      if (this.state.context) {
+        this.state.context.close().then(() => {
+          this.initPlayer(mergedBuffer);
+        });
+      } else {
+        this.initPlayer(mergedBuffer);
+      }
+    }
   }
 
   mergeBuffers(buffers) {
@@ -75,49 +110,14 @@ class WorkZone extends Component {
     // destination so we can hear the sound
     source.connect(ac.destination);
 
-    // // // start the source playing
-    // return out;
+    // start the source playing
     return source;
   }
 
-  setBuffersList(audioFile) {
-    const audioUrl = URL.createObjectURL(audioFile);
-    let audio = new Crunker();
-    audio.fetchAudio(audioUrl, audioUrl).then(buffers => {
-      const buffersList = [...this.state.buffersList, buffers[0]];
-      this.setState({
-        buffersList
-      });
-      this.setAudioFilesInPlayer(null);
-    });
-  }
-
-  setAudioFilesInPlayer(audioFile) {
-    if (audioFile) {
-      this.setBuffersList(audioFile);
-    } else {
-      const mergedBuffer = this.mergeBuffers(this.state.buffersList);
-
-      if (this.state.context) {
-        this.state.context.close().then(() => {
-          this.initPlayer(mergedBuffer);
-        });
-      } else {
-        this.initPlayer(mergedBuffer);
-      }
-    }
-  }
-
   initPlayer(audioFile) {
-    // const audio = new Audio(audioFile);
-    // audio.controls = true;
-    // audioFile.start();
     const audio = audioFile;
-    // const context = new AudioContext();
     const context = audioFile.context;
     const analyser = context.createAnalyser();
-    // const source = context.createMediaElementSource(audio);
-    // source.connect(analyser);
     audioFile.connect(analyser);
     analyser.connect(context.destination);
 
@@ -128,8 +128,35 @@ class WorkZone extends Component {
     });
   }
 
-  movePointerInPlayOrRecord(bool) {
-    this.setState({ movePointer: bool });
+  movePointerInPlayOrRecord(playingNow, isRecord) {
+    const instrumentRecord = this.state.recordsDic[
+      this.props.match.params.instrumentId.toString
+    ];
+    if (isRecord) {
+      console.log("instrumentRecord");
+      console.log(instrumentRecord);
+      const startTime =
+        instrumentRecord && instrumentRecord.duration
+          ? instrumentRecord.duration
+          : 0.0000000001;
+      this.setAudioStartTime(startTime);
+    }
+    this.setState({ movePointer: playingNow });
+  }
+
+  setAudioStartTime(startTime) {
+    this.setState({ audioStartTime: startTime });
+  }
+
+  clearRecord() {
+    this.setState({
+      recordsDic: {
+        ...this.state.recordsDic,
+        [this.props.match.params.instrumentId.toString]: {
+          duration: null
+        }
+      }
+    });
   }
 
   render() {
@@ -154,6 +181,7 @@ class WorkZone extends Component {
               {this.state.audio && this.state.context && (
                 <Player
                   audio={this.state.audio}
+                  audioStartTime={this.state.audioStartTime}
                   analyser={this.state.analyser}
                   setAudioFiles={this.setAudioFilesInPlayer}
                   movePointer={this.movePointerInPlayOrRecord}
@@ -161,7 +189,9 @@ class WorkZone extends Component {
               )}
               <RecordingTopRuler
                 project={this.props.project.project}
+                pointerStartPoint={this.state.audioStartTime}
                 movePointer={this.state.movePointer}
+                setStartTime={this.setAudioStartTime}
               />
 
               {project.instruments && project.instruments[0] ? (
@@ -169,6 +199,7 @@ class WorkZone extends Component {
                   instruments={project.instruments}
                   setAudioFiles={this.setAudioFilesInPlayer}
                   movePointer={this.movePointerInPlayOrRecord}
+                  clearRecord={this.clearRecord}
                 />
               ) : null}
             </div>

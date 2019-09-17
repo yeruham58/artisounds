@@ -8,8 +8,10 @@ class RecordingTopRuler extends Component {
     this.pointerRef = React.createRef();
 
     this.state = {
+      pointerStartPoint: this.props.pointerStartPoint,
       spacing: 60,
       secondsPerBit: 0,
+      secondsPerPx: 0,
       scrollNow: false,
       movePointer: false,
       pointerXPos: 0,
@@ -34,7 +36,9 @@ class RecordingTopRuler extends Component {
     canvas.addEventListener("click", this.getClickPosition, false);
 
     const secondsPerBit = 60 / this.state.projectTempo;
-    this.setState({ secondsPerBit });
+    const secondsPerPx =
+      secondsPerBit / (this.state.spacing / this.state.projectBit);
+    this.setState({ secondsPerBit, secondsPerPx });
   }
 
   componentWillReceiveProps(nextProp) {
@@ -42,16 +46,24 @@ class RecordingTopRuler extends Component {
       this.setState({ movePointer: nextProp.movePointer });
       if (nextProp.movePointer) this.movePointer();
     }
+    if (nextProp.pointerStartPoint) {
+      console.log("nextProp.pointerStartPoint");
+      console.log(nextProp.pointerStartPoint);
+      this.setState({ pointerStartPoint: nextProp.pointerStartPoint });
+    }
   }
 
   movePointer() {
     var elem = document.getElementById("record-pointer-holder");
-    var pos = 0;
+    console.log("this.state.pointerStartPoint in ruller");
+    console.log(this.state.pointerStartPoint);
+    var pos = this.state.pointerStartPoint / this.state.secondsPerPx;
     const { secondsPerBit } = this.state;
     const pxPerBit = this.state.spacing / this.state.projectBit;
     var id = setInterval(() => {
       if (!this.state.movePointer) {
         // pos = 0;
+        this.props.setStartTime(pos * this.state.secondsPerPx);
         clearInterval(id);
       } else {
         pos += pxPerBit / 100;
@@ -61,11 +73,15 @@ class RecordingTopRuler extends Component {
   }
 
   getClickPosition(e) {
-    const pointer = document.getElementById("record-pointer-holder");
-    const canvas = document.getElementById("time-line-holder");
-    const canvasPositions = canvas.getBoundingClientRect();
-    pointer.style.left =
-      e.clientX - canvasPositions.left + canvas.scrollLeft - 7.5 + "px"; // 7.5 is middle width of pointer element
+    if (!this.state.movePointer) {
+      const pointer = document.getElementById("record-pointer-holder");
+      const canvas = document.getElementById("time-line-holder");
+      const canvasPositions = canvas.getBoundingClientRect();
+      const setPoint = e.clientX - canvasPositions.left + canvas.scrollLeft;
+      pointer.style.left = setPoint - 7.5 + "px"; // 7.5 is middle width of pointer element
+      const audioPointInSeconds = this.state.secondsPerPx * setPoint;
+      this.props.setStartTime(audioPointInSeconds);
+    }
   }
 
   dragPointer() {
@@ -111,6 +127,8 @@ class RecordingTopRuler extends Component {
             scrollNum = timeline.scrollLeft - 10;
           }
           pointer.style.left = setPos + "px";
+          const audioPointInSeconds = this.state.secondsPerPx * setPos;
+          this.props.setStartTime(audioPointInSeconds);
           timeline.scroll({
             left: scrollNum,
             behavior: "smooth"
@@ -124,28 +142,32 @@ class RecordingTopRuler extends Component {
     e = e || window.event;
     e.preventDefault();
 
-    const timeline = document.getElementById("time-line-holder");
-    const timelineWidth = timeline.offsetWidth;
-    const timelineLeft = timeline.scrollLeft;
-    // calculate the new cursor position:
-    const newPos = this.state.pointerXPos - e.clientX;
-    this.setState({ pointerXPos: e.clientX });
+    if (!this.state.movePointer) {
+      const timeline = document.getElementById("time-line-holder");
+      const timelineWidth = timeline.offsetWidth;
+      const timelineLeft = timeline.scrollLeft;
+      // calculate the new cursor position:
+      const newPos = this.state.pointerXPos - e.clientX;
+      this.setState({ pointerXPos: e.clientX });
 
-    // set the element's new position:
-    var pointer = document.getElementById("record-pointer-holder");
+      // set the element's new position:
+      var pointer = document.getElementById("record-pointer-holder");
 
-    let setPos =
-      pointer.offsetLeft - newPos > 0 ? pointer.offsetLeft - newPos : 0;
-    if (setPos > 50 * this.state.spacing) setPos = 50 * this.state.spacing;
+      let setPos =
+        pointer.offsetLeft - newPos > 0 ? pointer.offsetLeft - newPos : 0;
+      if (setPos > 50 * this.state.spacing) setPos = 50 * this.state.spacing;
 
-    if (
-      pointer.offsetLeft > timelineWidth + timelineLeft - 25 ||
-      pointer.offsetLeft < timelineLeft
-    ) {
-      this.setState({ scrollNow: true });
-      this.scrollCanvas(timeline, pointer);
-    } else {
-      pointer.style.left = setPos + "px";
+      if (
+        pointer.offsetLeft > timelineWidth + timelineLeft - 25 ||
+        pointer.offsetLeft < timelineLeft
+      ) {
+        this.setState({ scrollNow: true });
+        this.scrollCanvas(timeline, pointer);
+      } else {
+        pointer.style.left = setPos + "px";
+        const audioPointInSeconds = this.state.secondsPerPx * setPos;
+        this.props.setStartTime(audioPointInSeconds);
+      }
     }
   }
 
@@ -212,7 +234,6 @@ class RecordingTopRuler extends Component {
           }}
         />
         <div
-          // onClick={this.movePointer}
           ref={this.pointerRef}
           id="record-pointer-holder"
           style={{ position: "absolute", height: "100%", top: "40px" }}
@@ -228,6 +249,8 @@ class RecordingTopRuler extends Component {
 }
 
 RecordingTopRuler.propTypes = {
+  setStartTime: PropTypes.func.isRequired,
+  pointerStartPoint: PropTypes.number.isRequired,
   project: PropTypes.object.isRequired,
   movePointer: PropTypes.bool.isRequired
 };

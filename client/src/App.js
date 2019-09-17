@@ -74,7 +74,7 @@ function App() {
             <Switch>
               <Route
                 exact
-                path="/projects/work-zone/:projectId"
+                path="/projects/work-zone/:projectId/:instrumentId"
                 component={WorkZone}
               />
             </Switch>

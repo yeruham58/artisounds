@@ -11,6 +11,8 @@ class Player extends Component {
 
     this.state = {
       currentAudio: this.props.audio,
+      audioStartTime: this.props.audioStartTime,
+      pointerCurrentPos: this.props.audioStartTime,
       isPlaing: false,
       analyser: this.props.analyser,
       canvas: null,
@@ -40,6 +42,10 @@ class Player extends Component {
 
       this.initPlayer(nextProp.audio);
     }
+
+    if (nextProp.audioStartTime) {
+      this.setState({ audioStartTime: nextProp.audioStartTime });
+    }
   }
 
   // Initialize the player after the page loads all of its HTML into the window
@@ -50,7 +56,7 @@ class Player extends Component {
         isPlaing: false
       });
       this.props.setAudioFiles(null);
-      this.props.movePointer(false);
+      this.props.movePointer(false, false);
     };
     const canvas = document.getElementById("analyser_render");
     const ctx = canvas.getContext("2d");
@@ -63,14 +69,6 @@ class Player extends Component {
   // frameLooper() animates any style of graphics you wish to the audio frequency
   // Looping at the default frame rate that the browser provides(approx. 60 FPS)
   frameLooper() {
-    // console.log("currentTime");
-    // console.log(this.state.currentAudio.context.currentTime);
-    // if (
-    //   this.state.currentAudio.context.currentTime >=
-    //   this.state.currentAudio.buffer.duration
-    // ) {
-    //   // this.state.currentAudio.context.currentTime = 0;
-    // }
     let fbc_array, bars, bar_x, bar_width, bar_height;
     const { ctx, canvas, analyser } = this.state;
     if (this.state.isPlaing) {
@@ -99,22 +97,31 @@ class Player extends Component {
   onPlay() {
     this.setState({ isPlaing: true });
     setTimeout(() => {
-      this.state.currentAudio
-        .start
-        // this.state.currentAudio.context.currentTime + 4,
-        // 2,
-        // this.state.currentAudio.buffer.duration - 2
-        ();
+      const { currentAudio, audioStartTime } = this.state;
+      console.log("audioStartTime");
+      console.log(audioStartTime);
+      if (currentAudio.buffer.duration > audioStartTime) {
+        currentAudio.start(
+          currentAudio.context.currentTime + 0, // how much time from now it will start,
+          audioStartTime,
+          currentAudio.buffer.duration - audioStartTime
+        );
+      }
       this.frameLooper();
-      this.props.movePointer(true);
+      this.props.movePointer(true, false);
     }, 500);
   }
 
   onStop() {
-    this.state.currentAudio.stop();
+    try {
+      this.state.currentAudio.stop();
+    } catch (err) {
+      console.log("audio is not plaing");
+    }
+
     this.setState({ isPlaing: false });
     this.props.setAudioFiles(null);
-    this.props.movePointer(false);
+    this.props.movePointer(false, false);
   }
 
   render() {
@@ -150,6 +157,7 @@ class Player extends Component {
 
 Player.propTypes = {
   audio: PropTypes.object.isRequired,
+  audioStartTime: PropTypes.number.isRequired,
   analyser: PropTypes.object.isRequired,
   setAudioFiles: PropTypes.func.isRequired,
   movePointer: PropTypes.func.isRequired

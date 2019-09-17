@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-// import Player from "./Player";
-
 class Recorder extends Component {
   constructor(props) {
     super(props);
@@ -21,7 +19,7 @@ class Recorder extends Component {
       const mediaRecorder = new MediaRecorder(stream);
       this.mediaRecorder = mediaRecorder;
       this.mediaRecorder.start();
-      this.props.movePointer(true);
+      this.props.movePointer(true, true);
 
       const audioChunks = this.state.audioBlob ? this.state.audioChunks : [];
       this.mediaRecorder.addEventListener("dataavailable", event => {
@@ -33,10 +31,7 @@ class Recorder extends Component {
         const audioBlob = new Blob(audioChunks);
         const audioUrl = URL.createObjectURL(audioBlob);
         this.props.setAudioFiles(audioBlob);
-        // const audio = new Audio(audioUrl);
-        // audio.controls = true;
         this.setState({
-          // audio,
           audioBlob,
           audioUrl
         });
@@ -47,7 +42,6 @@ class Recorder extends Component {
   render() {
     return (
       <div>
-        {/* <div>audioChunks:</div> */}
         <div>
           {this.state.audioChunks ? this.state.audioChunks.length : null}
         </div>
@@ -55,22 +49,19 @@ class Recorder extends Component {
         <button
           onClick={() => {
             this.mediaRecorder.stop();
-            this.props.movePointer(false);
+            this.props.movePointer(false, true);
           }}
         >
           stop
         </button>
         <button
           onClick={() => {
-            // this.state.audio.play();
-            // this.setState({ audioBlob: null });
             this.setState({ audioChunks: [] });
+            this.props.clearRecord();
           }}
         >
           clear record
-          {/* play */}
         </button>
-        {/* {this.state.audioBlob && <Player audio={this.state.audio} />} */}
       </div>
     );
   }
@@ -78,7 +69,8 @@ class Recorder extends Component {
 
 Recorder.propTypes = {
   setAudioFiles: PropTypes.func.isRequired,
-  movePointer: PropTypes.func.isRequired
+  movePointer: PropTypes.func.isRequired,
+  clearRecord: PropTypes.func.isRequired
 };
 
 export default Recorder;
