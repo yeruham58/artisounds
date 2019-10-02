@@ -1,5 +1,14 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import Crunker from "crunker";
+
+import {
+  setIsRecording,
+  setBuffersList,
+  setRecordsDic,
+  setAudioStartTime
+} from "../../actions/audioEditorActions";
 
 class Recorder extends Component {
   constructor(props) {
@@ -15,11 +24,12 @@ class Recorder extends Component {
   }
 
   startRecord() {
+    this.setRecordStartTime();
     navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
       const mediaRecorder = new MediaRecorder(stream);
       this.mediaRecorder = mediaRecorder;
       this.mediaRecorder.start();
-      this.props.movePointer(true, true);
+      this.props.setIsRecording(true);
 
       const audioChunks = this.state.audioBlob ? this.state.audioChunks : [];
       this.mediaRecorder.addEventListener("dataavailable", event => {
@@ -30,13 +40,39 @@ class Recorder extends Component {
       this.mediaRecorder.addEventListener("stop", () => {
         const audioBlob = new Blob(audioChunks);
         const audioUrl = URL.createObjectURL(audioBlob);
-        this.props.setAudioFiles(audioBlob);
+        let audio = new Crunker();
+        audio.fetchAudio(audioUrl, audioUrl).then(buffers => {
+          const buffersList = [...this.props.editor.buffersList, buffers[0]];
+          const recordsDic = {
+            ...this.props.editor.recordsDic,
+            [window.location.href.split("/")[
+              window.location.href.split("/").length - 1
+            ]]: {
+              duration: buffers[0].duration
+            }
+          };
+          this.props.setBuffersList(buffersList);
+          this.props.setRecordsDic(recordsDic);
+        });
         this.setState({
           audioBlob,
           audioUrl
         });
       });
     });
+  }
+
+  setRecordStartTime() {
+    const instrumentRecord = this.props.editor.recordsDic[
+      window.location.href.split("/")[
+        window.location.href.split("/").length - 1
+      ]
+    ];
+    const startTime =
+      instrumentRecord && instrumentRecord.duration
+        ? instrumentRecord.duration
+        : 0.0000000001;
+    this.props.setAudioStartTime(startTime);
   }
 
   render() {
@@ -49,7 +85,7 @@ class Recorder extends Component {
         <button
           onClick={() => {
             this.mediaRecorder.stop();
-            this.props.movePointer(false, true);
+            this.props.setIsRecording(false);
           }}
         >
           stop
@@ -68,9 +104,18 @@ class Recorder extends Component {
 }
 
 Recorder.propTypes = {
-  setAudioFiles: PropTypes.func.isRequired,
-  movePointer: PropTypes.func.isRequired,
+  setIsRecording: PropTypes.func.isRequired,
+  setBuffersList: PropTypes.func.isRequired,
+  setRecordsDic: PropTypes.func.isRequired,
   clearRecord: PropTypes.func.isRequired
 };
 
-export default Recorder;
+const mapStateToProps = state => ({
+  editor: state.audioEditor
+});
+
+export default connect(
+  mapStateToProps,
+
+  { setIsRecording, setBuffersList, setRecordsDic, setAudioStartTime }
+)(Recorder);

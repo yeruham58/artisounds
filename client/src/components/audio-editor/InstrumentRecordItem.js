@@ -2,24 +2,20 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import Recorder from "./Recorder";
+import RecordCanvas from "./RecordCanvas";
 
 class InstrumentRecordItem extends Component {
   render() {
     return (
       <div>
-        <Recorder
-          setAudioFiles={this.props.setAudioFiles}
-          movePointer={this.props.movePointer}
-          clearRecord={this.props.clearRecord}
-        />
+        <Recorder clearRecord={this.props.clearRecord} />
+        <RecordCanvas />
       </div>
     );
   }
 }
 
 InstrumentRecordItem.propTypes = {
-  setAudioFiles: PropTypes.func.isRequired,
-  movePointer: PropTypes.func.isRequired,
   clearRecord: PropTypes.func.isRequired
 };
 

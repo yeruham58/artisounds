@@ -2,69 +2,72 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
-import Crunker from "crunker";
-
-import InstrumentRecordFeed from "./InstrumentRecordFeed";
 import RecordingTopRuler from "./RecordingTopRuler";
 import Spinner from "../common/Spinner";
 import { getProject, clearProject } from "../../actions/projectActions";
+import {
+  setAudioBuffer,
+  setAudioStartTime
+} from "../../actions/audioEditorActions";
 import Player from "./Player";
+import Recorder from "./Recorder";
 
 class WorkZone extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      audioStartTime: 0,
       movePointer: false,
-      analyser: null,
-      audio: null,
-      context: null,
       buffersList: [],
+      setingBuffersList: false,
+      isPlaying: false,
+      isRecording: false,
       recordsDic: {}
     };
-    this.setAudioFilesInPlayer = this.setAudioFilesInPlayer.bind(this);
-    this.setAudioStartTime = this.setAudioStartTime.bind(this);
-    this.initPlayer = this.initPlayer.bind(this);
-    this.setBuffersList = this.setBuffersList.bind(this);
-    this.movePointerInPlayOrRecord = this.movePointerInPlayOrRecord.bind(this);
+    this.setBuffer = this.setBuffer.bind(this);
     this.clearRecord = this.clearRecord.bind(this);
   }
   componentDidMount() {
     this.props.getProject(this.props.match.params.projectId);
   }
 
-  setBuffersList(audioFile) {
-    const audioUrl = URL.createObjectURL(audioFile);
-    let audio = new Crunker();
-    audio.fetchAudio(audioUrl, audioUrl).then(buffers => {
-      const buffersList = [...this.state.buffersList, buffers[0]];
-      this.setState({
-        buffersList,
-        recordsDic: {
-          ...this.state.recordsDic,
-          [this.props.match.params.instrumentId.toString]: {
-            duration: buffers[0].duration
-          }
-        }
-      });
-      this.setAudioFilesInPlayer(null);
-    });
-  }
-
-  setAudioFilesInPlayer(audioFile) {
-    if (audioFile) {
-      this.setBuffersList(audioFile);
-    } else {
-      const mergedBuffer = this.mergeBuffers(this.state.buffersList);
-
-      if (this.state.context) {
-        this.state.context.close().then(() => {
-          this.initPlayer(mergedBuffer);
+  componentWillReceiveProps(nextProp) {
+    if (nextProp.editor) {
+      if (nextProp.editor.buffersList[0] && !this.state.setingBuffersList) {
+        this.setState({
+          setingBuffersList: true,
+          buffersList: nextProp.editor.buffersList
         });
-      } else {
-        this.initPlayer(mergedBuffer);
+        setTimeout(() => {
+          this.setBuffer(nextProp.editor.buffersList);
+        }, 100);
+      }
+      if (nextProp.editor.buffersList[0] && this.state.setingBuffersList) {
+        this.setState({
+          setingBuffersList: false,
+          buffersList: nextProp.editor.buffersList
+        });
+      }
+      if (nextProp.editor.audioStartTime) {
+        this.setState({ audioStartTime: nextProp.editor.audioStartTime });
+      }
+      if (Object.keys(nextProp.editor).indexOf("isPlaying") > 0) {
+        if (nextProp.editor.isPlaying && !this.state.isPlaying) {
+          this.setState({ isPlaying: true });
+        }
+        if (!nextProp.editor.isPlaying && this.state.isPlaying) {
+          this.setBuffer();
+          this.setState({ isPlaying: false });
+        }
       }
     }
+  }
+
+  setBuffer() {
+    const mergedBuffer = this.mergeBuffers(this.state.buffersList);
+    this.setState({
+      audio: mergedBuffer
+    });
+    this.props.setAudioBuffer(mergedBuffer);
   }
 
   mergeBuffers(buffers) {
@@ -109,43 +112,7 @@ class WorkZone extends Component {
     // connect the AudioBufferSourceNode to the
     // destination so we can hear the sound
     source.connect(ac.destination);
-
-    // start the source playing
     return source;
-  }
-
-  initPlayer(audioFile) {
-    const audio = audioFile;
-    const context = audioFile.context;
-    const analyser = context.createAnalyser();
-    audioFile.connect(analyser);
-    analyser.connect(context.destination);
-
-    this.setState({
-      analyser,
-      audio,
-      context
-    });
-  }
-
-  movePointerInPlayOrRecord(playingNow, isRecord) {
-    const instrumentRecord = this.state.recordsDic[
-      this.props.match.params.instrumentId.toString
-    ];
-    if (isRecord) {
-      console.log("instrumentRecord");
-      console.log(instrumentRecord);
-      const startTime =
-        instrumentRecord && instrumentRecord.duration
-          ? instrumentRecord.duration
-          : 0.0000000001;
-      this.setAudioStartTime(startTime);
-    }
-    this.setState({ movePointer: playingNow });
-  }
-
-  setAudioStartTime(startTime) {
-    this.setState({ audioStartTime: startTime });
   }
 
   clearRecord() {
@@ -171,37 +138,22 @@ class WorkZone extends Component {
         <div className="container">
           <div className="row">
             <div className="col-md-12">
-              <button
-                type="button"
-                className="btn btn-light mb-3"
-                onClick={() => window.history.back()}
-              >
-                Back
-              </button>
-              {this.state.audio && this.state.context && (
-                <Player
-                  audio={this.state.audio}
-                  audioStartTime={this.state.audioStartTime}
-                  analyser={this.state.analyser}
-                  setAudioFiles={this.setAudioFilesInPlayer}
-                  movePointer={this.movePointerInPlayOrRecord}
-                />
-              )}
-              <RecordingTopRuler
-                project={this.props.project.project}
-                pointerStartPoint={this.state.audioStartTime}
-                movePointer={this.state.movePointer}
-                setStartTime={this.setAudioStartTime}
-              />
-
-              {project.instruments && project.instruments[0] ? (
-                <InstrumentRecordFeed
-                  instruments={project.instruments}
-                  setAudioFiles={this.setAudioFilesInPlayer}
-                  movePointer={this.movePointerInPlayOrRecord}
-                  clearRecord={this.clearRecord}
-                />
-              ) : null}
+              <div>
+                <button
+                  type="button"
+                  className="btn btn-light mb-3"
+                  onClick={() => window.history.back()}
+                >
+                  Back
+                </button>
+                <Recorder clearRecord={this.clearRecord} />
+                <div className="text-center">
+                  <Player />
+                </div>
+              </div>
+              <div style={{ height: "10px" }}>
+                <RecordingTopRuler clearRecord={this.clearRecord} />
+              </div>
             </div>
           </div>
         </div>
@@ -213,6 +165,7 @@ class WorkZone extends Component {
 WorkZone.propTypes = {
   getProject: PropTypes.func.isRequired,
   clearProject: PropTypes.func.isRequired,
+  setAudioBuffer: PropTypes.func.isRequired,
   project: PropTypes.object.isRequired,
   auth: PropTypes.object.isRequired
 };
@@ -220,7 +173,8 @@ WorkZone.propTypes = {
 const mapStateToProps = state => ({
   project: state.project,
   auth: state.auth,
-  profile: state.profile
+  profile: state.profile,
+  editor: state.audioEditor
 });
 
 export default connect(
@@ -228,6 +182,8 @@ export default connect(
 
   {
     getProject,
-    clearProject
+    clearProject,
+    setAudioBuffer,
+    setAudioStartTime
   }
 )(WorkZone);

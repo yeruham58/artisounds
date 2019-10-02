@@ -1,5 +1,8 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
+
+import { setIsPlaying } from "../../actions/audioEditorActions";
 
 // import range from "../common/RangeSlider";
 
@@ -10,11 +13,9 @@ class Player extends Component {
     this.canvasRef = React.createRef();
 
     this.state = {
-      currentAudio: this.props.audio,
-      audioStartTime: this.props.audioStartTime,
-      pointerCurrentPos: this.props.audioStartTime,
-      isPlaing: false,
-      analyser: this.props.analyser,
+      currentAudio: null,
+      audioStartTime: this.props.editor.audioStartTime,
+      analyser: null,
       canvas: null,
       ctx: null
     };
@@ -25,45 +26,37 @@ class Player extends Component {
     this.onStop = this.onStop.bind(this);
   }
 
-  componentDidMount() {
-    this.initPlayer(this.props.audio);
-  }
-
   componentWillReceiveProps(nextProp) {
-    if (
-      nextProp.audio &&
-      nextProp.audio !== this.state.currentAudio &&
-      this.state.currentAudio
-    ) {
-      this.setState({
-        currentAudio: nextProp.audio,
-        analyser: nextProp.analyser
-      });
-
-      this.initPlayer(nextProp.audio);
+    if (nextProp.editor && nextProp.editor.audioBuffer) {
+      this.setState({ currentAudio: nextProp.editor.audioBuffer });
+      this.initPlayer(nextProp.editor.audioBuffer);
     }
 
-    if (nextProp.audioStartTime) {
-      this.setState({ audioStartTime: nextProp.audioStartTime });
+    if (nextProp.editor && nextProp.editor.audioStartTime) {
+      this.setState({ audioStartTime: nextProp.editor.audioStartTime });
     }
   }
 
   // Initialize the player after the page loads all of its HTML into the window
   initPlayer(newAudio) {
-    newAudio.loop = false;
-    newAudio.onended = () => {
+    if (newAudio.context) {
+      const context = newAudio.context;
+      const analyser = context.createAnalyser();
+      newAudio.connect(analyser);
+      analyser.connect(context.destination);
+
+      newAudio.loop = false;
+      newAudio.onended = () => {
+        this.props.setIsPlaying(false);
+      };
+      const canvas = document.getElementById("analyser_render");
+      const ctx = canvas.getContext("2d");
       this.setState({
-        isPlaing: false
+        analyser,
+        canvas,
+        ctx
       });
-      this.props.setAudioFiles(null);
-      this.props.movePointer(false, false);
-    };
-    const canvas = document.getElementById("analyser_render");
-    const ctx = canvas.getContext("2d");
-    this.setState({
-      canvas,
-      ctx
-    });
+    }
   }
 
   // frameLooper() animates any style of graphics you wish to the audio frequency
@@ -71,7 +64,7 @@ class Player extends Component {
   frameLooper() {
     let fbc_array, bars, bar_x, bar_width, bar_height;
     const { ctx, canvas, analyser } = this.state;
-    if (this.state.isPlaing) {
+    if (this.props.editor.isPlaying) {
       // Establish all variables that your Analyser will use
       window.requestAnimationFrame(this.frameLooper);
       if (analyser && ctx && canvas) {
@@ -95,11 +88,9 @@ class Player extends Component {
   }
 
   onPlay() {
-    this.setState({ isPlaing: true });
+    this.props.setIsPlaying(true);
     setTimeout(() => {
       const { currentAudio, audioStartTime } = this.state;
-      console.log("audioStartTime");
-      console.log(audioStartTime);
       if (currentAudio.buffer.duration > audioStartTime) {
         currentAudio.start(
           currentAudio.context.currentTime + 0, // how much time from now it will start,
@@ -108,7 +99,6 @@ class Player extends Component {
         );
       }
       this.frameLooper();
-      this.props.movePointer(true, false);
     }, 500);
   }
 
@@ -116,12 +106,10 @@ class Player extends Component {
     try {
       this.state.currentAudio.stop();
     } catch (err) {
-      console.log("audio is not plaing");
+      console.log("audio is not playing");
     }
 
-    this.setState({ isPlaing: false });
-    this.props.setAudioFiles(null);
-    this.props.movePointer(false, false);
+    this.props.setIsPlaying(false);
   }
 
   render() {
@@ -130,11 +118,8 @@ class Player extends Component {
         <div
           id="audio_player"
           style={{
-            width: "500px",
-            height: "100px",
             background: "#000",
-            padding: "5px",
-            margin: "50px auto"
+            padding: "5px"
           }}
         >
           <canvas
@@ -147,8 +132,12 @@ class Player extends Component {
               float: "left"
             }}
           />
-          <button onClick={this.onPlay}>play</button>
-          <button onClick={this.onStop}>stop</button>
+          <button onClick={this.onPlay} disabled={!this.state.currentAudio}>
+            play
+          </button>
+          <button onClick={this.onStop} disabled={!this.props.editor.isPlaying}>
+            stop
+          </button>
         </div>
       </div>
     );
@@ -156,11 +145,15 @@ class Player extends Component {
 }
 
 Player.propTypes = {
-  audio: PropTypes.object.isRequired,
-  audioStartTime: PropTypes.number.isRequired,
-  analyser: PropTypes.object.isRequired,
-  setAudioFiles: PropTypes.func.isRequired,
-  movePointer: PropTypes.func.isRequired
+  setIsPlaying: PropTypes.func.isRequired
 };
 
-export default Player;
+const mapStateToProps = state => ({
+  editor: state.audioEditor
+});
+
+export default connect(
+  mapStateToProps,
+
+  { setIsPlaying }
+)(Player);

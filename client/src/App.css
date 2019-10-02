@@ -194,7 +194,8 @@ img {
   border-right: 10px solid transparent;
 
   border-top: 10px solid #daa520;
-  height: 500px;
+  /* height: 500px; */
+  height: 100%;
   position: absolute;
   margin-left: -3px;
 }
@@ -202,7 +203,8 @@ img {
 /* record-pointer-line */
 .record-pointer-line {
   border-left: 2px solid #daa520;
-  height: 500px;
+  /* height: 500px; */
+  height: 100%;
   position: absolute;
   left: 0;
   margin-left: -1px;

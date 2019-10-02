@@ -1,5 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
+
+import { setAudioStartTime } from "../../actions/audioEditorActions";
+import InstrumentRecordFeed from "./InstrumentRecordFeed";
 
 class RecordingTopRuler extends Component {
   constructor(props) {
@@ -8,15 +12,17 @@ class RecordingTopRuler extends Component {
     this.pointerRef = React.createRef();
 
     this.state = {
-      pointerStartPoint: this.props.pointerStartPoint,
+      pointerStartPos: this.props.editor.audioStartTime,
       spacing: 60,
       secondsPerBit: 0,
       secondsPerPx: 0,
       scrollNow: false,
       movePointer: false,
       pointerXPos: 0,
-      projectBit: parseInt(this.props.project.bit.split("/")[0]),
-      projectTempo: this.props.project.tempo
+      projectBit: parseInt(this.props.project.project.bit.split("/")[0]),
+      projectTempo: this.props.project.project.tempo,
+      rulerTop: 0,
+      isMoving: false
     };
 
     this.initTimeLine = this.initTimeLine.bind(this);
@@ -26,6 +32,7 @@ class RecordingTopRuler extends Component {
     this.elementDrag = this.elementDrag.bind(this);
     this.scrollCanvas = this.scrollCanvas.bind(this);
     this.getClickPosition = this.getClickPosition.bind(this);
+    this.setRulerTop = this.setRulerTop.bind(this);
   }
 
   componentDidMount() {
@@ -42,28 +49,57 @@ class RecordingTopRuler extends Component {
   }
 
   componentWillReceiveProps(nextProp) {
-    if (Object.keys(nextProp).indexOf("movePointer")) {
-      this.setState({ movePointer: nextProp.movePointer });
-      if (nextProp.movePointer) this.movePointer();
+    if (nextProp.editor) {
+      if (
+        Object.keys(nextProp.editor).indexOf("isPlaying") > 0 ||
+        Object.keys(nextProp.editor).indexOf("isRecording") > 0
+      ) {
+        if (
+          !this.state.movePointer &&
+          (nextProp.editor.isPlaying || nextProp.editor.isRecording)
+        ) {
+          this.setState({
+            movePointer: true
+          });
+        }
+        if (
+          this.state.movePointer &&
+          (!nextProp.editor.isPlaying && !nextProp.editor.isRecording)
+        ) {
+          this.setState({
+            movePointer: false
+          });
+        }
+        if (
+          !this.state.movePointer &&
+          (nextProp.editor.isPlaying || nextProp.editor.isRecording)
+        )
+          setTimeout(() => {
+            this.movePointer();
+          }, 100);
+      }
+
+      if (nextProp.editor.audioStartTime) {
+        this.setState({ pointerStartPos: nextProp.editor.audioStartTime });
+      }
     }
-    if (nextProp.pointerStartPoint) {
-      console.log("nextProp.pointerStartPoint");
-      console.log(nextProp.pointerStartPoint);
-      this.setState({ pointerStartPoint: nextProp.pointerStartPoint });
-    }
+  }
+
+  setRulerTop() {
+    this.setState({
+      rulerTop: document.getElementById("time-line-holder").scrollTop
+    });
   }
 
   movePointer() {
     var elem = document.getElementById("record-pointer-holder");
-    console.log("this.state.pointerStartPoint in ruller");
-    console.log(this.state.pointerStartPoint);
-    var pos = this.state.pointerStartPoint / this.state.secondsPerPx;
+    var pos = this.state.pointerStartPos / this.state.secondsPerPx;
     const { secondsPerBit } = this.state;
     const pxPerBit = this.state.spacing / this.state.projectBit;
     var id = setInterval(() => {
       if (!this.state.movePointer) {
         // pos = 0;
-        this.props.setStartTime(pos * this.state.secondsPerPx);
+        this.props.setAudioStartTime(pos * this.state.secondsPerPx);
         clearInterval(id);
       } else {
         pos += pxPerBit / 100;
@@ -80,7 +116,7 @@ class RecordingTopRuler extends Component {
       const setPoint = e.clientX - canvasPositions.left + canvas.scrollLeft;
       pointer.style.left = setPoint - 7.5 + "px"; // 7.5 is middle width of pointer element
       const audioPointInSeconds = this.state.secondsPerPx * setPoint;
-      this.props.setStartTime(audioPointInSeconds);
+      this.props.setAudioStartTime(audioPointInSeconds);
     }
   }
 
@@ -128,7 +164,7 @@ class RecordingTopRuler extends Component {
           }
           pointer.style.left = setPos + "px";
           const audioPointInSeconds = this.state.secondsPerPx * setPos;
-          this.props.setStartTime(audioPointInSeconds);
+          this.props.setAudioStartTime(audioPointInSeconds);
           timeline.scroll({
             left: scrollNum,
             behavior: "smooth"
@@ -166,7 +202,7 @@ class RecordingTopRuler extends Component {
       } else {
         pointer.style.left = setPos + "px";
         const audioPointInSeconds = this.state.secondsPerPx * setPos;
-        this.props.setStartTime(audioPointInSeconds);
+        this.props.setAudioStartTime(audioPointInSeconds);
       }
     }
   }
@@ -219,29 +255,54 @@ class RecordingTopRuler extends Component {
     });
   }
   render() {
+    const { project } = this.props.project;
     const scaleLine = (
       <div
-        style={{ overflowX: "scroll", height: "80px", position: "relative" }}
+        style={{
+          overflowX: "scroll",
+          position: "relative",
+          // height: "100px"
+          maxHeight: window.innerHeight * 0.75 + "px"
+        }}
         id="time-line-holder"
+        onScroll={this.setRulerTop}
       >
         <canvas
           ref={this.canvasRef}
           id="timeline"
           width={60 * 50}
-          height="50"
+          height="50px"
           style={{
-            background: "#343a40"
+            background: "#343a40",
+            position: "absolute",
+            top: this.state.rulerTop + "px"
           }}
         />
         <div
           ref={this.pointerRef}
           id="record-pointer-holder"
-          style={{ position: "absolute", height: "100%", top: "40px" }}
+          style={{
+            position: "absolute",
+            height: "100%",
+            maxHeight: window.innerHeight * 0.75 - 40 + "px",
+            top: this.state.rulerTop + 40 + "px"
+          }}
         >
           <div className="record-pointer">
             <div className="record-pointer-line" />
           </div>
         </div>
+
+        {project.instruments && project.instruments[0] ? (
+          <div style={{ marginTop: "50px" }}>
+            <InstrumentRecordFeed
+              instruments={project.instruments}
+              setAudioFiles={this.props.setAudioFiles}
+              movePointer={this.props.movePointerFunc}
+              clearRecord={this.props.clearRecord}
+            />
+          </div>
+        ) : null}
       </div>
     );
     return <div id="ruler">{scaleLine}</div>;
@@ -249,10 +310,17 @@ class RecordingTopRuler extends Component {
 }
 
 RecordingTopRuler.propTypes = {
-  setStartTime: PropTypes.func.isRequired,
-  pointerStartPoint: PropTypes.number.isRequired,
   project: PropTypes.object.isRequired,
-  movePointer: PropTypes.bool.isRequired
+  clearRecord: PropTypes.func.isRequired
 };
 
-export default RecordingTopRuler;
+const mapStateToProps = state => ({
+  editor: state.audioEditor,
+  project: state.project
+});
+
+export default connect(
+  mapStateToProps,
+
+  { setAudioStartTime }
+)(RecordingTopRuler);
