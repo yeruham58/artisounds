@@ -28,10 +28,7 @@ class ProjectFeed extends Component {
       return <Spinner />;
     }
     const projectsListToShow = filterdProjects ? filterdProjects : projects;
-    // console.log("filterdProjects");
-    // console.log(filterdProjects);
-    // console.log(Object.keys(this.props.filterdProjects));
-    // console.log(filterdProjects && Object.keys(filterdProjects).length === 0);
+
     return projectsListToShow.map(project => (
       <ProjectItem
         key={project.id}

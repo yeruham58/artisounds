@@ -1,13 +1,15 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import Crunker from "crunker";
 
 import RecordingTopRuler from "./RecordingTopRuler";
 import Spinner from "../common/Spinner";
 import { getProject, clearProject } from "../../actions/projectActions";
 import {
   setAudioBuffer,
-  setAudioStartTime
+  setAudioStartTime,
+  setRecordsDic
 } from "../../actions/audioEditorActions";
 import Player from "./Player";
 import Recorder from "./Recorder";
@@ -17,34 +19,37 @@ class WorkZone extends Component {
     super(props);
     this.state = {
       movePointer: false,
-      buffersList: [],
-      setingBuffersList: false,
+      setingRecordsDic: false,
       isPlaying: false,
       isRecording: false,
       recordsDic: {}
     };
+    this.initAudioDic = this.initAudioDic.bind(this);
+    this.initBuffersList = this.initBuffersList.bind(this);
     this.setBuffer = this.setBuffer.bind(this);
     this.clearRecord = this.clearRecord.bind(this);
   }
   componentDidMount() {
     this.props.getProject(this.props.match.params.projectId);
+    setTimeout(() => {
+      this.initAudioDic();
+    }, 100);
   }
 
   componentWillReceiveProps(nextProp) {
     if (nextProp.editor) {
-      if (nextProp.editor.buffersList[0] && !this.state.setingBuffersList) {
+      if (nextProp.editor.recordsDic && !this.state.setingRecordsDic) {
         this.setState({
-          setingBuffersList: true,
-          buffersList: nextProp.editor.buffersList
+          setingRecordsDic: true
         });
         setTimeout(() => {
-          this.setBuffer(nextProp.editor.buffersList);
+          this.initBuffersList();
         }, 100);
       }
-      if (nextProp.editor.buffersList[0] && this.state.setingBuffersList) {
+
+      if (nextProp.editor.recordsDic && this.state.setingRecordsDic) {
         this.setState({
-          setingBuffersList: false,
-          buffersList: nextProp.editor.buffersList
+          setingRecordsDic: false
         });
       }
       if (nextProp.editor.audioStartTime) {
@@ -55,18 +60,54 @@ class WorkZone extends Component {
           this.setState({ isPlaying: true });
         }
         if (!nextProp.editor.isPlaying && this.state.isPlaying) {
-          this.setBuffer();
+          this.initBuffersList();
           this.setState({ isPlaying: false });
         }
       }
     }
   }
 
-  setBuffer() {
-    const mergedBuffer = this.mergeBuffers(this.state.buffersList);
-    this.setState({
-      audio: mergedBuffer
+  initAudioDic() {
+    const { instruments } = this.props.project.project;
+    const recordsDic = {};
+    instruments.forEach(instrument => {
+      recordsDic[instrument.id] = {};
+      const audioUrl = instrument.record_url ? instrument.record_url : null;
+      let audio = new Crunker();
+      if (audioUrl) {
+        audio
+          .fetchAudio(audioUrl, audioUrl)
+          .then(buffers => {
+            recordsDic[instrument.id].duration = buffers[0].duration;
+            recordsDic[instrument.id].buffer = buffers[0];
+          })
+          .catch(() => {
+            // err in Crunker create buffer
+            console.log("err in Crunker create buffer");
+            recordsDic[instrument.id].duration = null;
+            recordsDic[instrument.id].buffer = null;
+          });
+      } else {
+        recordsDic[instrument.id].duration = null;
+        recordsDic[instrument.id].buffer = null;
+      }
     });
+    this.props.setRecordsDic(recordsDic);
+  }
+
+  initBuffersList() {
+    const { recordsDic } = this.props.editor;
+    const buffersList = [];
+    for (var key in recordsDic) {
+      if (recordsDic[key].buffer) {
+        buffersList.push(recordsDic[key].buffer);
+      }
+    }
+    this.setBuffer(buffersList);
+  }
+
+  setBuffer(buffersList) {
+    const mergedBuffer = buffersList[0] ? this.mergeBuffers(buffersList) : null;
     this.props.setAudioBuffer(mergedBuffer);
   }
 
@@ -146,13 +187,13 @@ class WorkZone extends Component {
                 >
                   Back
                 </button>
-                <Recorder clearRecord={this.clearRecord} />
+                <Recorder />
                 <div className="text-center">
                   <Player />
                 </div>
               </div>
               <div style={{ height: "10px" }}>
-                <RecordingTopRuler clearRecord={this.clearRecord} />
+                <RecordingTopRuler />
               </div>
             </div>
           </div>
@@ -166,6 +207,7 @@ WorkZone.propTypes = {
   getProject: PropTypes.func.isRequired,
   clearProject: PropTypes.func.isRequired,
   setAudioBuffer: PropTypes.func.isRequired,
+  setRecordsDic: PropTypes.func.isRequired,
   project: PropTypes.object.isRequired,
   auth: PropTypes.object.isRequired
 };
@@ -184,6 +226,7 @@ export default connect(
     getProject,
     clearProject,
     setAudioBuffer,
-    setAudioStartTime
+    setAudioStartTime,
+    setRecordsDic
   }
 )(WorkZone);

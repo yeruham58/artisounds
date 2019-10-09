@@ -1,15 +1,15 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 
 class RecordCanvas extends Component {
   constructor(props) {
     super(props);
     this.canvasRef = React.createRef();
     this.state = {
-      recording: false,
-      recordLen: 80,
-      lineLen: 60 * 50,
-      secondsPerBit: 0,
-      pxPerBit: 0
+      isRecording: false,
+      recordLen: 0,
+      recordLineWidth: 0,
+      lineLen: 60 * 50
     };
 
     this.createRecordLine = this.createRecordLine.bind(this);
@@ -21,8 +21,20 @@ class RecordCanvas extends Component {
   }
 
   componentWillReceiveProps(nextProp) {
-    if (Object.keys(nextProp).indexOf("recording") > 0) {
-      this.setState({ recording: nextProp.recording });
+    if (nextProp.editor.recordsDic && nextProp.editor.recordsDic["101"]) {
+      const recordLen = nextProp.editor.recordsDic["101"].duration
+        ? nextProp.editor.recordsDic["101"].duration
+        : 0;
+      this.setState({
+        isRecording: nextProp.editor.isRecording,
+        recordLen: recordLen,
+        recordLineWidth: recordLen / nextProp.editor.secondsPerPx
+      });
+      if (nextProp.editor.isRecording && !this.state.isRecording) {
+        this.setRecordLineInRecord();
+      } else {
+        this.createRecordLine();
+      }
     }
   }
 
@@ -33,25 +45,26 @@ class RecordCanvas extends Component {
     // Create gradient
     var grd = context.createLinearGradient(0, 0, 200, 0);
     grd.addColorStop(0, "red");
-    grd.addColorStop(1, "white");
 
     // Fill with gradient
     context.fillStyle = grd;
-    context.fillRect(2, 2, this.state.recordLen, 86);
+    context.fillRect(2, 2, this.state.recordLineWidth, 86);
   }
 
   setRecordLineInRecord() {
-    var width = 100;
-    const { secondsPerBit, pxPerBit } = this.state;
+    const { pxPerBit, secondsPerBit } = this.props.editor;
+    var width = this.state.recordLineWidth;
     var id = setInterval(() => {
-      if (!this.state.recording) {
+      if (!this.state.isRecording) {
         clearInterval(id);
       } else {
-        width += pxPerBit / 100;
-        this.setState({ recordLen: width });
+        width += pxPerBit / 15;
+        this.setState({
+          recordLineWidth: width
+        });
         this.createRecordLine();
       }
-    }, (secondsPerBit * 1000) / 100);
+    }, (secondsPerBit * 1000) / 15);
   }
 
   render() {
@@ -76,7 +89,7 @@ class RecordCanvas extends Component {
               style={{
                 background: "white",
                 borderRadius: "3px",
-                width: this.state.recordLen,
+                width: this.state.recordLineWidth,
                 height: "88px",
                 marginLeft: "8px"
               }}
@@ -84,7 +97,7 @@ class RecordCanvas extends Component {
               <canvas
                 ref={this.canvasRef}
                 id="recordLine"
-                width={this.state.recordLen - 2}
+                width={this.state.recordLineWidth - 2}
                 height="86"
               />
             </div>
@@ -95,4 +108,12 @@ class RecordCanvas extends Component {
   }
 }
 
-export default RecordCanvas;
+const mapStateToProps = state => ({
+  editor: state.audioEditor
+});
+
+export default connect(
+  mapStateToProps,
+
+  {}
+)(RecordCanvas);

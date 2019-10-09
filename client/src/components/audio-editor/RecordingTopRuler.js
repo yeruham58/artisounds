@@ -2,7 +2,12 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
-import { setAudioStartTime } from "../../actions/audioEditorActions";
+import {
+  setAudioStartTime,
+  setSecondsPerBit,
+  setPxPerBit,
+  setSecondsPerPx
+} from "../../actions/audioEditorActions";
 import InstrumentRecordFeed from "./InstrumentRecordFeed";
 
 class RecordingTopRuler extends Component {
@@ -22,7 +27,8 @@ class RecordingTopRuler extends Component {
       projectBit: parseInt(this.props.project.project.bit.split("/")[0]),
       projectTempo: this.props.project.project.tempo,
       rulerTop: 0,
-      isMoving: false
+      isMoving: false,
+      audioPointInSeconds: 0
     };
 
     this.initTimeLine = this.initTimeLine.bind(this);
@@ -43,9 +49,13 @@ class RecordingTopRuler extends Component {
     canvas.addEventListener("click", this.getClickPosition, false);
 
     const secondsPerBit = 60 / this.state.projectTempo;
-    const secondsPerPx =
-      secondsPerBit / (this.state.spacing / this.state.projectBit);
+    const pxPerBit = this.state.spacing / this.state.projectBit;
+    const secondsPerPx = secondsPerBit / pxPerBit;
+
     this.setState({ secondsPerBit, secondsPerPx });
+    this.props.setPxPerBit(pxPerBit);
+    this.props.setSecondsPerBit(secondsPerBit);
+    this.props.setSecondsPerPx(secondsPerPx);
   }
 
   componentWillReceiveProps(nextProp) {
@@ -74,9 +84,10 @@ class RecordingTopRuler extends Component {
           !this.state.movePointer &&
           (nextProp.editor.isPlaying || nextProp.editor.isRecording)
         )
-          setTimeout(() => {
-            this.movePointer();
-          }, 100);
+          this.movePointer();
+        // setTimeout(() => {
+        //   this.movePointer();
+        // }, 10);
       }
 
       if (nextProp.editor.audioStartTime) {
@@ -99,13 +110,14 @@ class RecordingTopRuler extends Component {
     var id = setInterval(() => {
       if (!this.state.movePointer) {
         // pos = 0;
+        console.log("gonna clear");
         this.props.setAudioStartTime(pos * this.state.secondsPerPx);
         clearInterval(id);
       } else {
-        pos += pxPerBit / 100;
+        pos += pxPerBit / 15;
         elem.style.left = pos + "px";
       }
-    }, (secondsPerBit * 1000) / 100);
+    }, (secondsPerBit * 1000) / 15);
   }
 
   getClickPosition(e) {
@@ -163,8 +175,6 @@ class RecordingTopRuler extends Component {
             scrollNum = timeline.scrollLeft - 10;
           }
           pointer.style.left = setPos + "px";
-          const audioPointInSeconds = this.state.secondsPerPx * setPos;
-          this.props.setAudioStartTime(audioPointInSeconds);
           timeline.scroll({
             left: scrollNum,
             behavior: "smooth"
@@ -190,7 +200,7 @@ class RecordingTopRuler extends Component {
       var pointer = document.getElementById("record-pointer-holder");
 
       let setPos =
-        pointer.offsetLeft - newPos > 0 ? pointer.offsetLeft - newPos : 0;
+        pointer.offsetLeft - newPos > 0.5 ? pointer.offsetLeft - newPos : 0.5;
       if (setPos > 50 * this.state.spacing) setPos = 50 * this.state.spacing;
 
       if (
@@ -202,7 +212,7 @@ class RecordingTopRuler extends Component {
       } else {
         pointer.style.left = setPos + "px";
         const audioPointInSeconds = this.state.secondsPerPx * setPos;
-        this.props.setAudioStartTime(audioPointInSeconds);
+        this.setState({ audioPointInSeconds });
       }
     }
   }
@@ -211,6 +221,10 @@ class RecordingTopRuler extends Component {
     /* stop moving when mouse button is released:*/
     document.onmouseup = null;
     document.onmousemove = null;
+    setTimeout(() => {
+      this.props.setAudioStartTime(this.state.audioPointInSeconds);
+    }, 20);
+
     this.setState({ scrollNow: false });
   }
 
@@ -295,12 +309,7 @@ class RecordingTopRuler extends Component {
 
         {project.instruments && project.instruments[0] ? (
           <div style={{ marginTop: "50px" }}>
-            <InstrumentRecordFeed
-              instruments={project.instruments}
-              setAudioFiles={this.props.setAudioFiles}
-              movePointer={this.props.movePointerFunc}
-              clearRecord={this.props.clearRecord}
-            />
+            <InstrumentRecordFeed instruments={project.instruments} />
           </div>
         ) : null}
       </div>
@@ -311,7 +320,9 @@ class RecordingTopRuler extends Component {
 
 RecordingTopRuler.propTypes = {
   project: PropTypes.object.isRequired,
-  clearRecord: PropTypes.func.isRequired
+  setPxPerBit: PropTypes.func.isRequired,
+  setSecondsPerPx: PropTypes.func.isRequired,
+  setSecondsPerBit: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -322,5 +333,5 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
 
-  { setAudioStartTime }
+  { setAudioStartTime, setSecondsPerBit, setPxPerBit, setSecondsPerPx }
 )(RecordingTopRuler);

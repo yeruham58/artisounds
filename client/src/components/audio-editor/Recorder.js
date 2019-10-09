@@ -5,7 +5,6 @@ import Crunker from "crunker";
 
 import {
   setIsRecording,
-  setBuffersList,
   setRecordsDic,
   setAudioStartTime
 } from "../../actions/audioEditorActions";
@@ -21,6 +20,7 @@ class Recorder extends Component {
     };
 
     this.startRecord = this.startRecord.bind(this);
+    this.clearRecord = this.clearRecord.bind(this);
   }
 
   startRecord() {
@@ -42,16 +42,17 @@ class Recorder extends Component {
         const audioUrl = URL.createObjectURL(audioBlob);
         let audio = new Crunker();
         audio.fetchAudio(audioUrl, audioUrl).then(buffers => {
-          const buffersList = [...this.props.editor.buffersList, buffers[0]];
+          console.log("buffers[0].duration");
+          console.log(buffers[0].duration);
           const recordsDic = {
             ...this.props.editor.recordsDic,
             [window.location.href.split("/")[
               window.location.href.split("/").length - 1
             ]]: {
-              duration: buffers[0].duration
+              duration: buffers[0].duration,
+              buffer: buffers[0]
             }
           };
-          this.props.setBuffersList(buffersList);
           this.props.setRecordsDic(recordsDic);
         });
         this.setState({
@@ -71,8 +72,21 @@ class Recorder extends Component {
     const startTime =
       instrumentRecord && instrumentRecord.duration
         ? instrumentRecord.duration
-        : 0.0000000001;
+        : 0.0;
     this.props.setAudioStartTime(startTime);
+  }
+
+  clearRecord() {
+    const recordsDic = {
+      ...this.props.editor.recordsDic,
+      [window.location.href.split("/")[
+        window.location.href.split("/").length - 1
+      ]]: {
+        duration: null,
+        buffer: null
+      }
+    };
+    this.props.setRecordsDic(recordsDic);
   }
 
   render() {
@@ -93,7 +107,7 @@ class Recorder extends Component {
         <button
           onClick={() => {
             this.setState({ audioChunks: [] });
-            this.props.clearRecord();
+            this.clearRecord();
           }}
         >
           clear record
@@ -105,9 +119,7 @@ class Recorder extends Component {
 
 Recorder.propTypes = {
   setIsRecording: PropTypes.func.isRequired,
-  setBuffersList: PropTypes.func.isRequired,
-  setRecordsDic: PropTypes.func.isRequired,
-  clearRecord: PropTypes.func.isRequired
+  setRecordsDic: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -117,5 +129,5 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
 
-  { setIsRecording, setBuffersList, setRecordsDic, setAudioStartTime }
+  { setIsRecording, setRecordsDic, setAudioStartTime }
 )(Recorder);

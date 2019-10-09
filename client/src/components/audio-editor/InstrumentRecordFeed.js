@@ -9,18 +9,14 @@ class InstrumentRecordFeed extends Component {
 
     return instruments.map(instrument => (
       <span key={instrument.id}>
-        <InstrumentRecordItem
-          instrument={instrument}
-          clearRecord={this.props.clearRecord}
-        />
+        <InstrumentRecordItem instrument={instrument} />
       </span>
     ));
   }
 }
 
 InstrumentRecordFeed.propTypes = {
-  instruments: PropTypes.array.isRequired,
-  clearRecord: PropTypes.func.isRequired
+  instruments: PropTypes.array.isRequired
 };
 
 export default InstrumentRecordFeed;

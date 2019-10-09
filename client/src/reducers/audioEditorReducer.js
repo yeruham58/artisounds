@@ -2,9 +2,11 @@ import {
   SET_IS_PLAYING,
   SET_IS_RECORDING,
   SET_AUDIO_START_TIME,
-  SET_BUFFERS_LIST,
   SET_RECORDS_DIC,
-  SET_AUDIO_BUFFER
+  SET_AUDIO_BUFFER,
+  SET_PX_PER_BIT,
+  SET_SECONDS_PER_BIT,
+  SET_SECONDS_PER_PX
 } from "../actions/types";
 
 const initialState = {
@@ -13,7 +15,10 @@ const initialState = {
   audioStartTime: 0,
   audioBuffer: null,
   buffersList: [],
-  recordsDic: {}
+  recordsDic: {},
+  pxPerBit: 0,
+  secondsPerBit: 0,
+  secondsPerPx: 0.0001
 };
 
 export default function(state = initialState, action) {
@@ -33,11 +38,6 @@ export default function(state = initialState, action) {
         ...state,
         audioStartTime: action.payload
       };
-    case SET_BUFFERS_LIST:
-      return {
-        ...state,
-        buffersList: action.payload
-      };
     case SET_RECORDS_DIC:
       return {
         ...state,
@@ -47,6 +47,21 @@ export default function(state = initialState, action) {
       return {
         ...state,
         audioBuffer: action.payload
+      };
+    case SET_PX_PER_BIT:
+      return {
+        ...state,
+        pxPerBit: action.payload
+      };
+    case SET_SECONDS_PER_BIT:
+      return {
+        ...state,
+        secondsPerBit: action.payload
+      };
+    case SET_SECONDS_PER_PX:
+      return {
+        ...state,
+        secondsPerPx: action.payload
       };
     default:
       return state;

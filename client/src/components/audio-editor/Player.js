@@ -14,7 +14,10 @@ class Player extends Component {
 
     this.state = {
       currentAudio: null,
-      audioStartTime: this.props.editor.audioStartTime,
+      audioStartTime:
+        this.props.editor.audioStartTime > 0
+          ? this.props.editor.audioStartTime
+          : 0,
       analyser: null,
       canvas: null,
       ctx: null
@@ -27,9 +30,11 @@ class Player extends Component {
   }
 
   componentWillReceiveProps(nextProp) {
-    if (nextProp.editor && nextProp.editor.audioBuffer) {
+    if (nextProp.editor) {
       this.setState({ currentAudio: nextProp.editor.audioBuffer });
-      this.initPlayer(nextProp.editor.audioBuffer);
+      if (nextProp.editor.audioBuffer) {
+        this.initPlayer(nextProp.editor.audioBuffer);
+      }
     }
 
     if (nextProp.editor && nextProp.editor.audioStartTime) {
@@ -91,11 +96,15 @@ class Player extends Component {
     this.props.setIsPlaying(true);
     setTimeout(() => {
       const { currentAudio, audioStartTime } = this.state;
+      const { duration } = currentAudio.buffer;
       if (currentAudio.buffer.duration > audioStartTime) {
         currentAudio.start(
-          currentAudio.context.currentTime + 0, // how much time from now it will start,
+          // currentAudio.context.currentTime + 0, // how much time from now it will start,
+          0, // how much time from now it will start,
           audioStartTime,
-          currentAudio.buffer.duration - audioStartTime
+          duration - audioStartTime - currentAudio.context.currentTime > 0
+            ? duration - audioStartTime - currentAudio.context.currentTime
+            : duration - audioStartTime
         );
       }
       this.frameLooper();
