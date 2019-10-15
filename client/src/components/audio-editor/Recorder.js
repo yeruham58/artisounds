@@ -13,14 +13,39 @@ class Recorder extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      currentInstrumentId: window.location.href.split("/")[
+        window.location.href.split("/").length - 1
+      ],
       audio: null,
       audioUrl: null,
       audioBlob: null,
-      audioChunks: null
+      audioChunks: null,
+      isRecording: false
     };
 
     this.startRecord = this.startRecord.bind(this);
-    this.clearRecord = this.clearRecord.bind(this);
+  }
+
+  componentWillReceiveProps(nextProp) {
+    if (nextProp.editor) {
+      if (nextProp.editor.isRecording && !this.state.isRecording) {
+        this.setState({ isRecording: true });
+        // timeOut becouse thre is time out in the pointer
+        setTimeout(() => {
+          this.startRecord();
+        }, 100);
+      }
+      if (!nextProp.editor.isRecording && this.state.isRecording) {
+        this.setState({ isRecording: false });
+        this.mediaRecorder.stop();
+      }
+      if (
+        nextProp.editor.recordsDic[this.state.currentInstrumentId] &&
+        !nextProp.editor.recordsDic[this.state.currentInstrumentId].duration
+      ) {
+        this.setState({ audioChunks: [] });
+      }
+    }
   }
 
   startRecord() {
@@ -42,8 +67,6 @@ class Recorder extends Component {
         const audioUrl = URL.createObjectURL(audioBlob);
         let audio = new Crunker();
         audio.fetchAudio(audioUrl, audioUrl).then(buffers => {
-          console.log("buffers[0].duration");
-          console.log(buffers[0].duration);
           const recordsDic = {
             ...this.props.editor.recordsDic,
             [window.location.href.split("/")[
@@ -69,51 +92,16 @@ class Recorder extends Component {
         window.location.href.split("/").length - 1
       ]
     ];
+    // we shoud set to 00.01 so the new props will recognize a change, we need it after clear record
     const startTime =
       instrumentRecord && instrumentRecord.duration
         ? instrumentRecord.duration
-        : 0.0;
+        : 0.0000001;
     this.props.setAudioStartTime(startTime);
   }
 
-  clearRecord() {
-    const recordsDic = {
-      ...this.props.editor.recordsDic,
-      [window.location.href.split("/")[
-        window.location.href.split("/").length - 1
-      ]]: {
-        duration: null,
-        buffer: null
-      }
-    };
-    this.props.setRecordsDic(recordsDic);
-  }
-
   render() {
-    return (
-      <div>
-        <div>
-          {this.state.audioChunks ? this.state.audioChunks.length : null}
-        </div>
-        <button onClick={this.startRecord}>start</button>
-        <button
-          onClick={() => {
-            this.mediaRecorder.stop();
-            this.props.setIsRecording(false);
-          }}
-        >
-          stop
-        </button>
-        <button
-          onClick={() => {
-            this.setState({ audioChunks: [] });
-            this.clearRecord();
-          }}
-        >
-          clear record
-        </button>
-      </div>
-    );
+    return <div></div>;
   }
 }
 

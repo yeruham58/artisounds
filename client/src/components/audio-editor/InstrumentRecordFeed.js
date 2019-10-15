@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import InstrumentRecordItem from "./InstrumentRecordItem";
+// import InstrumentRecordItem from "./InstrumentRecordItem";
+import RecordCanvas from "./RecordCanvas";
 
 class InstrumentRecordFeed extends Component {
   render() {
@@ -9,7 +10,7 @@ class InstrumentRecordFeed extends Component {
 
     return instruments.map(instrument => (
       <span key={instrument.id}>
-        <InstrumentRecordItem instrument={instrument} />
+        <RecordCanvas instrument={instrument} />
       </span>
     ));
   }

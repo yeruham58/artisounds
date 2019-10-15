@@ -11,7 +11,8 @@ import {
   setAudioStartTime,
   setRecordsDic
 } from "../../actions/audioEditorActions";
-import Player from "./Player";
+import EditorControlBar from "./EditorControlBar";
+// import Player from "./Player";
 import Recorder from "./Recorder";
 
 class WorkZone extends Component {
@@ -180,17 +181,8 @@ class WorkZone extends Component {
           <div className="row">
             <div className="col-md-12">
               <div>
-                <button
-                  type="button"
-                  className="btn btn-light mb-3"
-                  onClick={() => window.history.back()}
-                >
-                  Back
-                </button>
+                <EditorControlBar />
                 <Recorder />
-                <div className="text-center">
-                  <Player />
-                </div>
               </div>
               <div style={{ height: "10px" }}>
                 <RecordingTopRuler />

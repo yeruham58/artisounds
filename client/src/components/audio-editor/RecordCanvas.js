@@ -9,7 +9,12 @@ class RecordCanvas extends Component {
       isRecording: false,
       recordLen: 0,
       recordLineWidth: 0,
-      lineLen: 60 * 50
+      lineLen: 60 * 50,
+      currentRecordId: parseInt(
+        window.location.href.split("/")[
+          window.location.href.split("/").length - 1
+        ]
+      )
     };
 
     this.createRecordLine = this.createRecordLine.bind(this);
@@ -21,17 +26,28 @@ class RecordCanvas extends Component {
   }
 
   componentWillReceiveProps(nextProp) {
-    if (nextProp.editor.recordsDic && nextProp.editor.recordsDic["101"]) {
-      const recordLen = nextProp.editor.recordsDic["101"].duration
-        ? nextProp.editor.recordsDic["101"].duration
+    if (
+      nextProp.editor.recordsDic &&
+      nextProp.editor.recordsDic[this.props.instrument.id]
+    ) {
+      const recordLen = nextProp.editor.recordsDic[this.props.instrument.id]
+        .duration
+        ? nextProp.editor.recordsDic[this.props.instrument.id].duration
         : 0;
       this.setState({
         isRecording: nextProp.editor.isRecording,
         recordLen: recordLen,
         recordLineWidth: recordLen / nextProp.editor.secondsPerPx
       });
-      if (nextProp.editor.isRecording && !this.state.isRecording) {
-        this.setRecordLineInRecord();
+      if (
+        nextProp.editor.isRecording &&
+        !this.state.isRecording &&
+        this.state.currentRecordId === this.props.instrument.id
+      ) {
+        // time out becouse there is time out in record and pointer
+        setTimeout(() => {
+          this.setRecordLineInRecord();
+        }, 100);
       } else {
         this.createRecordLine();
       }
@@ -39,7 +55,9 @@ class RecordCanvas extends Component {
   }
 
   createRecordLine() {
-    const canvas = document.getElementById("recordLine");
+    const canvas = document.getElementById(
+      this.props.instrument.id + "RecordLine"
+    );
     const context = canvas.getContext("2d");
 
     // Create gradient
@@ -96,7 +114,7 @@ class RecordCanvas extends Component {
             >
               <canvas
                 ref={this.canvasRef}
-                id="recordLine"
+                id={this.props.instrument.id + "RecordLine"}
                 width={this.state.recordLineWidth - 2}
                 height="86"
               />

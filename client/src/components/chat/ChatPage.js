@@ -44,7 +44,12 @@ class ChatPage extends Component {
   }
 
   componentWillUnmount() {
-    this.currentUser.disconnect();
+    try {
+      this.currentUser.disconnect();
+    } catch {
+      console.log("chat is not connected");
+    }
+
     this.props.updateDisconnectChat();
   }
 

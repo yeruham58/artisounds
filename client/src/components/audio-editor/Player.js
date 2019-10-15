@@ -20,7 +20,8 @@ class Player extends Component {
           : 0,
       analyser: null,
       canvas: null,
-      ctx: null
+      ctx: null,
+      isPlaying: false
     };
 
     this.frameLooper = this.frameLooper.bind(this);
@@ -31,14 +32,28 @@ class Player extends Component {
 
   componentWillReceiveProps(nextProp) {
     if (nextProp.editor) {
-      this.setState({ currentAudio: nextProp.editor.audioBuffer });
+      this.setState({
+        currentAudio: nextProp.editor.audioBuffer
+      });
       if (nextProp.editor.audioBuffer) {
         this.initPlayer(nextProp.editor.audioBuffer);
       }
-    }
 
-    if (nextProp.editor && nextProp.editor.audioStartTime) {
-      this.setState({ audioStartTime: nextProp.editor.audioStartTime });
+      if (nextProp.editor.audioStartTime) {
+        this.setState({ audioStartTime: nextProp.editor.audioStartTime });
+      }
+
+      if (nextProp.editor.isPlaying && !this.state.isPlaying) {
+        this.setState({ isPlaying: true });
+        //time out is for current audio to update
+        setTimeout(() => {
+          this.onPlay();
+        }, 100);
+      }
+      if (!nextProp.editor.isPlaying && this.state.isPlaying) {
+        this.setState({ isPlaying: false });
+        this.onStop();
+      }
     }
   }
 
@@ -51,9 +66,6 @@ class Player extends Component {
       analyser.connect(context.destination);
 
       newAudio.loop = false;
-      newAudio.onended = () => {
-        this.props.setIsPlaying(false);
-      };
       const canvas = document.getElementById("analyser_render");
       const ctx = canvas.getContext("2d");
       this.setState({
@@ -93,8 +105,8 @@ class Player extends Component {
   }
 
   onPlay() {
-    this.props.setIsPlaying(true);
-    setTimeout(() => {
+    // this.props.setIsPlaying(true);
+    if (this.state.currentAudio && this.state.audioStartTime) {
       const { currentAudio, audioStartTime } = this.state;
       const { duration } = currentAudio.buffer;
       if (currentAudio.buffer.duration > audioStartTime) {
@@ -102,13 +114,11 @@ class Player extends Component {
           // currentAudio.context.currentTime + 0, // how much time from now it will start,
           0, // how much time from now it will start,
           audioStartTime,
-          duration - audioStartTime - currentAudio.context.currentTime > 0
-            ? duration - audioStartTime - currentAudio.context.currentTime
-            : duration - audioStartTime
+          duration - audioStartTime
         );
       }
       this.frameLooper();
-    }, 500);
+    }
   }
 
   onStop() {
@@ -117,20 +127,12 @@ class Player extends Component {
     } catch (err) {
       console.log("audio is not playing");
     }
-
-    this.props.setIsPlaying(false);
   }
 
   render() {
     return (
       <div>
-        <div
-          id="audio_player"
-          style={{
-            background: "#000",
-            padding: "5px"
-          }}
-        >
+        <div id="audio_player">
           <canvas
             ref={this.canvasRef}
             id="analyser_render"
@@ -141,12 +143,6 @@ class Player extends Component {
               float: "left"
             }}
           />
-          <button onClick={this.onPlay} disabled={!this.state.currentAudio}>
-            play
-          </button>
-          <button onClick={this.onStop} disabled={!this.props.editor.isPlaying}>
-            stop
-          </button>
         </div>
       </div>
     );
