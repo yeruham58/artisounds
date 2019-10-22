@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import Crunker from "crunker";
+// import { Prompt } from "react-router";
 
 import RecordingTopRuler from "./RecordingTopRuler";
 import Spinner from "../common/Spinner";
@@ -12,7 +13,6 @@ import {
   setRecordsDic
 } from "../../actions/audioEditorActions";
 import EditorControlBar from "./EditorControlBar";
-// import Player from "./Player";
 import Recorder from "./Recorder";
 
 class WorkZone extends Component {
@@ -35,6 +35,16 @@ class WorkZone extends Component {
     setTimeout(() => {
       this.initAudioDic();
     }, 100);
+    window.addEventListener("beforeunload", function(e) {
+      // Cancel the event
+      if (true) {
+        e.preventDefault();
+      }
+      // Chrome requires returnValue to be set
+      else {
+        e.returnValue = "";
+      }
+    });
   }
 
   componentWillReceiveProps(nextProp) {
@@ -181,11 +191,15 @@ class WorkZone extends Component {
           <div className="row">
             <div className="col-md-12">
               <div>
+                {/* <React.Fragment>
+                  <Prompt
+                    when={true}
+                    message="You have unsaved changes, are you sure you want to leave?"
+                  /> */}
                 <EditorControlBar />
                 <Recorder />
-              </div>
-              <div style={{ height: "10px" }}>
                 <RecordingTopRuler />
+                {/* </React.Fragment> */}
               </div>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import PropTypes from "prop-types";
 
 class RecordCanvas extends Component {
   constructor(props) {
@@ -88,6 +89,9 @@ class RecordCanvas extends Component {
   render() {
     return (
       <div>
+        <div style={{ marginLeft: "12px", height: "25px" }}>
+          {this.props.instrument.instrument_detailes.art_practic_name}
+        </div>
         <div
           style={{
             background: "grey",
@@ -125,6 +129,10 @@ class RecordCanvas extends Component {
     );
   }
 }
+
+RecordCanvas.propTypes = {
+  instrument: PropTypes.object.isRequired
+};
 
 const mapStateToProps = state => ({
   editor: state.audioEditor

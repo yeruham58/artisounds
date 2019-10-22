@@ -9,6 +9,7 @@ import {
   setSecondsPerPx
 } from "../../actions/audioEditorActions";
 import InstrumentRecordFeed from "./InstrumentRecordFeed";
+import RecordControlList from "./RecordControlList";
 
 class RecordingTopRuler extends Component {
   constructor(props) {
@@ -29,7 +30,8 @@ class RecordingTopRuler extends Component {
       rulerTop: 0,
       isMoving: false,
       audioPointInSeconds: 0,
-      recordsHighth: window.innerHeight * 0.6
+      recordsHighth: window.innerHeight * 0.6,
+      timelineOverflowY: "scroll"
     };
 
     this.initTimeLine = this.initTimeLine.bind(this);
@@ -62,6 +64,14 @@ class RecordingTopRuler extends Component {
 
   componentWillReceiveProps(nextProp) {
     if (nextProp.editor) {
+      if (nextProp.editor.recordsDic) {
+        const highth = Object.keys(nextProp.editor.recordsDic).length * 115;
+        if (highth < this.state.recordsHighth) {
+          this.setState({ timelineOverflowY: "hidden" });
+        } else {
+          this.setState({ timelineOverflowY: "scroll" });
+        }
+      }
       if (nextProp.editor.audioStartTime) {
         this.setState({ pointerStartPos: nextProp.editor.audioStartTime });
       }
@@ -94,18 +104,35 @@ class RecordingTopRuler extends Component {
     }
   }
 
-  setRulerTop() {
-    const top =
-      document.getElementById("time-line-holder").scrollTop -
-        Object.keys(this.props.editor.recordsDic).length * 90 -
-        this.state.recordsHighth >
-      0
-        ? document.getElementById("time-line-holder").scrollTop
-        : 0;
+  setRulerTop(type) {
+    let top;
+    const scrollTop = document.getElementById(type).scrollTop;
+    const efectedElem =
+      type === "time-line-holder"
+        ? document.getElementById("record-control-list")
+        : document.getElementById("time-line-holder");
 
-    this.setState({
-      rulerTop: top
-    });
+    const { recordsHighth } = this.state;
+    const allRecordsHighth =
+      Object.keys(this.props.editor.recordsDic).length * 115;
+
+    const scrollLimit = allRecordsHighth + 50 - recordsHighth;
+
+    top = scrollTop < scrollLimit ? scrollTop : scrollLimit;
+
+    if (scrollTop < scrollLimit) {
+      this.setState({
+        rulerTop: top
+      });
+
+      efectedElem.scroll({
+        top: scrollTop
+      });
+    } else {
+      document.getElementById("time-line-holder").scroll({
+        top: scrollLimit
+      });
+    }
   }
 
   setPointer(audioStartTime) {
@@ -282,67 +309,118 @@ class RecordingTopRuler extends Component {
   }
   render() {
     const { project } = this.props.project;
+
     const scaleLine = (
-      <div
-        style={{
-          marginTop: "50px",
-          overflowX: "scroll",
-          position: "relative",
-          height: this.state.recordsHighth + "px"
-        }}
-        id="time-line-holder"
-        onScroll={this.setRulerTop}
-      >
-        <canvas
-          ref={this.canvasRef}
-          id="timeline"
-          width={60 * 50}
-          height="50px"
-          style={{
-            background: "#343a40",
-            position: "absolute",
-            top: this.state.rulerTop + "px"
-          }}
-        />
-        <div
-          ref={this.pointerRef}
-          id="record-pointer-holder"
-          style={{
-            position: "absolute",
-            height: "100%",
-            marginTop: "40px",
-            top: this.state.rulerTop + "px"
-          }}
-        >
-          <div className="record-pointer">
+      <div className="container">
+        <div className="row">
+          <div
+            className="col-md-2"
+            style={{ background: "white", padding: "0px" }}
+          >
             <div
-              className="record-pointer-line"
               style={{
-                height: this.state.recordsHighth
+                overflow: "hidden"
               }}
-            />
+            >
+              <div
+                style={{
+                  width: "100%",
+                  position: "relative",
+                  height: this.state.recordsHighth + "px",
+                  overflowY: "scroll",
+                  overflowX: "hidden",
+                  paddingRight: "17px",
+
+                  boxSizing: "content-box"
+                }}
+                id="record-control-list"
+                onScroll={() => this.setRulerTop("record-control-list")}
+              >
+                <div
+                  style={{
+                    height: "50px",
+                    width: "100%",
+                    position: "absolute",
+                    top: this.state.rulerTop + "px",
+                    background: "grey"
+                  }}
+                ></div>
+                <div style={{ marginTop: "50px" }}>
+                  <RecordControlList
+                    instruments={project.instruments}
+                    userId={this.props.auth.user.id}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-10" style={{ padding: "0px" }}>
+            <div>
+              <div
+                style={{
+                  // overflow: "scroll",
+                  overflowY: this.state.timelineOverflowY,
+                  position: "relative",
+                  height: this.state.recordsHighth + "px",
+                  background: "grey"
+                }}
+                id="time-line-holder"
+                onScroll={() => this.setRulerTop("time-line-holder")}
+                // style={{ background: "grey" }}
+              >
+                <canvas
+                  ref={this.canvasRef}
+                  id="timeline"
+                  width={60 * 50}
+                  height="50px"
+                  style={{
+                    background: "#343a40",
+                    position: "absolute",
+                    top: this.state.rulerTop + "px"
+                  }}
+                />
+                <div
+                  ref={this.pointerRef}
+                  id="record-pointer-holder"
+                  style={{
+                    position: "absolute",
+                    height: "100%",
+                    marginTop: "40px",
+                    top: this.state.rulerTop + "px"
+                  }}
+                >
+                  <div className="record-pointer">
+                    <div
+                      className="record-pointer-line"
+                      style={{ height: this.state.recordsHighth }}
+                    />
+                  </div>
+                </div>
+                {project.instruments && project.instruments[0] ? (
+                  <div style={{ marginTop: "50px" }}>
+                    <InstrumentRecordFeed instruments={project.instruments} />
+                  </div>
+                ) : null}
+              </div>
+            </div>
           </div>
         </div>
-
-        {project.instruments && project.instruments[0] ? (
-          <div style={{ marginTop: "50px" }}>
-            <InstrumentRecordFeed instruments={project.instruments} />
-          </div>
-        ) : null}
       </div>
     );
-    return <div id="ruler">{scaleLine}</div>;
+    return <div>{scaleLine}</div>;
   }
 }
 
 RecordingTopRuler.propTypes = {
   project: PropTypes.object.isRequired,
+  auth: PropTypes.object.isRequired,
   setPxPerBit: PropTypes.func.isRequired,
   setSecondsPerPx: PropTypes.func.isRequired,
   setSecondsPerBit: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
+  auth: state.auth,
   editor: state.audioEditor,
   project: state.project
 });

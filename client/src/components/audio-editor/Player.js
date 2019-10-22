@@ -140,7 +140,8 @@ class Player extends Component {
               width: "100%",
               height: "70px",
               background: "#002D3C",
-              float: "left"
+              float: "left",
+              marginBottom: "50px"
             }}
           />
         </div>

@@ -256,6 +256,8 @@ class CreateProject extends Component {
 
               <RangeSlider
                 value={this.state.tempo}
+                min={40}
+                max={260}
                 onChange={this.onTempoChange}
                 error={errors.tempo}
                 info="Please config the tempo of your project"
