@@ -7,7 +7,8 @@ import {
   setIsRecording,
   setRecordsDic,
   setAudioStartTime,
-  setCurrentBolb
+  setCurrentBolb,
+  clearRecord
 } from "../../actions/audioEditorActions";
 
 class Recorder extends Component {
@@ -36,8 +37,6 @@ class Recorder extends Component {
       fetch(recordUrl).then(res => {
         res.blob().then(blob => {
           const audioChunks = [blob];
-          console.log("blob");
-          console.log(this.state.audioChunks.concat(audioChunks));
           this.setState({
             audioBlob: blob,
             audioChunks: this.state.audioChunks.concat(audioChunks)
@@ -65,14 +64,9 @@ class Recorder extends Component {
         this.setState({ isRecording: false });
         this.mediaRecorder.stop();
       }
-      if (
-        nextProp.editor.recordsDic[this.state.currentInstrumentId] &&
-        !nextProp.editor.recordsDic[this.state.currentInstrumentId].buffer &&
-        Object.keys(this.state.recordDic)[0]
-      ) {
-        console.log("this Way");
-        console.log(this.state.recordDic);
+      if (nextProp.editor.clearRecord) {
         this.setState({ audioChunks: [] });
+        this.props.clearRecord(false);
       }
     }
   }
@@ -139,7 +133,8 @@ class Recorder extends Component {
 Recorder.propTypes = {
   setCurrentBolb: PropTypes.func.isRequired,
   setIsRecording: PropTypes.func.isRequired,
-  setRecordsDic: PropTypes.func.isRequired
+  setRecordsDic: PropTypes.func.isRequired,
+  clearRecord: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -149,5 +144,11 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
 
-  { setIsRecording, setRecordsDic, setAudioStartTime, setCurrentBolb }
+  {
+    setIsRecording,
+    setRecordsDic,
+    setAudioStartTime,
+    setCurrentBolb,
+    clearRecord
+  }
 )(Recorder);

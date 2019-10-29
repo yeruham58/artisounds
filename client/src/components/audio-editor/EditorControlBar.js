@@ -8,7 +8,8 @@ import {
   setRecordsDic,
   setCurrentBolb,
   uploadRecord,
-  deleteRecord
+  deleteRecord,
+  clearRecord
 } from "../../actions/audioEditorActions";
 import Player from "./Player";
 
@@ -37,6 +38,7 @@ class EditorControlBar extends Component {
     };
     this.props.setRecordsDic(recordsDic);
     this.props.setCurrentBolb({});
+    this.props.clearRecord(true);
   }
 
   uploadRecord() {
@@ -60,8 +62,6 @@ class EditorControlBar extends Component {
         this.props.editor.courrentRecordBolb &&
         !this.props.editor.courrentRecordBolb.size
       ) {
-        console.log("gonna delete");
-        console.log(recordKey);
         this.props.deleteRecord(recordKey, this.state.currentInstrumentId);
       }
     }
@@ -146,6 +146,7 @@ class EditorControlBar extends Component {
 EditorControlBar.propTypes = {
   uploadRecord: PropTypes.func.isRequired,
   deleteRecord: PropTypes.func.isRequired,
+  clearRecord: PropTypes.func.isRequired,
   setCurrentBolb: PropTypes.func.isRequired,
   setRecordsDic: PropTypes.func.isRequired,
   setIsPlaying: PropTypes.func.isRequired,
@@ -166,6 +167,7 @@ export default connect(
     setRecordsDic,
     setCurrentBolb,
     uploadRecord,
-    deleteRecord
+    deleteRecord,
+    clearRecord
   }
 )(EditorControlBar);

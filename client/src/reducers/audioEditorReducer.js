@@ -8,7 +8,9 @@ import {
   SET_SECONDS_PER_BIT,
   SET_SECONDS_PER_PX,
   SET_CURRENT_RECORD_BOLB,
-  ADD_RECORD
+  ADD_RECORD,
+  SAVING_RECORD,
+  CLEAR_RECORD
 } from "../actions/types";
 
 const initialState = {
@@ -21,7 +23,9 @@ const initialState = {
   pxPerBit: 0,
   secondsPerBit: 0,
   secondsPerPx: 0.0001,
-  courrentRecordBolb: null
+  courrentRecordBolb: null,
+  saving: false,
+  clearRecord: false
 };
 
 export default function(state = initialState, action) {
@@ -72,11 +76,21 @@ export default function(state = initialState, action) {
         courrentRecordBolb: action.payload
       };
     case ADD_RECORD:
-      return;
-    // return {
-    //   ...state,
-    //   courrentRecordBolb: action.payload
-    // };
+      return {
+        ...state,
+        saving: false
+      };
+    case SAVING_RECORD:
+      return {
+        ...state,
+        saving: true
+      };
+    case CLEAR_RECORD:
+      return {
+        ...state,
+        clearRecord: action.payload
+      };
+
     default:
       return state;
   }

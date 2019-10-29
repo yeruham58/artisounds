@@ -11,7 +11,9 @@ import {
   SET_SECONDS_PER_PX,
   SET_CURRENT_RECORD_BOLB,
   GET_ERRORS,
-  ADD_RECORD
+  ADD_RECORD,
+  SAVING_RECORD,
+  CLEAR_RECORD
 } from "./types";
 
 export const setRecordsDic = recordsDic => dispatch => {
@@ -42,10 +44,15 @@ export const setSecondsPerPx = secondsPerPx => dispatch => {
 export const setCurrentBolb = currentBolb => dispatch => {
   dispatch({ type: SET_CURRENT_RECORD_BOLB, payload: currentBolb });
 };
+export const clearRecord = clearRecord => dispatch => {
+  dispatch({ type: CLEAR_RECORD, payload: clearRecord });
+};
 
 //Upload record
 export const uploadRecord = (data, instrumentId) => dispatch => {
-  // dispatch(setFileUploading());
+  dispatch({
+    type: SAVING_RECORD
+  });
   axios
     .post(`/api/records/record-upload/${instrumentId}`, data, {
       headers: {
@@ -58,24 +65,14 @@ export const uploadRecord = (data, instrumentId) => dispatch => {
       if (200 === response.status) {
         // If file size is larger than expected.
         if (response.data.error) {
-          if ("LIMIT_FILE_SIZE" === response.data.error.code) {
-            // this.setUploadImgErr("Max size: 2MB");
-            dispatch({
-              type: GET_ERRORS,
-              payload: { uploadErrors: "Max size: 2MB" }
-            });
-          } else {
-            // If not the given file type
-            dispatch({
-              type: GET_ERRORS,
-              payload: { uploadErrors: response.data.error }
-            });
-          }
+          dispatch({
+            type: GET_ERRORS,
+            payload: { uploadErrors: response.data.error }
+          });
         } else {
           // Success
           dispatch({
-            type: ADD_RECORD,
-            payload: response.data
+            type: ADD_RECORD
           });
         }
       }
@@ -90,7 +87,9 @@ export const uploadRecord = (data, instrumentId) => dispatch => {
 
 //Delete record
 export const deleteRecord = (data, instrumentId) => dispatch => {
-  // dispatch(setFileUploading());
+  dispatch({
+    type: SAVING_RECORD
+  });
   axios
     .delete(`/api/records/record-upload/${instrumentId}`, {
       headers: {
@@ -100,6 +99,9 @@ export const deleteRecord = (data, instrumentId) => dispatch => {
     .then(response => {
       if (200 === response.status) {
         console.log("deleted");
+        dispatch({
+          type: ADD_RECORD
+        });
       }
     })
     .catch(error => {

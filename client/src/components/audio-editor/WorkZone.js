@@ -185,6 +185,21 @@ class WorkZone extends Component {
                 <Recorder recordUrls={this.props.project.project.instruments} />
                 <RecordingTopRuler />
               </div>
+              {this.props.editor.saving && (
+                <div
+                  className="text-center"
+                  style={{
+                    background: "#FFFAFA",
+                    height: "150px",
+                    width: "400px",
+                    position: "fixed",
+                    top: "80px",
+                    left: (window.innerWidth - 400) / 2
+                  }}
+                >
+                  <div className="mt-9">saving...</div>
+                </div>
+              )}
             </div>
           </div>
         </div>
