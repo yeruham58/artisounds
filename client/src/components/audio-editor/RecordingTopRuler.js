@@ -31,7 +31,7 @@ class RecordingTopRuler extends Component {
       isMoving: false,
       audioPointInSeconds: 0,
       recordsHighth: window.innerHeight * 0.6,
-      timelineOverflowY: "scroll"
+      timelineOverflowY: null
     };
 
     this.initTimeLine = this.initTimeLine.bind(this);
@@ -366,7 +366,6 @@ class RecordingTopRuler extends Component {
                 }}
                 id="time-line-holder"
                 onScroll={() => this.setRulerTop("time-line-holder")}
-                // style={{ background: "grey" }}
               >
                 <canvas
                   ref={this.canvasRef}

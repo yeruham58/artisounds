@@ -6,6 +6,7 @@ const projects = require("./routes/api/projects");
 const projectNotifications = require("./routes/api/projectNotifications");
 const uploadProfileImg = require("./routes/api/uploadProfileImg");
 const uploadPostMedia = require("./routes/api/uploadPostMedia");
+const uploadRecord = require("./routes/api/uploadRecord");
 const bodyParser = require("body-parser");
 const passport = require("passport");
 
@@ -40,9 +41,10 @@ app.use("/api/projects", projects);
 app.use("/api/projectNotifications", projectNotifications);
 app.use("/api/upload", uploadProfileImg);
 app.use("/api/upload", uploadPostMedia.router);
+app.use("/api/records", uploadRecord);
 
 const port = process.env.PORT || 5000;
 
-const controlArtDB = require("./controlArtTypes");
+// const controlArtDB = require("./controlArtTypes");
 
 app.listen(port, () => console.log(`server runing on port ${port}`));

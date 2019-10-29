@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
 
 import RecordControlItem from "./RecordControlItem";
 
@@ -13,8 +14,16 @@ class RecordControlList extends Component {
     if (
       instrument.user_id === this.props.userId &&
       instrument.id !== currentInstrument
-    )
-      window.location.href = `/projects/work-zone/${instrument.project_id}/${instrument.id}`;
+    ) {
+      if (
+        !this.props.editor.courrentRecordBolb ||
+        window.confirm(
+          "Are you sure you wanna change instrument before save your changes?"
+        )
+      ) {
+        window.location.href = `/projects/work-zone/${instrument.project_id}/${instrument.id}`;
+      }
+    }
   }
   render() {
     const instruments = this.props.instruments;
@@ -39,4 +48,12 @@ RecordControlList.propTypes = {
   userId: PropTypes.number.isRequired
 };
 
-export default RecordControlList;
+const mapStateToProps = state => ({
+  editor: state.audioEditor
+});
+
+export default connect(
+  mapStateToProps,
+
+  {}
+)(RecordControlList);

@@ -6,7 +6,9 @@ import {
   SET_AUDIO_BUFFER,
   SET_PX_PER_BIT,
   SET_SECONDS_PER_BIT,
-  SET_SECONDS_PER_PX
+  SET_SECONDS_PER_PX,
+  SET_CURRENT_RECORD_BOLB,
+  ADD_RECORD
 } from "../actions/types";
 
 const initialState = {
@@ -18,7 +20,8 @@ const initialState = {
   recordsDic: {},
   pxPerBit: 0,
   secondsPerBit: 0,
-  secondsPerPx: 0.0001
+  secondsPerPx: 0.0001,
+  courrentRecordBolb: null
 };
 
 export default function(state = initialState, action) {
@@ -63,6 +66,17 @@ export default function(state = initialState, action) {
         ...state,
         secondsPerPx: action.payload
       };
+    case SET_CURRENT_RECORD_BOLB:
+      return {
+        ...state,
+        courrentRecordBolb: action.payload
+      };
+    case ADD_RECORD:
+      return;
+    // return {
+    //   ...state,
+    //   courrentRecordBolb: action.payload
+    // };
     default:
       return state;
   }

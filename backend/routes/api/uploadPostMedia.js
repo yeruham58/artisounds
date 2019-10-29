@@ -68,9 +68,9 @@ function checkFileType(file, cb) {
 }
 
 /**
- * @route POST api/profile/profile-img-upload
+ * @route POST api/upload/post-media-upload
  * @desc Upload post image
- * @access public
+ * @access private
  */
 router.post(
   "/post-media-upload",

@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import Crunker from "crunker";
-// import { Prompt } from "react-router";
 
 import RecordingTopRuler from "./RecordingTopRuler";
 import Spinner from "../common/Spinner";
@@ -23,45 +22,39 @@ class WorkZone extends Component {
       setingRecordsDic: false,
       isPlaying: false,
       isRecording: false,
-      recordsDic: {}
+      recordsDic: {},
+      project: null
     };
     this.initAudioDic = this.initAudioDic.bind(this);
     this.initBuffersList = this.initBuffersList.bind(this);
     this.setBuffer = this.setBuffer.bind(this);
-    this.clearRecord = this.clearRecord.bind(this);
   }
   componentDidMount() {
     this.props.getProject(this.props.match.params.projectId);
-    setTimeout(() => {
-      this.initAudioDic();
-    }, 100);
-    window.addEventListener("beforeunload", function(e) {
-      // Cancel the event
-      if (true) {
-        e.preventDefault();
-      }
-      // Chrome requires returnValue to be set
-      else {
-        e.returnValue = "";
-      }
-    });
   }
 
   componentWillReceiveProps(nextProp) {
+    if (
+      nextProp.project &&
+      nextProp.project.project &&
+      nextProp.project.project !== this.state.project
+    ) {
+      this.setState({ project: nextProp.project.project });
+      setTimeout(() => {
+        this.initAudioDic();
+      }, 100);
+    }
     if (nextProp.editor) {
-      if (nextProp.editor.recordsDic && !this.state.setingRecordsDic) {
+      if (
+        nextProp.editor.recordsDic &&
+        nextProp.editor.recordsDic !== this.state.recordsDic
+      ) {
         this.setState({
-          setingRecordsDic: true
+          recordsDic: nextProp.editor.recordsDic
         });
         setTimeout(() => {
           this.initBuffersList();
         }, 100);
-      }
-
-      if (nextProp.editor.recordsDic && this.state.setingRecordsDic) {
-        this.setState({
-          setingRecordsDic: false
-        });
       }
       if (nextProp.editor.audioStartTime) {
         this.setState({ audioStartTime: nextProp.editor.audioStartTime });
@@ -79,31 +72,37 @@ class WorkZone extends Component {
   }
 
   initAudioDic() {
-    const { instruments } = this.props.project.project;
-    const recordsDic = {};
-    instruments.forEach(instrument => {
-      recordsDic[instrument.id] = {};
-      const audioUrl = instrument.record_url ? instrument.record_url : null;
-      let audio = new Crunker();
-      if (audioUrl) {
-        audio
-          .fetchAudio(audioUrl, audioUrl)
-          .then(buffers => {
-            recordsDic[instrument.id].duration = buffers[0].duration;
-            recordsDic[instrument.id].buffer = buffers[0];
-          })
-          .catch(() => {
-            // err in Crunker create buffer
-            console.log("err in Crunker create buffer");
+    if (this.props.project.project) {
+      const { instruments } = this.props.project.project;
+      const recordsDic = {};
+      if (instruments && instruments.length > 0) {
+        instruments.forEach(instrument => {
+          recordsDic[instrument.id] = {};
+          const audioUrl = instrument.record_url ? instrument.record_url : null;
+          let audio = new Crunker();
+          if (audioUrl) {
+            audio
+              .fetchAudio(audioUrl, audioUrl)
+              .then(buffers => {
+                recordsDic[instrument.id].duration = buffers[0].duration;
+                recordsDic[instrument.id].buffer = buffers[0];
+
+                this.props.setRecordsDic(recordsDic);
+              })
+              .catch(() => {
+                // err in Crunker create buffer
+                console.log("err in Crunker create buffer");
+                recordsDic[instrument.id].duration = null;
+                recordsDic[instrument.id].buffer = null;
+              });
+          } else {
             recordsDic[instrument.id].duration = null;
             recordsDic[instrument.id].buffer = null;
-          });
-      } else {
-        recordsDic[instrument.id].duration = null;
-        recordsDic[instrument.id].buffer = null;
+          }
+        });
+        this.props.setRecordsDic(recordsDic);
       }
-    });
-    this.props.setRecordsDic(recordsDic);
+    }
   }
 
   initBuffersList() {
@@ -114,11 +113,11 @@ class WorkZone extends Component {
         buffersList.push(recordsDic[key].buffer);
       }
     }
-    this.setBuffer(buffersList);
+    if (buffersList[0]) this.setBuffer(buffersList);
   }
 
   setBuffer(buffersList) {
-    const mergedBuffer = buffersList[0] ? this.mergeBuffers(buffersList) : null;
+    const mergedBuffer = this.mergeBuffers(buffersList);
     this.props.setAudioBuffer(mergedBuffer);
   }
 
@@ -167,17 +166,6 @@ class WorkZone extends Component {
     return source;
   }
 
-  clearRecord() {
-    this.setState({
-      recordsDic: {
-        ...this.state.recordsDic,
-        [this.props.match.params.instrumentId.toString]: {
-          duration: null
-        }
-      }
-    });
-  }
-
   render() {
     const { project, loading } = this.props.project;
 
@@ -191,15 +179,11 @@ class WorkZone extends Component {
           <div className="row">
             <div className="col-md-12">
               <div>
-                {/* <React.Fragment>
-                  <Prompt
-                    when={true}
-                    message="You have unsaved changes, are you sure you want to leave?"
-                  /> */}
-                <EditorControlBar />
-                <Recorder />
+                <EditorControlBar
+                  recordUrls={this.props.project.project.instruments}
+                />
+                <Recorder recordUrls={this.props.project.project.instruments} />
                 <RecordingTopRuler />
-                {/* </React.Fragment> */}
               </div>
             </div>
           </div>

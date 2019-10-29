@@ -5,7 +5,10 @@ import PropTypes from "prop-types";
 import {
   setIsPlaying,
   setIsRecording,
-  setRecordsDic
+  setRecordsDic,
+  setCurrentBolb,
+  uploadRecord,
+  deleteRecord
 } from "../../actions/audioEditorActions";
 import Player from "./Player";
 
@@ -15,22 +18,55 @@ class EditorControlBar extends Component {
 
     this.state = {
       isPlaying: false,
-      isRecording: false
+      isRecording: false,
+      currentInstrumentId: window.location.href.split("/")[
+        window.location.href.split("/").length - 1
+      ]
     };
     this.clearRecord = this.clearRecord.bind(this);
+    this.uploadRecord = this.uploadRecord.bind(this);
   }
 
   clearRecord() {
     const recordsDic = {
       ...this.props.editor.recordsDic,
-      [window.location.href.split("/")[
-        window.location.href.split("/").length - 1
-      ]]: {
+      [this.state.currentInstrumentId]: {
         duration: null,
         buffer: null
       }
     };
     this.props.setRecordsDic(recordsDic);
+    this.props.setCurrentBolb({});
+  }
+
+  uploadRecord() {
+    if (
+      this.props.editor.courrentRecordBolb &&
+      this.props.editor.courrentRecordBolb.size
+    ) {
+      const data = new FormData();
+      data.append(
+        "projectRecord",
+        this.props.editor.courrentRecordBolb,
+        "some name"
+      );
+      this.props.uploadRecord(data, this.state.currentInstrumentId);
+    } else {
+      const recordKey = this.props.recordUrls.find(
+        record => record.id === parseInt(this.state.currentInstrumentId)
+      ).record_key;
+      if (
+        recordKey &&
+        this.props.editor.courrentRecordBolb &&
+        !this.props.editor.courrentRecordBolb.size
+      ) {
+        console.log("gonna delete");
+        console.log(recordKey);
+        this.props.deleteRecord(recordKey, this.state.currentInstrumentId);
+      }
+    }
+
+    this.props.setCurrentBolb(null);
   }
   render() {
     return (
@@ -40,7 +76,9 @@ class EditorControlBar extends Component {
             <button
               type="button"
               className="btn btn-light mb-3 mr-4"
-              onClick={() => window.history.back()}
+              onClick={() => {
+                window.location.href = `/project/project-view/${this.props.project.project.id}`;
+              }}
             >
               Back
             </button>
@@ -88,6 +126,13 @@ class EditorControlBar extends Component {
             >
               Clear record
             </button>
+            <button
+              type="button"
+              className="btn btn-success mb-3 mr-2"
+              onClick={this.uploadRecord}
+            >
+              Save
+            </button>
           </div>
           <div className="col-md-4">
             <Player />
@@ -99,17 +144,28 @@ class EditorControlBar extends Component {
 }
 
 EditorControlBar.propTypes = {
+  uploadRecord: PropTypes.func.isRequired,
+  deleteRecord: PropTypes.func.isRequired,
+  setCurrentBolb: PropTypes.func.isRequired,
   setRecordsDic: PropTypes.func.isRequired,
   setIsPlaying: PropTypes.func.isRequired,
   setIsRecording: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-  editor: state.audioEditor
+  editor: state.audioEditor,
+  project: state.project
 });
 
 export default connect(
   mapStateToProps,
 
-  { setIsPlaying, setIsRecording, setRecordsDic }
+  {
+    setIsPlaying,
+    setIsRecording,
+    setRecordsDic,
+    setCurrentBolb,
+    uploadRecord,
+    deleteRecord
+  }
 )(EditorControlBar);

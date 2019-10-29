@@ -1,8 +1,5 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import PropTypes from "prop-types";
-
-import { setIsPlaying } from "../../actions/audioEditorActions";
 
 // import range from "../common/RangeSlider";
 
@@ -17,7 +14,7 @@ class Player extends Component {
       audioStartTime:
         this.props.editor.audioStartTime > 0
           ? this.props.editor.audioStartTime
-          : 0,
+          : 0.00001,
       analyser: null,
       canvas: null,
       ctx: null,
@@ -105,7 +102,6 @@ class Player extends Component {
   }
 
   onPlay() {
-    // this.props.setIsPlaying(true);
     if (this.state.currentAudio && this.state.audioStartTime) {
       const { currentAudio, audioStartTime } = this.state;
       const { duration } = currentAudio.buffer;
@@ -150,10 +146,6 @@ class Player extends Component {
   }
 }
 
-Player.propTypes = {
-  setIsPlaying: PropTypes.func.isRequired
-};
-
 const mapStateToProps = state => ({
   editor: state.audioEditor
 });
@@ -161,5 +153,5 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
 
-  { setIsPlaying }
+  {}
 )(Player);

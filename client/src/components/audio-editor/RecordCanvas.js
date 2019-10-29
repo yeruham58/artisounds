@@ -28,6 +28,18 @@ class RecordCanvas extends Component {
 
   componentWillReceiveProps(nextProp) {
     if (
+      nextProp.editor.isRecording &&
+      !this.state.isRecording &&
+      this.state.currentRecordId === this.props.instrument.id
+    ) {
+      // time out becouse there is time out in record and pointer
+      this.setState({ isRecording: true });
+      setTimeout(() => {
+        this.setRecordLineInRecord();
+      }, 100);
+    }
+
+    if (
       nextProp.editor.recordsDic &&
       nextProp.editor.recordsDic[this.props.instrument.id]
     ) {
@@ -40,18 +52,9 @@ class RecordCanvas extends Component {
         recordLen: recordLen,
         recordLineWidth: recordLen / nextProp.editor.secondsPerPx
       });
-      if (
-        nextProp.editor.isRecording &&
-        !this.state.isRecording &&
-        this.state.currentRecordId === this.props.instrument.id
-      ) {
-        // time out becouse there is time out in record and pointer
-        setTimeout(() => {
-          this.setRecordLineInRecord();
-        }, 100);
-      } else {
+      setTimeout(() => {
         this.createRecordLine();
-      }
+      }, 100);
     }
   }
 
@@ -73,6 +76,7 @@ class RecordCanvas extends Component {
   setRecordLineInRecord() {
     const { pxPerBit, secondsPerBit } = this.props.editor;
     var width = this.state.recordLineWidth;
+
     var id = setInterval(() => {
       if (!this.state.isRecording) {
         clearInterval(id);

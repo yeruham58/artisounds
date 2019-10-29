@@ -6,7 +6,8 @@ import Crunker from "crunker";
 import {
   setIsRecording,
   setRecordsDic,
-  setAudioStartTime
+  setAudioStartTime,
+  setCurrentBolb
 } from "../../actions/audioEditorActions";
 
 class Recorder extends Component {
@@ -18,16 +19,41 @@ class Recorder extends Component {
       ],
       audio: null,
       audioUrl: null,
+      audioChunks: [],
       audioBlob: null,
-      audioChunks: null,
-      isRecording: false
+      isRecording: false,
+      recordDic: null
     };
 
     this.startRecord = this.startRecord.bind(this);
   }
 
+  componentDidMount() {
+    const recordUrl = this.props.recordUrls.find(
+      record => record.id === parseInt(this.state.currentInstrumentId)
+    ).record_url;
+    if (recordUrl) {
+      fetch(recordUrl).then(res => {
+        res.blob().then(blob => {
+          const audioChunks = [blob];
+          console.log("blob");
+          console.log(this.state.audioChunks.concat(audioChunks));
+          this.setState({
+            audioBlob: blob,
+            audioChunks: this.state.audioChunks.concat(audioChunks)
+          });
+        });
+      });
+    }
+  }
+
   componentWillReceiveProps(nextProp) {
     if (nextProp.editor) {
+      if (this.state.recordDic !== nextProp.editor.recordsDic) {
+        this.setState({
+          recordDic: nextProp.editor.recordsDic
+        });
+      }
       if (nextProp.editor.isRecording && !this.state.isRecording) {
         this.setState({ isRecording: true });
         // timeOut becouse thre is time out in the pointer
@@ -41,8 +67,11 @@ class Recorder extends Component {
       }
       if (
         nextProp.editor.recordsDic[this.state.currentInstrumentId] &&
-        !nextProp.editor.recordsDic[this.state.currentInstrumentId].duration
+        !nextProp.editor.recordsDic[this.state.currentInstrumentId].buffer &&
+        Object.keys(this.state.recordDic)[0]
       ) {
+        console.log("this Way");
+        console.log(this.state.recordDic);
         this.setState({ audioChunks: [] });
       }
     }
@@ -55,15 +84,17 @@ class Recorder extends Component {
       this.mediaRecorder = mediaRecorder;
       this.mediaRecorder.start();
       this.props.setIsRecording(true);
-
       const audioChunks = this.state.audioBlob ? this.state.audioChunks : [];
+
       this.mediaRecorder.addEventListener("dataavailable", event => {
         audioChunks.push(event.data);
+
         this.setState({ audioChunks });
       });
 
       this.mediaRecorder.addEventListener("stop", () => {
         const audioBlob = new Blob(audioChunks);
+        this.props.setCurrentBolb(audioBlob);
         const audioUrl = URL.createObjectURL(audioBlob);
         let audio = new Crunker();
         audio.fetchAudio(audioUrl, audioUrl).then(buffers => {
@@ -106,6 +137,7 @@ class Recorder extends Component {
 }
 
 Recorder.propTypes = {
+  setCurrentBolb: PropTypes.func.isRequired,
   setIsRecording: PropTypes.func.isRequired,
   setRecordsDic: PropTypes.func.isRequired
 };
@@ -117,5 +149,5 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
 
-  { setIsRecording, setRecordsDic, setAudioStartTime }
+  { setIsRecording, setRecordsDic, setAudioStartTime, setCurrentBolb }
 )(Recorder);
