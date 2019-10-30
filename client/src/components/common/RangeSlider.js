@@ -4,18 +4,25 @@ const RangeSlider = (value, onChange, info, error) => {
   return (
     <div className="slidecontainer">
       <input
+        disabled={value.disabled}
         value={value.value}
         type="range"
         min={value.min}
         max={value.max}
-        className={!value.id ? "slider" : null}
+        className={
+          !value.id || value.id === "masterVolumeRange" ? "slider" : null
+        }
         id={value.id ? "myRange" + value.id : "myRange"}
         onChange={e => {
           value.onChange(e);
         }}
-        style={value.id ? { width: "80px" } : null}
+        style={
+          value.id && value.id !== "masterVolumeRange"
+            ? { width: "80px" }
+            : null
+        }
       />
-      {value.value >= 40 && (
+      {!value.id && (
         <p>
           Tempo: {value.value}
           <span id="demo" />

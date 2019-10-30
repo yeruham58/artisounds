@@ -54,7 +54,7 @@ class WorkZone extends Component {
         });
         setTimeout(() => {
           this.initBuffersList();
-        }, 100);
+        }, 200);
       }
       if (nextProp.editor.audioStartTime) {
         this.setState({ audioStartTime: nextProp.editor.audioStartTime });
@@ -153,6 +153,7 @@ class WorkZone extends Component {
         out.getChannelData(srcChannel).set(outt, 0);
       }
     }
+
     // Get an AudioBufferSourceNode.
     // This is the AudioNode to use when we want to play an AudioBuffer
     var source = ac.createBufferSource();
@@ -162,6 +163,7 @@ class WorkZone extends Component {
 
     // connect the AudioBufferSourceNode to the
     // destination so we can hear the sound
+
     source.connect(ac.destination);
     return source;
   }
@@ -185,6 +187,7 @@ class WorkZone extends Component {
                 <Recorder recordUrls={this.props.project.project.instruments} />
                 <RecordingTopRuler />
               </div>
+              {/* save record popup */}
               {this.props.editor.saving && (
                 <div
                   className="text-center"

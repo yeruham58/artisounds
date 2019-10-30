@@ -54,19 +54,32 @@ class Player extends Component {
     }
   }
 
-  // Initialize the player after the page loads all of its HTML into the window
   initPlayer(newAudio) {
     if (newAudio.context) {
-      const context = newAudio.context;
-      const analyser = context.createAnalyser();
-      newAudio.connect(analyser);
-      analyser.connect(context.destination);
+      // all of this part is to controll the volume, insted to use analyzer, I steel dont know how to use it tugether
+      const aCtx = new AudioContext();
+      const gainNode = aCtx.createGain();
+      gainNode.gain.value = this.props.editor.masterVolume / 100;
+      gainNode.connect(aCtx.destination);
+      let source = aCtx.createBufferSource();
+
+      source.buffer = newAudio.buffer;
+      source.connect(gainNode);
+
+      this.setState({ currentAudio: source });
+      //End of this part
+
+      // const context = newAudio.context;
+
+      // const analyser = context.createAnalyser();
+      // newAudio.connect(analyser);
+      // analyser.connect(context.destination);
 
       newAudio.loop = false;
       const canvas = document.getElementById("analyser_render");
       const ctx = canvas.getContext("2d");
       this.setState({
-        analyser,
+        // analyser,
         canvas,
         ctx
       });
@@ -104,6 +117,7 @@ class Player extends Component {
   onPlay() {
     if (this.state.currentAudio && this.state.audioStartTime) {
       const { currentAudio, audioStartTime } = this.state;
+
       const { duration } = currentAudio.buffer;
       if (currentAudio.buffer.duration > audioStartTime) {
         currentAudio.start(

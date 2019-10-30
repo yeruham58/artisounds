@@ -13,7 +13,8 @@ import {
   GET_ERRORS,
   ADD_RECORD,
   SAVING_RECORD,
-  CLEAR_RECORD
+  CLEAR_RECORD,
+  SET_MASTER_VOLUME
 } from "./types";
 
 export const setRecordsDic = recordsDic => dispatch => {
@@ -46,6 +47,9 @@ export const setCurrentBolb = currentBolb => dispatch => {
 };
 export const clearRecord = clearRecord => dispatch => {
   dispatch({ type: CLEAR_RECORD, payload: clearRecord });
+};
+export const setMasterVolume = masterVolume => dispatch => {
+  dispatch({ type: SET_MASTER_VOLUME, payload: masterVolume });
 };
 
 //Upload record
@@ -98,7 +102,6 @@ export const deleteRecord = (data, instrumentId) => dispatch => {
     })
     .then(response => {
       if (200 === response.status) {
-        console.log("deleted");
         dispatch({
           type: ADD_RECORD
         });

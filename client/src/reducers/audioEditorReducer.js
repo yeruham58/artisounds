@@ -10,7 +10,8 @@ import {
   SET_CURRENT_RECORD_BOLB,
   ADD_RECORD,
   SAVING_RECORD,
-  CLEAR_RECORD
+  CLEAR_RECORD,
+  SET_MASTER_VOLUME
 } from "../actions/types";
 
 const initialState = {
@@ -25,7 +26,8 @@ const initialState = {
   secondsPerPx: 0.0001,
   courrentRecordBolb: null,
   saving: false,
-  clearRecord: false
+  clearRecord: false,
+  masterVolume: 80
 };
 
 export default function(state = initialState, action) {
@@ -89,6 +91,11 @@ export default function(state = initialState, action) {
       return {
         ...state,
         clearRecord: action.payload
+      };
+    case SET_MASTER_VOLUME:
+      return {
+        ...state,
+        masterVolume: action.payload
       };
 
     default:
