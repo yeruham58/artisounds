@@ -11,10 +11,13 @@ import {
   ADD_RECORD,
   SAVING_RECORD,
   CLEAR_RECORD,
-  SET_MASTER_VOLUME
+  SET_MASTER_VOLUME,
+  SET_NUM_OF_BITS,
+  SET_CURRENT_RECORD_ID
 } from "../actions/types";
 
 const initialState = {
+  currentRecordId: null,
   isPlaing: false,
   isRecording: false,
   audioStartTime: 0,
@@ -27,7 +30,9 @@ const initialState = {
   courrentRecordBolb: null,
   saving: false,
   clearRecord: false,
-  masterVolume: 80
+  masterVolume: 80,
+  numOfBits: 50,
+  spacing: 60
 };
 
 export default function(state = initialState, action) {
@@ -96,6 +101,16 @@ export default function(state = initialState, action) {
       return {
         ...state,
         masterVolume: action.payload
+      };
+    case SET_NUM_OF_BITS:
+      return {
+        ...state,
+        numOfBits: action.payload
+      };
+    case SET_CURRENT_RECORD_ID:
+      return {
+        ...state,
+        currentRecordId: action.payload
       };
 
     default:

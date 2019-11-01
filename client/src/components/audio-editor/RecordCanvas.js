@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
+import { setNumOfBits } from "../../actions/audioEditorActions";
+
 class RecordCanvas extends Component {
   constructor(props) {
     super(props);
@@ -10,12 +12,8 @@ class RecordCanvas extends Component {
       isRecording: false,
       recordLen: 0,
       recordLineWidth: 0,
-      lineLen: 60 * 50,
-      currentRecordId: parseInt(
-        window.location.href.split("/")[
-          window.location.href.split("/").length - 1
-        ]
-      )
+      lineLen: this.props.editor.spacing * this.props.editor.numOfBits,
+      currentRecordId: this.props.editor.currentRecordId
     };
 
     this.createRecordLine = this.createRecordLine.bind(this);
@@ -47,14 +45,29 @@ class RecordCanvas extends Component {
         .duration
         ? nextProp.editor.recordsDic[this.props.instrument.id].duration
         : 0;
+      const recordLineWidth = recordLen / nextProp.editor.secondsPerPx;
       this.setState({
         isRecording: nextProp.editor.isRecording,
-        recordLen: recordLen,
-        recordLineWidth: recordLen / nextProp.editor.secondsPerPx
+        recordLen,
+        recordLineWidth
       });
+      if (
+        nextProp.editor.spacing * nextProp.editor.numOfBits - recordLineWidth <
+        1000
+      ) {
+        this.props.setNumOfBits(nextProp.editor.numOfBits + 20);
+      }
       setTimeout(() => {
         this.createRecordLine();
       }, 100);
+    }
+    if (
+      nextProp.editor &&
+      this.state.lineLen !== nextProp.editor.spacing * nextProp.editor.numOfBits
+    ) {
+      this.setState({
+        lineLen: nextProp.editor.spacing * nextProp.editor.numOfBits
+      });
     }
   }
 
@@ -90,6 +103,9 @@ class RecordCanvas extends Component {
           recordLineWidth: width
         });
         this.createRecordLine();
+        if (this.state.lineLen - width < 1000) {
+          this.props.setNumOfBits(this.props.editor.numOfBits + 20);
+        }
       }
     }, (secondsPerBit * 1000) / 15);
   }
@@ -145,7 +161,8 @@ class RecordCanvas extends Component {
 }
 
 RecordCanvas.propTypes = {
-  instrument: PropTypes.object.isRequired
+  instrument: PropTypes.object.isRequired,
+  setNumOfBits: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -155,5 +172,5 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
 
-  {}
+  { setNumOfBits }
 )(RecordCanvas);

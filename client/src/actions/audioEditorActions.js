@@ -14,9 +14,14 @@ import {
   ADD_RECORD,
   SAVING_RECORD,
   CLEAR_RECORD,
-  SET_MASTER_VOLUME
+  SET_MASTER_VOLUME,
+  SET_NUM_OF_BITS,
+  SET_CURRENT_RECORD_ID
 } from "./types";
 
+export const setCurretRecordId = recordsId => dispatch => {
+  dispatch({ type: SET_CURRENT_RECORD_ID, payload: recordsId });
+};
 export const setRecordsDic = recordsDic => dispatch => {
   dispatch({ type: SET_RECORDS_DIC, payload: recordsDic });
 };
@@ -50,6 +55,9 @@ export const clearRecord = clearRecord => dispatch => {
 };
 export const setMasterVolume = masterVolume => dispatch => {
   dispatch({ type: SET_MASTER_VOLUME, payload: masterVolume });
+};
+export const setNumOfBits = numOfBits => dispatch => {
+  dispatch({ type: SET_NUM_OF_BITS, payload: numOfBits });
 };
 
 //Upload record

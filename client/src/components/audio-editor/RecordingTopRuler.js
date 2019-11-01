@@ -19,7 +19,8 @@ class RecordingTopRuler extends Component {
 
     this.state = {
       pointerStartPos: this.props.editor.audioStartTime,
-      spacing: 60,
+      spacing: this.props.editor.spacing,
+      numOfBits: this.props.editor.numOfBits,
       secondsPerBit: 0,
       secondsPerPx: 0,
       scrollNow: false,
@@ -69,12 +70,7 @@ class RecordingTopRuler extends Component {
       const instruList = nextProp.project.project.instruments.filter(
         instrument =>
           instrument.record_url ||
-          instrument.id ===
-            parseInt(
-              window.location.href.split("/")[
-                window.location.href.split("/").length - 1
-              ]
-            )
+          instrument.id === this.props.editor.currentRecordId
       );
       this.setState({ instruListLen: instruList.length });
       const highth = instruList.length * (90 + 18);
@@ -113,6 +109,12 @@ class RecordingTopRuler extends Component {
           (nextProp.editor.isPlaying || nextProp.editor.isRecording)
         )
           this.movePointer();
+        if (nextProp.editor.numOfBits !== this.state.numOfBits) {
+          this.setState({ numOfBits: nextProp.editor.numOfBits });
+          setTimeout(() => {
+            this.initTimeLine();
+          }, 100);
+        }
       }
     }
   }
@@ -280,7 +282,8 @@ class RecordingTopRuler extends Component {
 
       let setPos =
         pointer.offsetLeft - newPos > 0.5 ? pointer.offsetLeft - newPos : 0.5;
-      if (setPos > 50 * this.state.spacing) setPos = 50 * this.state.spacing;
+      if (setPos > this.state.numOfBits * this.state.spacing - 17)
+        setPos = this.state.numOfBits * this.state.spacing - 17;
 
       if (
         pointer.offsetLeft > timelineWidth + timelineLeft - 25 ||
@@ -316,11 +319,11 @@ class RecordingTopRuler extends Component {
 
     context.beginPath();
     context.moveTo(0, 25);
-    context.lineTo(50 * spacing, 25);
+    context.lineTo(this.state.numOfBits * spacing, 25);
     context.strokeStyle = "black";
     context.stroke();
 
-    for (var interval = 0; interval < 50; interval++) {
+    for (var interval = 0; interval < this.state.numOfBits; interval++) {
       context.beginPath();
       context.strokeStyle = "red";
       context.moveTo(interval * spacing + 7.5, 0);
@@ -331,7 +334,10 @@ class RecordingTopRuler extends Component {
         subInterval < this.state.projectBit;
         subInterval++
       ) {
-        context.moveTo(interval * spacing + 7.5 + subSpacing * subInterval, 50);
+        context.moveTo(
+          interval * spacing + 7.5 + subSpacing * subInterval,
+          this.state.numOfBits
+        );
         context.lineTo(interval * spacing + 7.5 + subSpacing * subInterval, 37);
       }
       context.stroke();
@@ -414,7 +420,7 @@ class RecordingTopRuler extends Component {
                 <canvas
                   ref={this.canvasRef}
                   id="timeline"
-                  width={this.state.spacing * 50}
+                  width={this.state.spacing * this.state.numOfBits}
                   height="50px"
                   style={{
                     background: "#343a40",

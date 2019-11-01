@@ -9,7 +9,8 @@ import { getProject, clearProject } from "../../actions/projectActions";
 import {
   setAudioBuffer,
   setAudioStartTime,
-  setRecordsDic
+  setRecordsDic,
+  setCurretRecordId
 } from "../../actions/audioEditorActions";
 import EditorControlBar from "./EditorControlBar";
 import Recorder from "./Recorder";
@@ -24,9 +25,6 @@ class WorkZone extends Component {
       isRecording: false,
       recordsDic: {},
       project: null,
-      currentInstrumentId: window.location.href.split("/")[
-        window.location.href.split("/").length - 1
-      ],
       recordBlob: null
     };
     this.initAudioDic = this.initAudioDic.bind(this);
@@ -37,6 +35,13 @@ class WorkZone extends Component {
 
   componentDidMount() {
     this.props.getProject(this.props.match.params.projectId);
+    this.props.setCurretRecordId(
+      parseInt(
+        window.location.href.split("/")[
+          window.location.href.split("/").length - 1
+        ]
+      )
+    );
   }
 
   componentWillReceiveProps(nextProp) {
@@ -80,7 +85,7 @@ class WorkZone extends Component {
 
   setRecordBlob() {
     const recordObject = this.props.project.project.instruments.find(
-      record => record.id === parseInt(this.state.currentInstrumentId)
+      record => record.id === this.props.editor.currentRecordId
     );
 
     const recordUrl = recordObject ? recordObject.record_url : null;
@@ -193,7 +198,7 @@ class WorkZone extends Component {
     }
 
     const recordObject = this.props.project.project.instruments.find(
-      record => record.id === parseInt(this.state.currentInstrumentId)
+      record => record.id === this.props.editor.currentRecordId
     );
 
     const record_key = recordObject ? recordObject.record_key : null;
@@ -233,6 +238,7 @@ class WorkZone extends Component {
 }
 
 WorkZone.propTypes = {
+  setCurretRecordId: PropTypes.func.isRequired,
   getProject: PropTypes.func.isRequired,
   clearProject: PropTypes.func.isRequired,
   setAudioBuffer: PropTypes.func.isRequired,
@@ -256,6 +262,7 @@ export default connect(
     clearProject,
     setAudioBuffer,
     setAudioStartTime,
-    setRecordsDic
+    setRecordsDic,
+    setCurretRecordId
   }
 )(WorkZone);
