@@ -66,7 +66,11 @@ class RecordCanvas extends Component {
 
     // Create gradient
     var grd = context.createLinearGradient(0, 0, 200, 0);
-    grd.addColorStop(0, "red");
+    const recordColor =
+      this.state.currentRecordId === this.props.instrument.id
+        ? "#78bcff"
+        : "#5e80e6";
+    grd.addColorStop(0, recordColor);
 
     // Fill with gradient
     context.fillStyle = grd;
@@ -93,38 +97,44 @@ class RecordCanvas extends Component {
   render() {
     return (
       <div>
-        <div style={{ marginLeft: "12px", height: "25px" }}>
-          {this.props.instrument.instrument_detailes.art_practic_name}
+        <div style={{ height: "18px", marginLeft: "12px", fontSize: "12px" }}>
+          {" "}
+          <strong>
+            {this.props.instrument.instrument_detailes.art_practic_name}
+          </strong>
         </div>
         <div
           style={{
-            background: "grey",
+            background:
+              this.state.currentRecordId === this.props.instrument.id
+                ? "#ebedf0"
+                : "#d6dbe0",
             width: this.state.lineLen,
             height: "90px"
           }}
         >
           <div
-            style={{
-              background: "#A9A9A9",
-              width: this.state.lineLen,
-              height: "88px"
-            }}
+          // style={{
+          //   // background: "#fdf3f5",
+          //   width: this.state.lineLen,
+          //   height: "89px"
+          // }}
           >
             <div
               id="record-line-holder"
               style={{
-                background: "white",
+                background: "#ffe34d",
                 borderRadius: "3px",
                 width: this.state.recordLineWidth,
-                height: "88px",
-                marginLeft: "8px"
+                height: "89px",
+                marginLeft: "7.5px"
               }}
             >
               <canvas
                 ref={this.canvasRef}
                 id={this.props.instrument.id + "RecordLine"}
                 width={this.state.recordLineWidth - 2}
-                height="86"
+                height="87"
               />
             </div>
           </div>

@@ -23,12 +23,18 @@ class WorkZone extends Component {
       isPlaying: false,
       isRecording: false,
       recordsDic: {},
-      project: null
+      project: null,
+      currentInstrumentId: window.location.href.split("/")[
+        window.location.href.split("/").length - 1
+      ],
+      recordBlob: null
     };
     this.initAudioDic = this.initAudioDic.bind(this);
     this.initBuffersList = this.initBuffersList.bind(this);
     this.setBuffer = this.setBuffer.bind(this);
+    this.setRecordBlob = this.setRecordBlob.bind(this);
   }
+
   componentDidMount() {
     this.props.getProject(this.props.match.params.projectId);
   }
@@ -42,6 +48,7 @@ class WorkZone extends Component {
       this.setState({ project: nextProp.project.project });
       setTimeout(() => {
         this.initAudioDic();
+        this.setRecordBlob();
       }, 100);
     }
     if (nextProp.editor) {
@@ -71,6 +78,23 @@ class WorkZone extends Component {
     }
   }
 
+  setRecordBlob() {
+    const recordObject = this.props.project.project.instruments.find(
+      record => record.id === parseInt(this.state.currentInstrumentId)
+    );
+
+    const recordUrl = recordObject ? recordObject.record_url : null;
+
+    if (recordUrl) {
+      fetch(recordUrl).then(res => {
+        res.blob().then(blob => {
+          const recordBlob = blob;
+          this.setState({ recordBlob });
+        });
+      });
+    }
+  }
+
   initAudioDic() {
     if (this.props.project.project) {
       const { instruments } = this.props.project.project;
@@ -86,7 +110,6 @@ class WorkZone extends Component {
               .then(buffers => {
                 recordsDic[instrument.id].duration = buffers[0].duration;
                 recordsDic[instrument.id].buffer = buffers[0];
-
                 this.props.setRecordsDic(recordsDic);
               })
               .catch(() => {
@@ -115,7 +138,6 @@ class WorkZone extends Component {
     }
     if (buffersList[0]) this.setBuffer(buffersList);
   }
-
   setBuffer(buffersList) {
     const mergedBuffer = this.mergeBuffers(buffersList);
     this.props.setAudioBuffer(mergedBuffer);
@@ -138,7 +160,6 @@ class WorkZone extends Component {
       ac.sampleRate * maxDuration,
       ac.sampleRate
     );
-
     for (var j = 0; j < buffers.length; j++) {
       for (
         var srcChannel = 0;
@@ -153,17 +174,13 @@ class WorkZone extends Component {
         out.getChannelData(srcChannel).set(outt, 0);
       }
     }
-
     // Get an AudioBufferSourceNode.
     // This is the AudioNode to use when we want to play an AudioBuffer
     var source = ac.createBufferSource();
-
     // // set the buffer in the AudioBufferSourceNode
     source.buffer = out;
-
     // connect the AudioBufferSourceNode to the
     // destination so we can hear the sound
-
     source.connect(ac.destination);
     return source;
   }
@@ -175,16 +192,20 @@ class WorkZone extends Component {
       return <Spinner />;
     }
 
+    const recordObject = this.props.project.project.instruments.find(
+      record => record.id === parseInt(this.state.currentInstrumentId)
+    );
+
+    const record_key = recordObject ? recordObject.record_key : null;
+
     return (
       <div className="work-zone">
         <div className="container">
           <div className="row">
             <div className="col-md-12">
               <div>
-                <EditorControlBar
-                  recordUrls={this.props.project.project.instruments}
-                />
-                <Recorder recordUrls={this.props.project.project.instruments} />
+                <EditorControlBar record_key={record_key} />
+                <Recorder recordBlob={this.state.recordBlob} />
                 <RecordingTopRuler />
               </div>
               {/* save record popup */}

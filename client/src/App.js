@@ -59,6 +59,13 @@ function App() {
         <div className="App">
           <Navbar />
           <Route exact path="/" component={Landing} />
+          {/* <Switch>
+            <Route
+              exact
+              path="/projects/work-zone/:projectId/:instrumentId"
+              component={WorkZone}
+            />
+          </Switch> */}
           <div className="container">
             <Route exact path="/register" component={Register} />
             <Route exact path="/login" component={Login} />
@@ -70,7 +77,7 @@ function App() {
               path="/project/project-view/:projectId"
               component={ProjectView}
             />
-            {/* ##TODO: add id's to following url */}
+
             <Switch>
               <Route
                 exact
@@ -78,6 +85,7 @@ function App() {
                 component={WorkZone}
               />
             </Switch>
+
             <Switch>
               <Route
                 exact

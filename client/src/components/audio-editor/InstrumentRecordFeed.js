@@ -8,7 +8,13 @@ class InstrumentRecordFeed extends Component {
 
     return instruments.map(
       instrument =>
-        instrument.user_detailes && (
+        (instrument.record_url ||
+          instrument.id ===
+            parseInt(
+              window.location.href.split("/")[
+                window.location.href.split("/").length - 1
+              ]
+            )) && (
           <div key={instrument.id}>
             <div>
               <RecordCanvas instrument={instrument} />

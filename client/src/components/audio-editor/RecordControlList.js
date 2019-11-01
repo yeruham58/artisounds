@@ -29,10 +29,16 @@ class RecordControlList extends Component {
     const instruments = this.props.instruments;
     return instruments.map(
       instrument =>
-        instrument.user_detailes && (
+        (instrument.record_url ||
+          instrument.id ===
+            parseInt(
+              window.location.href.split("/")[
+                window.location.href.split("/").length - 1
+              ]
+            )) && (
           <div
             key={instrument.id}
-            onClick={() => this.changeInstrument(instrument)}
+            onDoubleClick={() => this.changeInstrument(instrument)}
           >
             <div>
               <RecordControlItem instrument={instrument} />

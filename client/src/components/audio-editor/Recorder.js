@@ -29,24 +29,13 @@ class Recorder extends Component {
     this.startRecord = this.startRecord.bind(this);
   }
 
-  componentDidMount() {
-    const recordUrl = this.props.recordUrls.find(
-      record => record.id === parseInt(this.state.currentInstrumentId)
-    ).record_url;
-    if (recordUrl) {
-      fetch(recordUrl).then(res => {
-        res.blob().then(blob => {
-          const audioChunks = [blob];
-          this.setState({
-            audioBlob: blob,
-            audioChunks: this.state.audioChunks.concat(audioChunks)
-          });
-        });
+  componentWillReceiveProps(nextProp) {
+    if (nextProp.recordBlob && !this.state.audioBlob) {
+      this.setState({
+        audioBlob: nextProp.recordBlob,
+        audioChunks: this.state.audioChunks.concat([nextProp.recordBlob])
       });
     }
-  }
-
-  componentWillReceiveProps(nextProp) {
     if (nextProp.editor) {
       if (this.state.recordDic !== nextProp.editor.recordsDic) {
         this.setState({

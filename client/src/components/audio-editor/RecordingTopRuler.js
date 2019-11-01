@@ -31,7 +31,8 @@ class RecordingTopRuler extends Component {
       isMoving: false,
       audioPointInSeconds: 0,
       recordsHighth: window.innerHeight * 0.6,
-      timelineOverflowY: null
+      timelineOverflowY: null,
+      instruListLen: 0
     };
 
     this.initTimeLine = this.initTimeLine.bind(this);
@@ -43,16 +44,17 @@ class RecordingTopRuler extends Component {
     this.scrollCanvas = this.scrollCanvas.bind(this);
     this.getClickPosition = this.getClickPosition.bind(this);
     this.setRulerTop = this.setRulerTop.bind(this);
+    this.scrollCanvasInRecord = this.scrollCanvasInRecord.bind(this);
   }
 
   componentDidMount() {
     const pointer = document.getElementById("record-pointer-holder");
-    const canvas = document.getElementById("time-line-holder");
+    const canvas = document.getElementById("timeline");
     this.initTimeLine();
     this.dragPointer(pointer);
     canvas.addEventListener("click", this.getClickPosition, false);
 
-    const secondsPerBit = 60 / this.state.projectTempo;
+    const secondsPerBit = this.state.spacing / this.state.projectTempo;
     const pxPerBit = this.state.spacing / this.state.projectBit;
     const secondsPerPx = secondsPerBit / pxPerBit;
 
@@ -63,15 +65,26 @@ class RecordingTopRuler extends Component {
   }
 
   componentWillReceiveProps(nextProp) {
-    if (nextProp.editor) {
-      if (nextProp.editor.recordsDic) {
-        const highth = Object.keys(nextProp.editor.recordsDic).length * 115;
-        if (highth < this.state.recordsHighth) {
-          this.setState({ timelineOverflowY: "hidden" });
-        } else {
-          this.setState({ timelineOverflowY: "scroll" });
-        }
+    if (nextProp.project && nextProp.project.project) {
+      const instruList = nextProp.project.project.instruments.filter(
+        instrument =>
+          instrument.record_url ||
+          instrument.id ===
+            parseInt(
+              window.location.href.split("/")[
+                window.location.href.split("/").length - 1
+              ]
+            )
+      );
+      this.setState({ instruListLen: instruList.length });
+      const highth = instruList.length * (90 + 18);
+      if (highth < this.state.recordsHighth) {
+        this.setState({ timelineOverflowY: "hidden" });
+      } else {
+        this.setState({ timelineOverflowY: "scroll" });
       }
+    }
+    if (nextProp.editor) {
       if (nextProp.editor.audioStartTime) {
         this.setState({ pointerStartPos: nextProp.editor.audioStartTime });
       }
@@ -113,8 +126,7 @@ class RecordingTopRuler extends Component {
         : document.getElementById("time-line-holder");
 
     const { recordsHighth } = this.state;
-    const allRecordsHighth =
-      Object.keys(this.props.editor.recordsDic).length * 115;
+    const allRecordsHighth = this.state.instruListLen * (90 + 18);
 
     const scrollLimit = allRecordsHighth + 50 - recordsHighth;
 
@@ -137,32 +149,41 @@ class RecordingTopRuler extends Component {
 
   setPointer(audioStartTime) {
     const pointer = document.getElementById("record-pointer-holder");
-    pointer.style.left = audioStartTime / this.state.secondsPerPx - 7.5 + "px"; // 7.5 is middle width of pointer element
+    const pos =
+      audioStartTime / this.state.secondsPerPx - 7.5 > 0
+        ? audioStartTime / this.state.secondsPerPx - 7.5
+        : 0; // 7.5 is middle width of pointer element
+    pointer.style.left = pos + "px";
   }
 
   movePointer() {
-    var elem = document.getElementById("record-pointer-holder");
-    // we need th timeOut for when start record after a record, so the state will first update with the new start time of the first record duration
+    var pointer = document.getElementById("record-pointer-holder");
+    // we need the timeOut for when start record after a record, so the state will first update with the new start time of the first record duration
+    this.setState({ scrollNow: true });
     setTimeout(() => {
-      var pos = this.state.pointerStartPos / this.state.secondsPerPx;
       const { secondsPerBit } = this.state;
       const pxPerBit = this.state.spacing / this.state.projectBit;
+      var pos = this.state.pointerStartPos / this.state.secondsPerPx;
       var id = setInterval(() => {
         if (!this.state.movePointer) {
           // pos = 0;
           this.props.setAudioStartTime(pos * this.state.secondsPerPx);
           clearInterval(id);
+          this.setState({ scrollNow: false });
         } else {
           pos += pxPerBit / 15;
-          elem.style.left = pos + "px";
+          pointer.style.left = pos + "px";
         }
       }, (secondsPerBit * 1000) / 15);
+      setTimeout(() => {
+        this.scrollCanvasInRecord((secondsPerBit * 1000) / 15, pxPerBit / 15);
+      }, 100);
     }, 100);
   }
 
   getClickPosition(e) {
-    if (!this.state.movePointer) {
-      const canvas = document.getElementById("time-line-holder");
+    if (!this.state.movePointer && e.clientY > 225) {
+      const canvas = document.getElementById("timeline");
       const canvasPositions = canvas.getBoundingClientRect();
       const setPoint = e.clientX - canvasPositions.left + canvas.scrollLeft;
       const audioPointInSeconds = this.state.secondsPerPx * setPoint;
@@ -221,6 +242,25 @@ class RecordingTopRuler extends Component {
         }
       }
     }, 0.2);
+  }
+
+  //scroll the canvas during play
+  scrollCanvasInRecord(intervatTime, scrollPx) {
+    const ruler = document.getElementById("time-line-holder");
+    const pointer = document.getElementById("record-pointer-holder");
+    var pos = pointer.offsetLeft - ruler.offsetWidth * 0.45;
+    var id = setInterval(() => {
+      const { scrollNow } = this.state;
+      if (!scrollNow) {
+        clearInterval(id);
+      } else {
+        pos += scrollPx;
+        ruler.scroll({
+          left: pos,
+          behavior: "smooth"
+        });
+      }
+    }, intervatTime);
   }
 
   elementDrag(e) {
@@ -283,16 +323,16 @@ class RecordingTopRuler extends Component {
     for (var interval = 0; interval < 50; interval++) {
       context.beginPath();
       context.strokeStyle = "red";
-      context.moveTo(interval * spacing + 7, 0);
-      context.lineTo(interval * spacing + 7, 70);
+      context.moveTo(interval * spacing + 7.5, 0);
+      context.lineTo(interval * spacing + 7.5, 70);
 
       for (
         var subInterval = 0;
         subInterval < this.state.projectBit;
         subInterval++
       ) {
-        context.moveTo(interval * spacing + 7 + subSpacing * subInterval, 50);
-        context.lineTo(interval * spacing + 7 + subSpacing * subInterval, 37);
+        context.moveTo(interval * spacing + 7.5 + subSpacing * subInterval, 50);
+        context.lineTo(interval * spacing + 7.5 + subSpacing * subInterval, 37);
       }
       context.stroke();
       context.beginPath();
@@ -315,7 +355,7 @@ class RecordingTopRuler extends Component {
         <div className="row">
           <div
             className="col-md-2"
-            style={{ background: "white", padding: "0px" }}
+            style={{ background: "grey", padding: "0px" }}
           >
             <div
               style={{
@@ -334,7 +374,9 @@ class RecordingTopRuler extends Component {
                   boxSizing: "content-box"
                 }}
                 id="record-control-list"
-                onScroll={() => this.setRulerTop("record-control-list")}
+                onScroll={() => {
+                  this.setRulerTop("record-control-list");
+                }}
               >
                 <div
                   style={{
@@ -342,7 +384,7 @@ class RecordingTopRuler extends Component {
                     width: "100%",
                     position: "absolute",
                     top: this.state.rulerTop + "px",
-                    background: "grey"
+                    background: "#343a40"
                   }}
                 ></div>
                 <div style={{ marginTop: "50px" }}>
@@ -361,8 +403,10 @@ class RecordingTopRuler extends Component {
                   // overflow: "scroll",
                   overflowY: this.state.timelineOverflowY,
                   position: "relative",
+                  left: -20,
                   height: this.state.recordsHighth + "px",
-                  background: "grey"
+                  background: "grey",
+                  color: "white"
                 }}
                 id="time-line-holder"
                 onScroll={() => this.setRulerTop("time-line-holder")}
@@ -370,7 +414,7 @@ class RecordingTopRuler extends Component {
                 <canvas
                   ref={this.canvasRef}
                   id="timeline"
-                  width={60 * 50}
+                  width={this.state.spacing * 50}
                   height="50px"
                   style={{
                     background: "#343a40",

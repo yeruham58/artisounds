@@ -35,14 +35,24 @@ class RecordControlItem extends Component {
     return (
       <div>
         <div>
-          <div style={{ height: "25px" }}>{userFirstName}</div>
+          <div
+            style={{
+              height: "18px",
+              background: "grey",
+              color: "white",
+              minWidth: "100px",
+              fontSize: "12px"
+            }}
+          >
+            <strong style={{ marginLeft: "8px" }}>{userFirstName}</strong>
+          </div>
           <div
             style={{
               background: `${
                 parseInt(this.state.currentInstrumentId) ===
                 this.props.instrument.id
-                  ? "#C0C0C0"
-                  : "#F5F5F5"
+                  ? "#ebedf0"
+                  : "#c9cfd6"
               }`,
               minWidth: "100px",
               height: "90px"

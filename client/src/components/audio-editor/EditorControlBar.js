@@ -59,9 +59,7 @@ class EditorControlBar extends Component {
       );
       this.props.uploadRecord(data, this.state.currentInstrumentId);
     } else {
-      const recordKey = this.props.recordUrls.find(
-        record => record.id === parseInt(this.state.currentInstrumentId)
-      ).record_key;
+      const recordKey = this.props.record_key;
       if (
         recordKey &&
         this.props.editor.courrentRecordBolb &&
@@ -184,7 +182,8 @@ EditorControlBar.propTypes = {
   setRecordsDic: PropTypes.func.isRequired,
   setIsPlaying: PropTypes.func.isRequired,
   setIsRecording: PropTypes.func.isRequired,
-  setMasterVolume: PropTypes.func.isRequired
+  setMasterVolume: PropTypes.func.isRequired,
+  record_key: PropTypes.string
 };
 
 const mapStateToProps = state => ({
