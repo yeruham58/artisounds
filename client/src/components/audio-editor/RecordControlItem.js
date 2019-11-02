@@ -65,7 +65,9 @@ class RecordControlItem extends Component {
                 className="rounded ml-2"
                 style={{ width: "40px", height: "40px" }}
               />
+
               <i
+                style={{ color: this.state.isMuted ? "grey" : "	#4169E1" }}
                 className={`fas ${
                   this.state.isMuted ? "fa-volume-mute" : "fa-volume-up"
                 } mt-4 ml-3`}

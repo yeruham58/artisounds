@@ -8,7 +8,6 @@ import Spinner from "../common/Spinner";
 import { getProject, clearProject } from "../../actions/projectActions";
 import {
   setAudioBuffer,
-  setAudioStartTime,
   setRecordsDic,
   setCurretRecordId
 } from "../../actions/audioEditorActions";
@@ -18,6 +17,7 @@ import Recorder from "./Recorder";
 class WorkZone extends Component {
   constructor(props) {
     super(props);
+    this.pointerRef = React.createRef();
     this.state = {
       movePointer: false,
       setingRecordsDic: false,
@@ -64,9 +64,11 @@ class WorkZone extends Component {
         this.setState({
           recordsDic: nextProp.editor.recordsDic
         });
-        setTimeout(() => {
-          this.initBuffersList();
-        }, 200);
+        // this timeout is for state to update in reload page
+        if (Object.keys(nextProp.editor.recordsDic)[0])
+          setTimeout(() => {
+            this.initBuffersList();
+          }, 100);
       }
       if (nextProp.editor.audioStartTime) {
         this.setState({ audioStartTime: nextProp.editor.audioStartTime });
@@ -136,12 +138,15 @@ class WorkZone extends Component {
   initBuffersList() {
     const { recordsDic } = this.props.editor;
     const buffersList = [];
-    for (var key in recordsDic) {
-      if (recordsDic[key].buffer) {
-        buffersList.push(recordsDic[key].buffer);
+
+    setTimeout(() => {
+      for (var key in recordsDic) {
+        if (recordsDic[key].buffer) {
+          buffersList.push(recordsDic[key].buffer);
+        }
       }
-    }
-    if (buffersList[0]) this.setBuffer(buffersList);
+      if (buffersList[0]) this.setBuffer(buffersList);
+    }, 500);
   }
   setBuffer(buffersList) {
     const mergedBuffer = this.mergeBuffers(buffersList);
@@ -209,9 +214,12 @@ class WorkZone extends Component {
           <div className="row">
             <div className="col-md-12">
               <div>
-                <EditorControlBar record_key={record_key} />
+                <EditorControlBar
+                  record_key={record_key}
+                  pointerRef={this.pointerRef}
+                />
                 <Recorder recordBlob={this.state.recordBlob} />
-                <RecordingTopRuler />
+                <RecordingTopRuler pointerRef={this.pointerRef} />
               </div>
               {/* save record popup */}
               {this.props.editor.saving && (
@@ -261,7 +269,6 @@ export default connect(
     getProject,
     clearProject,
     setAudioBuffer,
-    setAudioStartTime,
     setRecordsDic,
     setCurretRecordId
   }

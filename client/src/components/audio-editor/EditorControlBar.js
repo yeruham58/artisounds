@@ -23,11 +23,11 @@ class EditorControlBar extends Component {
     this.state = {
       isPlaying: false,
       isRecording: false,
-      currentInstrumentId: window.location.href.split("/")[
-        window.location.href.split("/").length - 1
-      ],
-      volume: 80
+      currentInstrumentId: this.props.editor.currentRecordId,
+      volume: 80,
+      headphonesMood: true
     };
+
     this.clearRecord = this.clearRecord.bind(this);
     this.uploadRecord = this.uploadRecord.bind(this);
     this.onVolumeChange = this.onVolumeChange.bind(this);
@@ -115,7 +115,11 @@ class EditorControlBar extends Component {
                 disabled={this.state.isPlaying || this.state.isRecording}
                 onClick={() => {
                   this.props.setIsRecording(true);
-                  this.setState({ isRecording: true });
+                  this.props.setIsPlaying(this.state.headphonesMood);
+                  this.setState({
+                    isRecording: true,
+                    isPlaying: this.state.headphonesMood
+                  });
                 }}
               >
                 <i className="fas fa-circle"></i>
@@ -132,6 +136,19 @@ class EditorControlBar extends Component {
                 }}
               >
                 <i className="fas fa-stop"></i>
+              </button>
+              {/* headphones mood control */}
+              <button
+                type="button"
+                className="btn btn-light mb-3 mr-2"
+                style={{
+                  color: this.state.headphonesMood ? "#D2691E" : "grey"
+                }}
+                onClick={() => {
+                  this.setState({ headphonesMood: !this.state.headphonesMood });
+                }}
+              >
+                <i className="fas fa-headphones-alt"></i>
               </button>
               <button
                 type="button"
@@ -155,7 +172,7 @@ class EditorControlBar extends Component {
                 }}
               >
                 <RangeSlider
-                  disabled={this.props.editor.isPlaying}
+                  // disabled={this.props.editor.isPlaying}
                   id="masterVolumeRange"
                   value={this.state.volume}
                   min={0}
@@ -166,7 +183,7 @@ class EditorControlBar extends Component {
             </div>
           </div>
           <div className="col-md-4">
-            <Player />
+            <Player pointerRef={this.props.pointerRef} />
           </div>
         </div>
       </div>

@@ -429,7 +429,8 @@ class RecordingTopRuler extends Component {
                   }}
                 />
                 <div
-                  ref={this.pointerRef}
+                  // ref={this.pointerRef}
+                  ref={this.props.pointerRef}
                   id="record-pointer-holder"
                   style={{
                     position: "absolute",
@@ -438,7 +439,7 @@ class RecordingTopRuler extends Component {
                     top: this.state.rulerTop + "px"
                   }}
                 >
-                  <div className="record-pointer">
+                  <div className="record-pointer" ref={this.props.pointerRef}>
                     <div
                       className="record-pointer-line"
                       style={{ height: this.state.recordsHighth }}

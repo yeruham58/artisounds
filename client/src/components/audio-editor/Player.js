@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 
-// import range from "../common/RangeSlider";
-
 class Player extends Component {
   constructor(props) {
     super(props);
@@ -18,7 +16,8 @@ class Player extends Component {
       analyser: null,
       canvas: null,
       ctx: null,
-      isPlaying: false
+      isPlaying: false,
+      volume: 0
     };
 
     this.frameLooper = this.frameLooper.bind(this);
@@ -29,11 +28,26 @@ class Player extends Component {
 
   componentWillReceiveProps(nextProp) {
     if (nextProp.editor) {
-      this.setState({
-        currentAudio: nextProp.editor.audioBuffer
-      });
-      if (nextProp.editor.audioBuffer) {
-        this.initPlayer(nextProp.editor.audioBuffer);
+      if (nextProp.editor.audioBuffer && nextProp.editor.audioBuffer.context) {
+        const initIfPlaying =
+          nextProp.editor.masterVolume !== this.state.volume;
+        this.setState({
+          volume: nextProp.editor.masterVolume
+        });
+
+        if (!nextProp.editor.isPlaying) {
+          this.setState({ currentAudio: nextProp.editor.audioBuffer });
+        }
+
+        if (
+          (!nextProp.editor.isPlaying &&
+            nextProp.editor.audioBuffer !== this.state.currentAudio) ||
+          initIfPlaying
+        ) {
+          setTimeout(() => {
+            this.initPlayer(nextProp.editor.audioBuffer);
+          }, 100);
+        }
       }
 
       if (nextProp.editor.audioStartTime) {
@@ -65,6 +79,15 @@ class Player extends Component {
 
       source.buffer = newAudio.buffer;
       source.connect(gainNode);
+
+      const pointerLeftPx = this.props.pointerRef.current.offsetLeft;
+      const currentTime = this.props.editor.secondsPerPx * pointerLeftPx;
+      const { duration } = this.state.currentAudio.buffer;
+
+      if (this.state.isPlaying && duration - currentTime > 0) {
+        this.onStop();
+        source.start(0, currentTime, duration - currentTime);
+      }
 
       this.setState({ currentAudio: source });
       //End of this part
@@ -127,7 +150,7 @@ class Player extends Component {
           duration - audioStartTime
         );
       }
-      this.frameLooper();
+      // this.frameLooper();
     }
   }
 
