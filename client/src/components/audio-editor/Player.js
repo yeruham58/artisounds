@@ -41,6 +41,7 @@ class Player extends Component {
 
         if (
           (!nextProp.editor.isPlaying &&
+            !nextProp.editor.isRecording &&
             nextProp.editor.audioBuffer !== this.state.currentAudio) ||
           initIfPlaying
         ) {
@@ -50,7 +51,10 @@ class Player extends Component {
         }
       }
 
-      if (nextProp.editor.audioStartTime) {
+      if (
+        nextProp.editor.audioStartTime &&
+        nextProp.editor.audioStartTime !== this.state.audioStartTime
+      ) {
         this.setState({ audioStartTime: nextProp.editor.audioStartTime });
       }
 

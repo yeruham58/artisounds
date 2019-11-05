@@ -15,6 +15,7 @@ import {
   setMasterVolume
 } from "../../actions/audioEditorActions";
 import Player from "./Player";
+import Metronome from "../common/Metronome";
 
 class EditorControlBar extends Component {
   constructor(props) {
@@ -25,7 +26,11 @@ class EditorControlBar extends Component {
       isRecording: false,
       currentInstrumentId: this.props.editor.currentRecordId,
       volume: 80,
-      headphonesMood: true
+      headphonesMood: true,
+      playMetronome: true,
+      active1234: true,
+      projectBit: parseInt(this.props.project.project.bit.split("/")[0]),
+      projectTempo: this.props.project.project.tempo
     };
 
     this.clearRecord = this.clearRecord.bind(this);
@@ -82,6 +87,20 @@ class EditorControlBar extends Component {
   }
 
   render() {
+    const currentRecordObj = this.props.editor.recordsDic[
+      this.state.currentInstrumentId
+    ];
+    const currentDuration =
+      currentRecordObj &&
+      currentRecordObj.duration &&
+      this.props.editor.isRecording
+        ? currentRecordObj.duration
+        : this.props.editor.audioStartTime;
+    const secondsPerBit = this.props.editor.secondsPerBit;
+    const waitingTime =
+      currentDuration % secondsPerBit > 0
+        ? (secondsPerBit - (currentDuration % secondsPerBit)) * 1000
+        : 0;
     return (
       <div>
         <div className="row">
@@ -114,8 +133,18 @@ class EditorControlBar extends Component {
                 className="btn btn-light mb-3 mr-2 text-danger"
                 disabled={this.state.isPlaying || this.state.isRecording}
                 onClick={() => {
-                  this.props.setIsRecording(true);
-                  this.props.setIsPlaying(this.state.headphonesMood);
+                  const waitingTime =
+                    (60 / this.state.projectTempo) *
+                    1000 *
+                    (this.state.projectBit + 1);
+                  const waitBeforeRecord = this.state.active1234
+                    ? waitingTime
+                    : 0;
+                  setTimeout(() => {
+                    this.props.setIsRecording(true);
+                    this.props.setIsPlaying(this.state.headphonesMood);
+                  }, waitBeforeRecord);
+
                   this.setState({
                     isRecording: true,
                     isPlaying: this.state.headphonesMood
@@ -157,6 +186,33 @@ class EditorControlBar extends Component {
               >
                 Clear record
               </button>
+              {/* metronome controle */}
+              <button
+                type="button"
+                className={`btn ${
+                  this.state.active1234 ? "btn-warning" : "btn-secondary"
+                } mb-3 mr-2`}
+                onClick={() =>
+                  this.setState({ active1234: !this.state.active1234 })
+                }
+              >
+                <span style={{ fontSize: "8px" }}>1</span>
+                <span style={{ fontSize: "10px" }}>2</span>
+                <span style={{ fontSize: "12px" }}>3</span>
+                <span style={{ fontSize: "14px" }}>4</span>
+              </button>
+              <button
+                type="button"
+                className={`btn ${
+                  this.state.playMetronome ? "btn-warning" : "btn-secondary"
+                } mb-3 mr-2`}
+                onClick={() =>
+                  this.setState({ playMetronome: !this.state.playMetronome })
+                }
+              >
+                <i className="fas fa-thermometer"></i>
+              </button>
+
               <button
                 type="button"
                 className="btn btn-success mb-3 mr-2"
@@ -164,6 +220,7 @@ class EditorControlBar extends Component {
               >
                 Save
               </button>
+
               <div
                 style={{
                   width: "150px",
@@ -184,6 +241,14 @@ class EditorControlBar extends Component {
           </div>
           <div className="col-md-4">
             <Player pointerRef={this.props.pointerRef} />
+            <Metronome
+              play={
+                this.state.playMetronome &&
+                (this.state.isPlaying || this.state.isRecording)
+              }
+              bitsPerMin={this.props.project.project.tempo}
+              waitingTime={waitingTime}
+            />
           </div>
         </div>
       </div>

@@ -44,10 +44,7 @@ class Recorder extends Component {
       }
       if (nextProp.editor.isRecording && !this.state.isRecording) {
         this.setState({ isRecording: true });
-        // timeOut becouse thre is time out in the pointer
-        setTimeout(() => {
-          this.startRecord();
-        }, 100);
+        this.startRecord();
       }
       if (!nextProp.editor.isRecording && this.state.isRecording) {
         this.setState({ isRecording: false });
@@ -62,42 +59,45 @@ class Recorder extends Component {
 
   startRecord() {
     this.setRecordStartTime();
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-      const mediaRecorder = new MediaRecorder(stream);
-      this.mediaRecorder = mediaRecorder;
-      this.mediaRecorder.start();
-      this.props.setIsRecording(true);
-      const audioChunks = this.state.audioBlob ? this.state.audioChunks : [];
+    // timeOut becouse thre is time out in the pointer
+    setTimeout(() => {
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        const mediaRecorder = new MediaRecorder(stream);
+        this.mediaRecorder = mediaRecorder;
+        this.mediaRecorder.start();
+        // this.props.setIsRecording(true);
+        const audioChunks = this.state.audioBlob ? this.state.audioChunks : [];
 
-      this.mediaRecorder.addEventListener("dataavailable", event => {
-        audioChunks.push(event.data);
+        this.mediaRecorder.addEventListener("dataavailable", event => {
+          audioChunks.push(event.data);
 
-        this.setState({ audioChunks });
-      });
-
-      this.mediaRecorder.addEventListener("stop", () => {
-        const audioBlob = new Blob(audioChunks);
-        this.props.setCurrentBolb(audioBlob);
-        const audioUrl = URL.createObjectURL(audioBlob);
-        let audio = new Crunker();
-        audio.fetchAudio(audioUrl, audioUrl).then(buffers => {
-          const recordsDic = {
-            ...this.props.editor.recordsDic,
-            [window.location.href.split("/")[
-              window.location.href.split("/").length - 1
-            ]]: {
-              duration: buffers[0].duration,
-              buffer: buffers[0]
-            }
-          };
-          this.props.setRecordsDic(recordsDic);
+          this.setState({ audioChunks });
         });
-        this.setState({
-          audioBlob,
-          audioUrl
+
+        this.mediaRecorder.addEventListener("stop", () => {
+          const audioBlob = new Blob(audioChunks);
+          this.props.setCurrentBolb(audioBlob);
+          const audioUrl = URL.createObjectURL(audioBlob);
+          let audio = new Crunker();
+          audio.fetchAudio(audioUrl, audioUrl).then(buffers => {
+            const recordsDic = {
+              ...this.props.editor.recordsDic,
+              [window.location.href.split("/")[
+                window.location.href.split("/").length - 1
+              ]]: {
+                duration: buffers[0].duration,
+                buffer: buffers[0]
+              }
+            };
+            this.props.setRecordsDic(recordsDic);
+          });
+          this.setState({
+            audioBlob,
+            audioUrl
+          });
         });
       });
-    });
+    }, 100);
   }
 
   setRecordStartTime() {
@@ -111,7 +111,9 @@ class Recorder extends Component {
       instrumentRecord && instrumentRecord.duration
         ? instrumentRecord.duration
         : 0.0000001;
+
     this.props.setAudioStartTime(startTime);
+    console.log("setting");
   }
 
   render() {

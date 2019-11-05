@@ -18,7 +18,8 @@ class RecordingTopRuler extends Component {
     this.pointerRef = React.createRef();
 
     this.state = {
-      pointerStartPos: this.props.editor.audioStartTime,
+      // pointerStartPos: this.props.editor.audioStartTime,
+      pointerStartPos: null,
       spacing: this.props.editor.spacing,
       numOfBits: this.props.editor.numOfBits,
       secondsPerBit: 0,
@@ -29,7 +30,6 @@ class RecordingTopRuler extends Component {
       projectBit: parseInt(this.props.project.project.bit.split("/")[0]),
       projectTempo: this.props.project.project.tempo,
       rulerTop: 0,
-      isMoving: false,
       audioPointInSeconds: 0,
       recordsHighth: window.innerHeight * 0.6,
       timelineOverflowY: null,
@@ -81,8 +81,13 @@ class RecordingTopRuler extends Component {
       }
     }
     if (nextProp.editor) {
-      if (nextProp.editor.audioStartTime) {
+      if (
+        nextProp.editor.audioStartTime &&
+        this.state.pointerStartPos !== nextProp.editor.audioStartTime &&
+        !this.state.movePointer
+      ) {
         this.setState({ pointerStartPos: nextProp.editor.audioStartTime });
+        this.setPointer(nextProp.editor.audioStartTime);
       }
       if (
         Object.keys(nextProp.editor).indexOf("isPlaying") > 0 ||
@@ -152,9 +157,9 @@ class RecordingTopRuler extends Component {
   setPointer(audioStartTime) {
     const pointer = document.getElementById("record-pointer-holder");
     const pos =
-      audioStartTime / this.state.secondsPerPx - 7.5 > 0
-        ? audioStartTime / this.state.secondsPerPx - 7.5
-        : 0; // 7.5 is middle width of pointer element
+      audioStartTime / this.state.secondsPerPx > 0
+        ? audioStartTime / this.state.secondsPerPx
+        : 0;
     pointer.style.left = pos + "px";
   }
 
@@ -173,13 +178,13 @@ class RecordingTopRuler extends Component {
           clearInterval(id);
           this.setState({ scrollNow: false });
         } else {
-          pos += pxPerBit / 15;
+          pos += pxPerBit / 20;
           pointer.style.left = pos + "px";
         }
-      }, (secondsPerBit * 1000) / 15);
+      }, (secondsPerBit * 1000) / 20);
       setTimeout(() => {
-        this.scrollCanvasInRecord((secondsPerBit * 1000) / 15, pxPerBit / 15);
-      }, 100);
+        this.scrollCanvasInRecord((secondsPerBit * 1000) / 20, pxPerBit / 20);
+      }, 20);
     }, 100);
   }
 
@@ -187,10 +192,10 @@ class RecordingTopRuler extends Component {
     if (!this.state.movePointer && e.clientY > 225) {
       const canvas = document.getElementById("timeline");
       const canvasPositions = canvas.getBoundingClientRect();
-      const setPoint = e.clientX - canvasPositions.left + canvas.scrollLeft;
+      const setPoint =
+        e.clientX - canvasPositions.left + canvas.scrollLeft - 7.5; // 7.5 is middle width of pointer element
       const audioPointInSeconds = this.state.secondsPerPx * setPoint;
       this.props.setAudioStartTime(audioPointInSeconds);
-      this.setPointer(audioPointInSeconds);
     }
   }
 
@@ -236,6 +241,7 @@ class RecordingTopRuler extends Component {
             setPos = timelineLeft;
             scrollNum = timeline.scrollLeft - 10;
           }
+
           pointer.style.left = setPos + "px";
           timeline.scroll({
             left: scrollNum,
@@ -293,8 +299,8 @@ class RecordingTopRuler extends Component {
         this.scrollCanvas(timeline, pointer);
       } else {
         pointer.style.left = setPos + "px";
-        const audioPointInSeconds = this.state.secondsPerPx * setPos;
-        this.setState({ audioPointInSeconds });
+        // const audioPointInSeconds = this.state.secondsPerPx * setPos;
+        // this.setState({ audioPointInSeconds });
       }
     }
   }
@@ -303,9 +309,9 @@ class RecordingTopRuler extends Component {
     /* stop moving when mouse button is released:*/
     document.onmouseup = null;
     document.onmousemove = null;
-    setTimeout(() => {
-      this.props.setAudioStartTime(this.state.audioPointInSeconds);
-    }, 20);
+    const pointer = document.getElementById("record-pointer-holder");
+    const audioPointInSeconds = this.state.secondsPerPx * pointer.offsetLeft;
+    this.props.setAudioStartTime(audioPointInSeconds);
 
     this.setState({ scrollNow: false });
   }

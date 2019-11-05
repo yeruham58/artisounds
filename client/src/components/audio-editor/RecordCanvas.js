@@ -98,7 +98,7 @@ class RecordCanvas extends Component {
       if (!this.state.isRecording) {
         clearInterval(id);
       } else {
-        width += pxPerBit / 15;
+        width += pxPerBit / 20;
         this.setState({
           recordLineWidth: width
         });
@@ -107,7 +107,7 @@ class RecordCanvas extends Component {
           this.props.setNumOfBits(this.props.editor.numOfBits + 20);
         }
       }
-    }, (secondsPerBit * 1000) / 15);
+    }, (secondsPerBit * 1000) / 20);
   }
 
   render() {
