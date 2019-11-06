@@ -122,12 +122,9 @@ class WorkZone extends Component {
 
   initBuffersList(masterVolume) {
     const { recordsDic } = this.props.editor;
-    console.log("masterVolume");
-    console.log(masterVolume);
     //Not working without time outwhen loading page, I have to understend why
     setTimeout(() => {
       const buffersList = initBuffersList(recordsDic, masterVolume);
-      console.log("gonna set the list");
       this.props.setBuffersList(buffersList[1]);
       if (buffersList[0][0]) {
         this.setBuffer(buffersList[0]);

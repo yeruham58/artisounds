@@ -81,11 +81,7 @@ class RecordingTopRuler extends Component {
       }
     }
     if (nextProp.editor) {
-      if (
-        nextProp.editor.audioStartTime &&
-        this.state.pointerStartPos !== nextProp.editor.audioStartTime &&
-        !this.state.movePointer
-      ) {
+      if (this.state.pointerStartPos !== nextProp.editor.audioStartTime) {
         this.setState({ pointerStartPos: nextProp.editor.audioStartTime });
         this.setPointer(nextProp.editor.audioStartTime);
       }
@@ -178,12 +174,15 @@ class RecordingTopRuler extends Component {
           clearInterval(id);
           this.setState({ scrollNow: false });
         } else {
-          pos += pxPerBit / 20;
+          pos += pxPerBit / pxPerBit;
           pointer.style.left = pos + "px";
         }
-      }, (secondsPerBit * 1000) / 20);
+      }, (secondsPerBit * 1000) / pxPerBit);
       setTimeout(() => {
-        this.scrollCanvasInRecord((secondsPerBit * 1000) / 20, pxPerBit / 20);
+        this.scrollCanvasInRecord(
+          (secondsPerBit * 1000) / pxPerBit,
+          pxPerBit / pxPerBit
+        );
       }, 20);
     }, 100);
   }
@@ -311,6 +310,8 @@ class RecordingTopRuler extends Component {
     document.onmousemove = null;
     const pointer = document.getElementById("record-pointer-holder");
     const audioPointInSeconds = this.state.secondsPerPx * pointer.offsetLeft;
+    console.log("audioPointInSeconds");
+    console.log(audioPointInSeconds);
     this.props.setAudioStartTime(audioPointInSeconds);
 
     this.setState({ scrollNow: false });

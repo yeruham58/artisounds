@@ -103,6 +103,7 @@ class EditorControlBar extends Component {
       currentDuration % secondsPerBit > 0
         ? (secondsPerBit - (currentDuration % secondsPerBit)) * 1000
         : 0;
+
     return (
       <div>
         <div className="row">
@@ -123,7 +124,11 @@ class EditorControlBar extends Component {
                 className="btn btn-light mb-3 mr-2 text-success"
                 disabled={this.state.isPlaying || this.state.isRecording}
                 onClick={() => {
-                  this.props.setIsPlaying(true);
+                  const waitingTime = (60 / this.state.projectTempo) * 1000;
+                  setTimeout(() => {
+                    this.props.setIsPlaying(true);
+                  }, waitingTime);
+
                   this.setState({ isPlaying: true });
                 }}
               >
@@ -135,13 +140,10 @@ class EditorControlBar extends Component {
                 className="btn btn-light mb-3 mr-2 text-danger"
                 disabled={this.state.isPlaying || this.state.isRecording}
                 onClick={() => {
-                  const waitingTime =
-                    (60 / this.state.projectTempo) *
-                    1000 *
-                    (this.state.projectBit + 1);
+                  const waitingTime = (60 / this.state.projectTempo) * 1000;
                   const waitBeforeRecord = this.state.active1234
-                    ? waitingTime
-                    : 0;
+                    ? waitingTime * (this.state.projectBit + 1)
+                    : waitingTime;
                   setTimeout(() => {
                     this.props.setIsRecording(true);
                     this.props.setIsPlaying(this.state.headphonesMood);

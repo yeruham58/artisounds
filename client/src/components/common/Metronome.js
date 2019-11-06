@@ -16,6 +16,8 @@ class Metronome extends Component {
     if (nextProp.play && !this.state.play) {
       this.setState({ play: true });
       const waiteBeforePlay = this.props.waitingTime;
+      console.log("waiteBeforePlay");
+      console.log(waiteBeforePlay);
       setTimeout(() => {
         this.playMetronome();
       }, 100 + waiteBeforePlay);
