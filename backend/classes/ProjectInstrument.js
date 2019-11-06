@@ -30,7 +30,8 @@ ProjectInstrument.init(
     characters_key: Sequelize.STRING,
     record_url: Sequelize.STRING,
     record_key: Sequelize.STRING,
-    comments: Sequelize.STRING
+    comments: Sequelize.STRING,
+    volume: Sequelize.INTEGER
   },
   { sequelize, modelName: "ProjectInstrument" }
 );

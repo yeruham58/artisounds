@@ -15,11 +15,6 @@ const Project = require("../../classes/Project");
 // const Comment = require("../../classes/Comment");
 const { deleteAwsFile } = require("./uploadPostMedia");
 
-//@ route   GET api/projets/test
-//@desc     test projets route
-//@access   public
-router.get("/test", (req, res) => res.json({ msg: "projects works" }));
-
 //@ route   GET api/projects/instruments
 //@desc     Get all instruments
 //@access   public
@@ -420,6 +415,7 @@ router.patch(
               updatedInstrument.instrument_id = req.body.instrument_id;
             if (req.body.original)
               updatedInstrument.original = req.body.original;
+            if (req.body.volume) updatedInstrument.volume = req.body.volume;
             if (Object.keys(req.body).indexOf("role") >= 0)
               updatedInstrument.role = req.body.role;
             // updatedInstrument.characters_url = null;

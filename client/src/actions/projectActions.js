@@ -229,7 +229,10 @@ export const updateInstrument = (
   axios
     .patch(`/api/projects/instrument/${instrumentId}`, newData)
     .then(res => {
-      if (window.location.href.indexOf("project-view") < 0) {
+      if (
+        window.location.href.indexOf("project-view") < 0 &&
+        window.location.href.indexOf("work-zone") < 0
+      ) {
         history.push(`/project/project-view/${res.data.id}`);
       } else {
         dispatch({

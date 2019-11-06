@@ -9,7 +9,7 @@ class RecordControlItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      volume: 8,
+      volume: this.props.instrument.volume ? this.props.instrument.volume : 8,
       isMuted: false,
       currentInstrumentId: this.props.editor.currentRecordId
     };

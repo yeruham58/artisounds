@@ -7,7 +7,9 @@ export const initAudioDic = instruments => {
     recordsDic[instrument.id].duration = null;
     recordsDic[instrument.id].buffer = null;
     recordsDic[instrument.id].isMute = false;
-    recordsDic[instrument.id].volume = 8;
+    recordsDic[instrument.id].volume = instrument.volume
+      ? instrument.volume
+      : 8;
     const audioUrl = instrument.record_url ? instrument.record_url : null;
     let audio = new Crunker();
     if (audioUrl) {
@@ -17,7 +19,9 @@ export const initAudioDic = instruments => {
           recordsDic[instrument.id].duration = buffers[0].duration;
           recordsDic[instrument.id].buffer = buffers[0];
           recordsDic[instrument.id].isMute = false;
-          recordsDic[instrument.id].volume = 8;
+          recordsDic[instrument.id].volume = instrument.volume
+            ? instrument.volume
+            : 8;
         })
         .catch(() => {
           // err in Crunker create buffer
@@ -38,9 +42,8 @@ export const initBuffersList = (recordsDic, masterVolume) => {
     if (recordsDic[key].buffer && !recordsDic[key].isMute) {
       const aCtx = new AudioContext();
       const gainNode = aCtx.createGain();
-      // gainNode.gain.value = recordsDic[key].volume;
       gainNode.gain.value =
-        ((masterVolume / 100) * recordsDic[key].volume) / 100;
+        ((masterVolume / 100) * recordsDic[key].volume) / 10;
       gainNode.connect(aCtx.destination);
       let source = aCtx.createBufferSource();
 

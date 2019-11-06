@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
 import RangeSlider from "../common/RangeSlider";
+import { updateInstrument } from "../../actions/projectActions";
 
 import {
   setIsPlaying,
@@ -54,6 +55,9 @@ class EditorControlBar extends Component {
   }
 
   uploadRecord() {
+    const volume = this.props.editor.recordsDic[this.state.currentInstrumentId]
+      .volume;
+    this.props.updateInstrument(this.state.currentInstrumentId, { volume }, "");
     if (
       this.props.editor.courrentRecordBolb &&
       this.props.editor.courrentRecordBolb.size
@@ -269,7 +273,8 @@ EditorControlBar.propTypes = {
   setIsPlaying: PropTypes.func.isRequired,
   setIsRecording: PropTypes.func.isRequired,
   setMasterVolume: PropTypes.func.isRequired,
-  record_key: PropTypes.string
+  record_key: PropTypes.string,
+  updateInstrument: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -288,6 +293,7 @@ export default connect(
     uploadRecord,
     deleteRecord,
     clearRecord,
-    setMasterVolume
+    setMasterVolume,
+    updateInstrument
   }
 )(EditorControlBar);

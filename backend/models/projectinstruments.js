@@ -12,7 +12,8 @@ module.exports = (sequelize, DataTypes) => {
       characters_key: DataTypes.STRING,
       record_url: DataTypes.STRING,
       record_key: DataTypes.STRING,
-      comments: DataTypes.STRING
+      comments: DataTypes.STRING,
+      volume: DataTypes.INTEGER
     },
     {}
   );
