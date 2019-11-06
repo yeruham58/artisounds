@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import Popup from "reactjs-popup";
+import ReactPlayer from "react-player";
 
 import TextAreaFieldGroup from "../../common/TextAreaFieldGroup";
 import {
@@ -157,249 +158,269 @@ class InstrumentItem extends Component {
       );
 
     return (
-      <div
-        className="card card-body bg-light mb-3"
-        style={{ minHeight: imgInTop ? "280px" : "190px" }}
-      >
-        {imgInTop && (
-          <div className="text-center">
-            {doImgLink ? (
-              <Link to={`/profile/${instrument.user_id}`}>{img}</Link>
-            ) : (
-              <div>{img}</div>
-            )}
-          </div>
-        )}
-        <div className="row">
-          <div className={imgInTop ? null : "col-3"}>
-            {!imgInTop ? (
-              doImgLink ? (
+      <div>
+        <div
+          className="card card-body bg-light"
+          style={{
+            minHeight: imgInTop ? "280px" : "190px",
+            marginBottom: `${instrument.record_url ? "5px" : "55px"}`
+          }}
+        >
+          {imgInTop && (
+            <div className="text-center">
+              {doImgLink ? (
                 <Link to={`/profile/${instrument.user_id}`}>{img}</Link>
               ) : (
                 <div>{img}</div>
-              )
-            ) : null}
-          </div>
-          <div className={imgInTop ? "col-5" : "col-4"}>
-            <div>
-              <strong>{instrument.instrument_detailes.art_practic_name}</strong>
-            </div>
-            <div style={instrument.user_detailes ? null : { color: "green" }}>
-              {instrument.user_detailes ? (
-                <Link to={`/profile/${instrument.user_id}`}>
-                  {instrument.user_detailes.name}
-                </Link>
-              ) : (
-                "Still open"
               )}
             </div>
-          </div>
-          <div className={imgInTop ? "col-7" : "col-5"}>
-            <div>
-              {instrument.role &&
-              instrument.user_id &&
-              !this.state.moreDetailes ? (
-                <div className="mb-2">
-                  <strong>Roll: </strong> {instrument.role}
-                </div>
+          )}
+          <div className="row">
+            <div className={imgInTop ? null : "col-3"}>
+              {!imgInTop ? (
+                doImgLink ? (
+                  <Link to={`/profile/${instrument.user_id}`}>{img}</Link>
+                ) : (
+                  <div>{img}</div>
+                )
               ) : null}
-              {instrument.user_detailes &&
-              this.props.logedInUserId === instrument.user_detailes.id ? (
-                <Link
-                  to={`/projects/work-zone/${instrument.project_id}/${instrument.id}`}
-                  className="btn btn-outline-warning mb-2"
-                  style={{ width: "100%" }}
-                >
-                  Work on it
-                </Link>
-              ) : null}
-              {this.props.projectOwner && !instrument.user_detailes ? (
-                <Link
-                  to={`/profiles/${instrument.project_id}/${instrument.id}`}
-                  className="btn btn-outline-success mb-2"
-                  style={{ width: "100%" }}
-                >
-                  Invite a freind
-                </Link>
-              ) : null}
-
-              {!this.props.projectOwner &&
-              !instrument.user_id &&
-              !alreadyInvited ? (
-                <div>
-                  <Popup
-                    modal
-                    trigger={
-                      <button
-                        type="button"
-                        disabled={joinDisabled || alreadySent}
-                        className={
-                          joinDisabled
-                            ? `btn btn btn-success mb-2`
-                            : alreadySent
-                            ? "btn btn-primary mb-2"
-                            : "btn btn-outline-success mb-2"
-                        }
-                        style={{ width: "100%" }}
-                      >
-                        {alreadySent ? "Already sent" : "Join project"}
-                      </button>
-                    }
-                  >
-                    {close => (
-                      <div className="mt-3">
-                        <strong>
-                          You can add some message with the Join project req
-                        </strong>
-                        <div className="mt-3" />
-                        <TextAreaFieldGroup
-                          placeholder="Send some message"
-                          name="joinProjectMsg"
-                          value={this.state.joinProjectMsg}
-                          onChange={e => {
-                            this.setState({ joinProjectMsg: e.target.value });
-                          }}
-                          error=""
-                          info=""
-                        />
-
-                        <button
-                          type="button"
-                          className="btn btn-outline-primary mt-3 mb-3"
-                          onClick={() => {
-                            this.sendJoinProjectReq();
-                            close();
-                          }}
-                        >
-                          {this.state.joinProjectMsg.length > 0
-                            ? "Send"
-                            : "Send without a message"}
-                        </button>
-                      </div>
-                    )}
-                  </Popup>
-                </div>
-              ) : null}
-              {alreadyInvited && (
-                <div>
-                  <button
-                    type="button"
-                    className="btn btn-outline-primary mb-2"
-                    onClick={() => this.onAcceptInvitation(alreadyInvited)}
-                  >
-                    Accept and join
-                  </button>
-                </div>
-              )}
-              {alreadySent && !this.props.projectOwner && (
-                <div>
-                  <button
-                    type="button"
-                    className="btn btn-outline-primary mb-2"
-                    onClick={() => {
-                      this.props.deleteNotificationsById(
-                        this.props.notifications.find(
-                          notification =>
-                            notification.sender_id === this.props.logedInUserId
-                        ).id
-                      );
-                    }}
+            </div>
+            <div className={imgInTop ? "col-5" : "col-4"}>
+              <div>
+                <strong>
+                  {instrument.instrument_detailes.art_practic_name}
+                </strong>
+              </div>
+              <div style={instrument.user_detailes ? null : { color: "green" }}>
+                {instrument.user_detailes ? (
+                  <Link to={`/profile/${instrument.user_id}`}>
+                    {instrument.user_detailes.name}
+                  </Link>
+                ) : (
+                  "Still open"
+                )}
+              </div>
+            </div>
+            <div className={imgInTop ? "col-7" : "col-5"}>
+              <div>
+                {instrument.role &&
+                instrument.user_id &&
+                !this.state.moreDetailes ? (
+                  <div className="mb-2">
+                    <strong>Roll: </strong> {instrument.role}
+                  </div>
+                ) : null}
+                {instrument.user_detailes &&
+                this.props.logedInUserId === instrument.user_detailes.id ? (
+                  <Link
+                    to={`/projects/work-zone/${instrument.project_id}/${instrument.id}`}
+                    className="btn btn-outline-warning mb-2"
                     style={{ width: "100%" }}
                   >
-                    Cancel
-                  </button>
-                </div>
-              )}
-              {this.props.projectOwner && !instrument.user_detailes ? (
-                <button
-                  type="button"
-                  className="btn btn-outline-primary mb-2"
-                  style={{ width: "100%" }}
-                  onClick={() => {
-                    this.props.updateInstrument(
-                      instrument.id,
-                      {
-                        user_id: this.props.projectOwnerId
-                      },
-                      this.props.history
-                    );
-                    this.props.deleteNotificationsByInstrumentId(instrument.id);
-                  }}
-                >
-                  Il'l do it
-                </button>
-              ) : null}
-            </div>
-          </div>
-        </div>
+                    Work on it
+                  </Link>
+                ) : null}
+                {this.props.projectOwner && !instrument.user_detailes ? (
+                  <Link
+                    to={`/profiles/${instrument.project_id}/${instrument.id}`}
+                    className="btn btn-outline-success mb-2"
+                    style={{ width: "100%" }}
+                  >
+                    Invite a freind
+                  </Link>
+                ) : null}
 
-        {instrument.role && this.state.moreDetailes ? (
-          <div className="mt-3">
-            <strong>Roll: </strong> {instrument.role}
-          </div>
-        ) : null}
-        {instrument.comments && this.state.moreDetailes ? (
-          <div>
-            <div>
-              <strong>Comment: </strong>
-            </div>
-            <div className="project-details">{instrument.comments}</div>
-          </div>
-        ) : null}
-        <div>
-          {instrument.comments || (instrument.role && !instrument.user_id) ? (
-            <button
-              onClick={() =>
-                this.setState({
-                  moreDetailes: !this.state.moreDetailes
-                })
-              }
-              type="button"
-              className="btn btn-light mt-2 float-right "
-            >
-              {this.state.moreDetailes ? (
-                <i className="fas fa-minus" />
-              ) : (
-                <i className="fas fa-plus" />
-              )}
-            </button>
-          ) : null}
+                {!this.props.projectOwner &&
+                !instrument.user_id &&
+                !alreadyInvited ? (
+                  <div>
+                    <Popup
+                      modal
+                      trigger={
+                        <button
+                          type="button"
+                          disabled={joinDisabled || alreadySent}
+                          className={
+                            joinDisabled
+                              ? `btn btn btn-success mb-2`
+                              : alreadySent
+                              ? "btn btn-primary mb-2"
+                              : "btn btn-outline-success mb-2"
+                          }
+                          style={{ width: "100%" }}
+                        >
+                          {alreadySent ? "Already sent" : "Join project"}
+                        </button>
+                      }
+                    >
+                      {close => (
+                        <div className="mt-3">
+                          <strong>
+                            You can add some message with the Join project req
+                          </strong>
+                          <div className="mt-3" />
+                          <TextAreaFieldGroup
+                            placeholder="Send some message"
+                            name="joinProjectMsg"
+                            value={this.state.joinProjectMsg}
+                            onChange={e => {
+                              this.setState({ joinProjectMsg: e.target.value });
+                            }}
+                            error=""
+                            info=""
+                          />
 
-          {(this.props.projectOwnerId === this.props.logedInUserId &&
-            !instrument.record_url) ||
-          (instrument.user_detailes &&
-            instrument.user_detailes.id === this.props.logedInUserId) ? (
-            <div>
-              <Popup
-                modal
-                trigger={
+                          <button
+                            type="button"
+                            className="btn btn-outline-primary mt-3 mb-3"
+                            onClick={() => {
+                              this.sendJoinProjectReq();
+                              close();
+                            }}
+                          >
+                            {this.state.joinProjectMsg.length > 0
+                              ? "Send"
+                              : "Send without a message"}
+                          </button>
+                        </div>
+                      )}
+                    </Popup>
+                  </div>
+                ) : null}
+                {alreadyInvited && (
+                  <div>
+                    <button
+                      type="button"
+                      className="btn btn-outline-primary mb-2"
+                      onClick={() => this.onAcceptInvitation(alreadyInvited)}
+                    >
+                      Accept and join
+                    </button>
+                  </div>
+                )}
+                {alreadySent && !this.props.projectOwner && (
+                  <div>
+                    <button
+                      type="button"
+                      className="btn btn-outline-primary mb-2"
+                      onClick={() => {
+                        this.props.deleteNotificationsById(
+                          this.props.notifications.find(
+                            notification =>
+                              notification.sender_id ===
+                              this.props.logedInUserId
+                          ).id
+                        );
+                      }}
+                      style={{ width: "100%" }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+                {this.props.projectOwner && !instrument.user_detailes ? (
                   <button
                     type="button"
-                    className="btn btn-light mt-2 float-right"
+                    className="btn btn-outline-primary mb-2"
+                    style={{ width: "100%" }}
+                    onClick={() => {
+                      this.props.updateInstrument(
+                        instrument.id,
+                        {
+                          user_id: this.props.projectOwnerId
+                        },
+                        this.props.history
+                      );
+                      this.props.deleteNotificationsByInstrumentId(
+                        instrument.id
+                      );
+                    }}
                   >
-                    <i className="fas fa-pencil-alt" />
+                    Il'l do it
                   </button>
-                }
-              >
-                {close => (
-                  <InstrumentForm
-                    project_id={instrument.project_id}
-                    instrument={instrument}
-                    close={close}
-                  />
-                )}
-              </Popup>
+                ) : null}
+              </div>
+            </div>
+          </div>
 
-              <button
-                onClick={() => this.onDeleteClick(instrument)}
-                type="button"
-                className="btn btn-light mt-2 float-right"
-              >
-                <i className="far fa-trash-alt" />
-              </button>
+          {instrument.role && this.state.moreDetailes ? (
+            <div className="mt-3">
+              <strong>Roll: </strong> {instrument.role}
             </div>
           ) : null}
+          {instrument.comments && this.state.moreDetailes ? (
+            <div>
+              <div>
+                <strong>Comment: </strong>
+              </div>
+              <div className="project-details">{instrument.comments}</div>
+            </div>
+          ) : null}
+          <div>
+            {instrument.comments || (instrument.role && !instrument.user_id) ? (
+              <button
+                onClick={() =>
+                  this.setState({
+                    moreDetailes: !this.state.moreDetailes
+                  })
+                }
+                type="button"
+                className="btn btn-light mt-2 float-right "
+              >
+                {this.state.moreDetailes ? (
+                  <i className="fas fa-minus" />
+                ) : (
+                  <i className="fas fa-plus" />
+                )}
+              </button>
+            ) : null}
+
+            {(this.props.projectOwnerId === this.props.logedInUserId &&
+              !instrument.record_url) ||
+            (instrument.user_detailes &&
+              instrument.user_detailes.id === this.props.logedInUserId) ? (
+              <div>
+                <Popup
+                  modal
+                  trigger={
+                    <button
+                      type="button"
+                      className="btn btn-light mt-2 float-right"
+                    >
+                      <i className="fas fa-pencil-alt" />
+                    </button>
+                  }
+                >
+                  {close => (
+                    <InstrumentForm
+                      project_id={instrument.project_id}
+                      instrument={instrument}
+                      close={close}
+                    />
+                  )}
+                </Popup>
+
+                <button
+                  onClick={() => this.onDeleteClick(instrument)}
+                  type="button"
+                  className="btn btn-light mt-2 float-right"
+                >
+                  <i className="far fa-trash-alt" />
+                </button>
+              </div>
+            ) : null}
+          </div>
         </div>
+        {instrument.record_url && (
+          <div className="mb-3">
+            <ReactPlayer
+              url={instrument.record_url}
+              controls
+              width="100%"
+              height="30px"
+            />
+          </div>
+        )}
       </div>
     );
   }
