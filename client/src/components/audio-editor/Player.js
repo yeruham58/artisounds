@@ -4,50 +4,35 @@ import { connect } from "react-redux";
 class Player extends Component {
   constructor(props) {
     super(props);
-    this.audioRef = React.createRef();
     this.canvasRef = React.createRef();
 
     this.state = {
-      currentAudio: null,
+      buffersList: null,
+      playingNowList: null,
       audioStartTime:
         this.props.editor.audioStartTime > 0
           ? this.props.editor.audioStartTime
           : 0.00001,
-      analyser: null,
-      canvas: null,
-      ctx: null,
       isPlaying: false,
       volume: 0
     };
-
-    this.frameLooper = this.frameLooper.bind(this);
-    this.initPlayer = this.initPlayer.bind(this);
-    this.onPlay = this.onPlay.bind(this);
-    this.onStop = this.onStop.bind(this);
   }
 
   componentWillReceiveProps(nextProp) {
     if (nextProp.editor) {
-      if (nextProp.editor.audioBuffer && nextProp.editor.audioBuffer.context) {
-        const initIfPlaying =
-          nextProp.editor.masterVolume !== this.state.volume;
-        this.setState({
-          volume: nextProp.editor.masterVolume
-        });
-
-        if (!nextProp.editor.isPlaying) {
-          this.setState({ currentAudio: nextProp.editor.audioBuffer });
-        }
-
-        if (
-          (!nextProp.editor.isPlaying &&
-            !nextProp.editor.isRecording &&
-            nextProp.editor.audioBuffer !== this.state.currentAudio) ||
-          initIfPlaying
-        ) {
-          setTimeout(() => {
-            this.initPlayer(nextProp.editor.audioBuffer);
-          }, 100);
+      if (
+        nextProp.editor.buffersList &&
+        nextProp.editor.buffersList !== this.state.buffersList
+      ) {
+        this.setState({ buffersList: nextProp.editor.buffersList });
+        if (this.state.isPlaying) {
+          this.onStop();
+          var id = setInterval(() => {
+            if (!this.state.playingNowList) {
+              this.onPlay();
+              clearInterval(id);
+            }
+          }, 20);
         }
       }
 
@@ -72,98 +57,31 @@ class Player extends Component {
     }
   }
 
-  initPlayer(newAudio) {
-    if (newAudio.context) {
-      // all of this part is to controll the volume, insted to use analyzer, I steel dont know how to use it tugether
-      const aCtx = new AudioContext();
-      const gainNode = aCtx.createGain();
-      gainNode.gain.value = this.props.editor.masterVolume / 100;
-      gainNode.connect(aCtx.destination);
-      let source = aCtx.createBufferSource();
-
-      source.buffer = newAudio.buffer;
-      source.connect(gainNode);
-
-      const pointerLeftPx = this.props.pointerRef.current.offsetLeft;
-      const currentTime = this.props.editor.secondsPerPx * pointerLeftPx;
-      const { duration } = this.state.currentAudio.buffer;
-
-      if (this.state.isPlaying && duration - currentTime > 0) {
-        this.onStop();
-        source.start(0, currentTime, duration - currentTime);
-      }
-
-      this.setState({ currentAudio: source });
-      //End of this part
-
-      // const context = newAudio.context;
-
-      // const analyser = context.createAnalyser();
-      // newAudio.connect(analyser);
-      // analyser.connect(context.destination);
-
-      newAudio.loop = false;
-      const canvas = document.getElementById("analyser_render");
-      const ctx = canvas.getContext("2d");
-      this.setState({
-        // analyser,
-        canvas,
-        ctx
-      });
-    }
-  }
-
-  // frameLooper() animates any style of graphics you wish to the audio frequency
-  // Looping at the default frame rate that the browser provides(approx. 60 FPS)
-  frameLooper() {
-    let fbc_array, bars, bar_x, bar_width, bar_height;
-    const { ctx, canvas, analyser } = this.state;
-    if (this.props.editor.isPlaying) {
-      // Establish all variables that your Analyser will use
-      window.requestAnimationFrame(this.frameLooper);
-      if (analyser && ctx && canvas) {
-        fbc_array = new Uint8Array(analyser.frequencyBinCount);
-        analyser.getByteFrequencyData(fbc_array);
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-        ctx.fillStyle = "#00CCFF"; // Color of the bars
-        bars = 100;
-        for (var i = 0; i < bars; i++) {
-          bar_x = i * 3;
-          bar_width = 2;
-          bar_height = -(fbc_array[i] / 2);
-          //  fillRect( x, y, width, height ) // Explanation of the parameters below
-          ctx.fillRect(bar_x, canvas.height, bar_width, bar_height);
-        }
-      }
-    } else {
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-      return;
-    }
-  }
-
   onPlay() {
-    if (this.state.currentAudio && this.state.audioStartTime) {
-      const { currentAudio, audioStartTime } = this.state;
-
-      const { duration } = currentAudio.buffer;
-      if (currentAudio.buffer.duration > audioStartTime) {
-        currentAudio.start(
-          // currentAudio.context.currentTime + 0, // how much time from now it will start,
+    for (var buffer of this.props.editor.buffersList) {
+      const pointerLeftPx = this.props.pointerRef.current.offsetLeft;
+      const audioStartTime = this.props.editor.secondsPerPx * pointerLeftPx;
+      const { duration } = buffer.buffer;
+      if (duration > audioStartTime) {
+        buffer.start(
           0, // how much time from now it will start,
           audioStartTime,
           duration - audioStartTime
         );
       }
-      // this.frameLooper();
     }
+    this.setState({ playingNowList: this.props.editor.buffersList });
   }
 
   onStop() {
-    try {
-      this.state.currentAudio.stop();
-    } catch (err) {
-      console.log("audio is not playing");
+    for (var buffer of this.state.playingNowList) {
+      try {
+        buffer.stop();
+      } catch (err) {
+        console.log("audio is not playing");
+      }
     }
+    this.setState({ playingNowList: null });
   }
 
   render() {

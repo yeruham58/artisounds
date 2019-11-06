@@ -13,7 +13,8 @@ import {
   CLEAR_RECORD,
   SET_MASTER_VOLUME,
   SET_NUM_OF_BITS,
-  SET_CURRENT_RECORD_ID
+  SET_CURRENT_RECORD_ID,
+  SET_BUFFERS_LIST
 } from "../actions/types";
 
 const initialState = {
@@ -61,6 +62,11 @@ export default function(state = initialState, action) {
       return {
         ...state,
         audioBuffer: action.payload
+      };
+    case SET_BUFFERS_LIST:
+      return {
+        ...state,
+        buffersList: action.payload
       };
     case SET_PX_PER_BIT:
       return {

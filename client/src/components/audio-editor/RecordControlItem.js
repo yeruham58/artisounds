@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
 
 import RangeSlider from "../common/RangeSlider";
+import { setRecordsDic } from "../../actions/audioEditorActions";
 
 class RecordControlItem extends Component {
   constructor(props) {
@@ -9,9 +11,7 @@ class RecordControlItem extends Component {
     this.state = {
       volume: 8,
       isMuted: false,
-      currentInstrumentId: window.location.href.split("/")[
-        window.location.href.split("/").length - 1
-      ]
+      currentInstrumentId: this.props.editor.currentRecordId
     };
 
     this.onVolumeChange = this.onVolumeChange.bind(this);
@@ -21,9 +21,31 @@ class RecordControlItem extends Component {
   onVolumeChange() {
     var slider = document.getElementById("myRange" + this.props.instrument.id);
     this.setState({ volume: slider.value });
+
+    document.onmouseup = () => {
+      const recordsDic = {
+        ...this.props.editor.recordsDic,
+        [this.props.instrument.id]: {
+          ...this.props.editor.recordsDic[this.props.instrument.id],
+          volume: slider.value
+        }
+      };
+
+      this.props.setRecordsDic(recordsDic);
+      document.onmouseup = null;
+    };
   }
 
   muteControle() {
+    const recordsDic = {
+      ...this.props.editor.recordsDic,
+      [this.props.instrument.id]: {
+        ...this.props.editor.recordsDic[this.props.instrument.id],
+        isMute: !this.state.isMuted
+      }
+    };
+
+    this.props.setRecordsDic(recordsDic);
     this.setState({ isMuted: !this.state.isMuted });
   }
 
@@ -91,7 +113,18 @@ class RecordControlItem extends Component {
 }
 
 RecordControlItem.propTypes = {
-  instrument: PropTypes.object.isRequired
+  instrument: PropTypes.object.isRequired,
+  setRecordsDic: PropTypes.func.isRequired
 };
 
-export default RecordControlItem;
+const mapStateToProps = state => ({
+  editor: state.audioEditor
+});
+
+export default connect(
+  mapStateToProps,
+
+  {
+    setRecordsDic
+  }
+)(RecordControlItem);

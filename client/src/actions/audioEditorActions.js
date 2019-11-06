@@ -16,7 +16,8 @@ import {
   CLEAR_RECORD,
   SET_MASTER_VOLUME,
   SET_NUM_OF_BITS,
-  SET_CURRENT_RECORD_ID
+  SET_CURRENT_RECORD_ID,
+  SET_BUFFERS_LIST
 } from "./types";
 
 export const setCurretRecordId = recordsId => dispatch => {
@@ -27,6 +28,9 @@ export const setRecordsDic = recordsDic => dispatch => {
 };
 export const setAudioBuffer = audioBuffer => dispatch => {
   dispatch({ type: SET_AUDIO_BUFFER, payload: audioBuffer });
+};
+export const setBuffersList = buffersList => dispatch => {
+  dispatch({ type: SET_BUFFERS_LIST, payload: buffersList });
 };
 export const setIsPlaying = isPlaying => dispatch => {
   dispatch({ type: SET_IS_PLAYING, payload: isPlaying });

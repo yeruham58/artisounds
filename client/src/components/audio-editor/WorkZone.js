@@ -1,16 +1,18 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import Crunker from "crunker";
 
 import RecordingTopRuler from "./RecordingTopRuler";
 import Spinner from "../common/Spinner";
 import { getProject, clearProject } from "../../actions/projectActions";
 import {
   setAudioBuffer,
+  setBuffersList,
   setRecordsDic,
   setCurretRecordId
 } from "../../actions/audioEditorActions";
+import { mergeBuffers } from "./controlAudioBufferFuncs";
+import { initAudioDic, initBuffersList } from "./setPlayerTracks";
 import EditorControlBar from "./EditorControlBar";
 import Recorder from "./Recorder";
 
@@ -25,9 +27,11 @@ class WorkZone extends Component {
       isRecording: false,
       recordsDic: {},
       project: null,
-      recordBlob: null
+      recordBlob: null,
+      buffersList: null,
+      masterVolume: this.props.editor.masterVolume
     };
-    this.initAudioDic = this.initAudioDic.bind(this);
+    this.setAudioDic = this.setAudioDic.bind(this);
     this.initBuffersList = this.initBuffersList.bind(this);
     this.setBuffer = this.setBuffer.bind(this);
     this.setRecordBlob = this.setRecordBlob.bind(this);
@@ -52,9 +56,9 @@ class WorkZone extends Component {
     ) {
       this.setState({ project: nextProp.project.project });
       setTimeout(() => {
-        this.initAudioDic();
+        this.setAudioDic();
         this.setRecordBlob();
-      }, 100);
+      }, 20);
     }
     if (nextProp.editor) {
       if (
@@ -67,18 +71,22 @@ class WorkZone extends Component {
         // this timeout is for state to update in reload page
         if (Object.keys(nextProp.editor.recordsDic)[0])
           setTimeout(() => {
-            this.initBuffersList();
-          }, 100);
+            this.initBuffersList(nextProp.editor.masterVolume);
+          }, 20);
       }
       if (nextProp.editor.audioStartTime) {
         this.setState({ audioStartTime: nextProp.editor.audioStartTime });
+      }
+      if (nextProp.editor.masterVolume !== this.state.masterVolume) {
+        this.setState({ masterVolume: nextProp.editor.masterVolume });
+        this.initBuffersList(nextProp.editor.masterVolume);
       }
       if (Object.keys(nextProp.editor).indexOf("isPlaying") > 0) {
         if (nextProp.editor.isPlaying && !this.state.isPlaying) {
           this.setState({ isPlaying: true });
         }
         if (!nextProp.editor.isPlaying && this.state.isPlaying) {
-          this.initBuffersList();
+          this.initBuffersList(nextProp.editor.masterVolume);
           this.setState({ isPlaying: false });
         }
       }
@@ -102,97 +110,34 @@ class WorkZone extends Component {
     }
   }
 
-  initAudioDic() {
+  setAudioDic() {
     if (this.props.project.project) {
       const { instruments } = this.props.project.project;
-      const recordsDic = {};
       if (instruments && instruments.length > 0) {
-        instruments.forEach(instrument => {
-          recordsDic[instrument.id] = {};
-          const audioUrl = instrument.record_url ? instrument.record_url : null;
-          let audio = new Crunker();
-          if (audioUrl) {
-            audio
-              .fetchAudio(audioUrl, audioUrl)
-              .then(buffers => {
-                recordsDic[instrument.id].duration = buffers[0].duration;
-                recordsDic[instrument.id].buffer = buffers[0];
-                this.props.setRecordsDic(recordsDic);
-              })
-              .catch(() => {
-                // err in Crunker create buffer
-                console.log("err in Crunker create buffer");
-                recordsDic[instrument.id].duration = null;
-                recordsDic[instrument.id].buffer = null;
-              });
-          } else {
-            recordsDic[instrument.id].duration = null;
-            recordsDic[instrument.id].buffer = null;
-          }
-        });
+        const recordsDic = initAudioDic(instruments);
         this.props.setRecordsDic(recordsDic);
       }
     }
   }
 
-  initBuffersList() {
+  initBuffersList(masterVolume) {
     const { recordsDic } = this.props.editor;
-    const buffersList = [];
-
+    console.log("masterVolume");
+    console.log(masterVolume);
+    //Not working without time outwhen loading page, I have to understend why
     setTimeout(() => {
-      for (var key in recordsDic) {
-        if (recordsDic[key].buffer) {
-          buffersList.push(recordsDic[key].buffer);
-        }
+      const buffersList = initBuffersList(recordsDic, masterVolume);
+      console.log("gonna set the list");
+      this.props.setBuffersList(buffersList[1]);
+      if (buffersList[0][0]) {
+        this.setBuffer(buffersList[0]);
       }
-      if (buffersList[0]) this.setBuffer(buffersList);
     }, 500);
   }
-  setBuffer(buffersList) {
-    const mergedBuffer = this.mergeBuffers(buffersList);
-    this.props.setAudioBuffer(mergedBuffer);
-  }
 
-  mergeBuffers(buffers) {
-    const ac = new AudioContext();
-    var maxChannels = 0;
-    var maxDuration = 0;
-    for (var i = 0; i < buffers.length; i++) {
-      if (buffers[i].numberOfChannels > maxChannels) {
-        maxChannels = buffers[i].numberOfChannels;
-      }
-      if (buffers[i].duration > maxDuration) {
-        maxDuration = buffers[i].duration;
-      }
-    }
-    var out = ac.createBuffer(
-      maxChannels,
-      ac.sampleRate * maxDuration,
-      ac.sampleRate
-    );
-    for (var j = 0; j < buffers.length; j++) {
-      for (
-        var srcChannel = 0;
-        srcChannel < buffers[j].numberOfChannels;
-        srcChannel++
-      ) {
-        var outt = out.getChannelData(srcChannel);
-        var inn = buffers[j].getChannelData(srcChannel);
-        for (var i2 = 0; i2 < inn.length; i2++) {
-          outt[i2] += inn[i2];
-        }
-        out.getChannelData(srcChannel).set(outt, 0);
-      }
-    }
-    // Get an AudioBufferSourceNode.
-    // This is the AudioNode to use when we want to play an AudioBuffer
-    var source = ac.createBufferSource();
-    // // set the buffer in the AudioBufferSourceNode
-    source.buffer = out;
-    // connect the AudioBufferSourceNode to the
-    // destination so we can hear the sound
-    source.connect(ac.destination);
-    return source;
+  setBuffer(buffersList) {
+    const mergedBuffer = mergeBuffers(buffersList);
+    this.props.setAudioBuffer(mergedBuffer);
   }
 
   render() {
@@ -250,6 +195,7 @@ WorkZone.propTypes = {
   getProject: PropTypes.func.isRequired,
   clearProject: PropTypes.func.isRequired,
   setAudioBuffer: PropTypes.func.isRequired,
+  setBuffersList: PropTypes.func.isRequired,
   setRecordsDic: PropTypes.func.isRequired,
   project: PropTypes.object.isRequired,
   auth: PropTypes.object.isRequired
@@ -270,6 +216,7 @@ export default connect(
     clearProject,
     setAudioBuffer,
     setRecordsDic,
-    setCurretRecordId
+    setCurretRecordId,
+    setBuffersList
   }
 )(WorkZone);

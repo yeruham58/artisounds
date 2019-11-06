@@ -82,13 +82,15 @@ class Recorder extends Component {
           audio.fetchAudio(audioUrl, audioUrl).then(buffers => {
             const recordsDic = {
               ...this.props.editor.recordsDic,
-              [window.location.href.split("/")[
-                window.location.href.split("/").length - 1
-              ]]: {
+              [this.props.editor.currentRecordId]: {
+                ...this.props.editor.recordsDic[
+                  this.props.editor.currentRecordId
+                ],
                 duration: buffers[0].duration,
                 buffer: buffers[0]
               }
             };
+
             this.props.setRecordsDic(recordsDic);
           });
           this.setState({
@@ -113,7 +115,6 @@ class Recorder extends Component {
         : 0.0000001;
 
     this.props.setAudioStartTime(startTime);
-    console.log("setting");
   }
 
   render() {

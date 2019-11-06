@@ -42,10 +42,12 @@ class EditorControlBar extends Component {
     const recordsDic = {
       ...this.props.editor.recordsDic,
       [this.state.currentInstrumentId]: {
+        ...this.props.editor.recordsDic[this.state.currentInstrumentId],
         duration: null,
         buffer: null
       }
     };
+
     this.props.setRecordsDic(recordsDic);
     this.props.setCurrentBolb({});
     this.props.clearRecord(true);
