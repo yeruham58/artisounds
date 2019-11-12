@@ -9,6 +9,7 @@ import { deleteNotificationsByProjectId } from "../../../actions/notificationAct
 import CreateProject from "../create-project/CreateProject";
 import projectDefaultImg from "../../../img/musicGif.gif";
 import InstrumentDefaultImg from "../../../img/stillNoBodyImg.jpeg";
+import ProjectAudioControls from "./ProjectAudioControls";
 
 class ProjectItem extends Component {
   constructor(props) {
@@ -246,6 +247,12 @@ class ProjectItem extends Component {
         </div>
         <div className="row">
           <div className="col-12">
+            {project.instruments.find(instru => instru.record_url) && (
+              <div style={{ float: "left", width: "100%" }}>
+                <ProjectAudioControls project={project} />
+              </div>
+            )}
+
             {this.props.projectOwner ? (
               <div>
                 <Popup
@@ -271,12 +278,18 @@ class ProjectItem extends Component {
                 </button>
               </div>
             ) : null}
-            <div
-              className="btn btn-outline-primary mr-2 mb-2"
+            <button
               onClick={this.moreDetailesControl}
+              type="button"
+              className="btn btn-light mt-2 float-right "
             >
-              {this.state.moreDetails ? "Close" : "More detailes"}
-            </div>
+              {this.state.moreDetails ? (
+                <i className="fas fa-minus" />
+              ) : (
+                <i className="fas fa-plus" />
+              )}
+            </button>
+
             {this.props.showActions ? (
               <Link
                 to={`/project/project-view/${project.id}`}

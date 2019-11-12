@@ -36,8 +36,6 @@ export const initAudioDic = instruments => {
 
 export const initBuffersList = (recordsDic, masterVolume) => {
   const buffersList = [];
-  const testBuffersList = [];
-
   for (var key in recordsDic) {
     if (recordsDic[key].buffer && !recordsDic[key].isMute) {
       const aCtx = new AudioContext();
@@ -50,10 +48,20 @@ export const initBuffersList = (recordsDic, masterVolume) => {
       source.buffer = recordsDic[key].buffer;
       source.connect(gainNode);
 
-      testBuffersList.push(source);
-      buffersList.push(recordsDic[key].buffer);
+      buffersList.push(source);
     }
   }
 
-  return [buffersList, testBuffersList];
+  return buffersList;
+};
+
+export const getLongestDuration = buffersList => {
+  let duration = 0;
+  if (buffersList && buffersList[0]) {
+    for (let buffer of buffersList) {
+      if (buffer.buffer.duration > duration) duration = buffer.buffer.duration;
+    }
+  }
+
+  return duration;
 };

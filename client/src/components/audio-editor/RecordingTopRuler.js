@@ -170,7 +170,9 @@ class RecordingTopRuler extends Component {
       var id = setInterval(() => {
         if (!this.state.movePointer) {
           // pos = 0;
-          this.props.setAudioStartTime(pos * this.state.secondsPerPx);
+          this.props.setAudioStartTime({
+            audioStartTime: pos * this.state.secondsPerPx
+          });
           clearInterval(id);
           this.setState({ scrollNow: false });
         } else {
@@ -188,13 +190,13 @@ class RecordingTopRuler extends Component {
   }
 
   getClickPosition(e) {
-    if (!this.state.movePointer && e.clientY > 225) {
-      const canvas = document.getElementById("timeline");
-      const canvasPositions = canvas.getBoundingClientRect();
+    const canvas = document.getElementById("timeline");
+    const canvasPositions = canvas.getBoundingClientRect();
+    if (e.clientY > canvasPositions.top + 26 && !this.state.movePointer) {
       const setPoint =
         e.clientX - canvasPositions.left + canvas.scrollLeft - 7.5; // 7.5 is middle width of pointer element
       const audioPointInSeconds = this.state.secondsPerPx * setPoint;
-      this.props.setAudioStartTime(audioPointInSeconds);
+      this.props.setAudioStartTime({ audioStartTime: audioPointInSeconds });
     }
   }
 
@@ -310,9 +312,7 @@ class RecordingTopRuler extends Component {
     document.onmousemove = null;
     const pointer = document.getElementById("record-pointer-holder");
     const audioPointInSeconds = this.state.secondsPerPx * pointer.offsetLeft;
-    console.log("audioPointInSeconds");
-    console.log(audioPointInSeconds);
-    this.props.setAudioStartTime(audioPointInSeconds);
+    this.props.setAudioStartTime({ audioStartTime: audioPointInSeconds });
 
     this.setState({ scrollNow: false });
   }
@@ -366,10 +366,7 @@ class RecordingTopRuler extends Component {
     const scaleLine = (
       <div className="container">
         <div className="row">
-          <div
-            className="col-md-2"
-            style={{ background: "grey", padding: "0px" }}
-          >
+          <div className="col-2" style={{ background: "grey", padding: "0px" }}>
             <div
               style={{
                 overflow: "hidden"
@@ -409,7 +406,7 @@ class RecordingTopRuler extends Component {
               </div>
             </div>
           </div>
-          <div className="col-md-10" style={{ padding: "0px" }}>
+          <div className="col-10" style={{ padding: "0px" }}>
             <div>
               <div
                 style={{

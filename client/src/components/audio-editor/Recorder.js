@@ -114,7 +114,7 @@ class Recorder extends Component {
         ? instrumentRecord.duration
         : 0.0000001;
 
-    this.props.setAudioStartTime(startTime);
+    this.props.setAudioStartTime({ audioStartTime: startTime });
   }
 
   render() {

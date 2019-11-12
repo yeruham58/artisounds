@@ -110,154 +110,164 @@ class EditorControlBar extends Component {
 
     return (
       <div>
-        <div className="row">
-          <div className="col-md-8">
-            <div>
-              <button
-                type="button"
-                className="btn btn-light mb-3 mr-4"
-                onClick={() => {
-                  window.location.href = `/project/project-view/${this.props.project.project.id}`;
-                }}
-              >
-                Back
-              </button>
-              {/* play  */}
-              <button
-                type="button"
-                className="btn btn-light mb-3 mr-2 text-success"
-                disabled={this.state.isPlaying || this.state.isRecording}
-                onClick={() => {
-                  const waitingTime = (60 / this.state.projectTempo) * 1000;
-                  setTimeout(() => {
-                    this.props.setIsPlaying(true);
-                  }, waitingTime);
+        <div>
+          <div>
+            <button
+              type="button"
+              className="btn btn-light mb-3 mr-4"
+              onClick={() => {
+                window.location.href = `/project/project-view/${this.props.project.project.id}`;
+              }}
+            >
+              Back
+            </button>
+            {/* play  */}
+            <button
+              type="button"
+              className="btn btn-light mb-3 mr-2 text-success"
+              disabled={this.state.isPlaying || this.state.isRecording}
+              onClick={() => {
+                const waitingTime = (60 / this.state.projectTempo) * 1000;
+                setTimeout(() => {
+                  this.props.setIsPlaying(true);
+                }, waitingTime);
 
-                  this.setState({ isPlaying: true });
-                }}
-              >
-                <i className="fas fa-play"></i>
-              </button>
-              {/* record */}
-              <button
-                type="button"
-                className="btn btn-light mb-3 mr-2 text-danger"
-                disabled={this.state.isPlaying || this.state.isRecording}
-                onClick={() => {
-                  const waitingTime = (60 / this.state.projectTempo) * 1000;
-                  const waitBeforeRecord = this.state.active1234
-                    ? waitingTime * (this.state.projectBit + 1)
-                    : waitingTime;
-                  setTimeout(() => {
-                    this.props.setIsRecording(true);
-                    this.props.setIsPlaying(this.state.headphonesMood);
-                  }, waitBeforeRecord);
+                this.setState({ isPlaying: true });
+              }}
+            >
+              <i className="fas fa-play"></i>
+            </button>
+            {/* record */}
+            <button
+              type="button"
+              className="btn btn-light mb-3 mr-2 text-danger"
+              disabled={this.state.isPlaying || this.state.isRecording}
+              onClick={() => {
+                const waitingTime = (60 / this.state.projectTempo) * 1000;
+                const waitBeforeRecord = this.state.active1234
+                  ? waitingTime * (this.state.projectBit + 1)
+                  : waitingTime;
+                setTimeout(() => {
+                  this.props.setIsRecording(true);
+                  this.props.setIsPlaying(this.state.headphonesMood);
+                }, waitBeforeRecord);
 
-                  this.setState({
-                    isRecording: true,
-                    isPlaying: this.state.headphonesMood
-                  });
-                }}
-              >
-                <i className="fas fa-circle"></i>
-              </button>
-              {/* stop */}
-              <button
-                type="button"
-                className="btn btn-light mb-3 mr-2 text-warning"
-                disabled={!this.state.isPlaying && !this.state.isRecording}
-                onClick={() => {
-                  this.props.setIsPlaying(false);
-                  this.props.setIsRecording(false);
-                  this.setState({ isPlaying: false, isRecording: false });
-                }}
-              >
-                <i className="fas fa-stop"></i>
-              </button>
-              {/* headphones mood control */}
-              <button
-                type="button"
-                className="btn btn-light mb-3 mr-2"
-                style={{
-                  color: this.state.headphonesMood ? "#D2691E" : "grey"
-                }}
-                onClick={() => {
-                  this.setState({ headphonesMood: !this.state.headphonesMood });
-                }}
-              >
-                <i className="fas fa-headphones-alt"></i>
-              </button>
-              <button
-                type="button"
-                className="btn btn-light mb-3 mr-2"
-                onClick={this.clearRecord}
-              >
-                Clear record
-              </button>
-              {/* metronome controle */}
-              <button
-                type="button"
-                className={`btn ${
-                  this.state.active1234 ? "btn-warning" : "btn-secondary"
-                } mb-3 mr-2`}
-                onClick={() =>
-                  this.setState({ active1234: !this.state.active1234 })
-                }
-              >
-                <span style={{ fontSize: "8px" }}>1</span>
-                <span style={{ fontSize: "10px" }}>2</span>
-                <span style={{ fontSize: "12px" }}>3</span>
-                <span style={{ fontSize: "14px" }}>4</span>
-              </button>
-              <button
-                type="button"
-                className={`btn ${
-                  this.state.playMetronome ? "btn-warning" : "btn-secondary"
-                } mb-3 mr-2`}
-                onClick={() =>
-                  this.setState({ playMetronome: !this.state.playMetronome })
-                }
-              >
-                <i className="fas fa-thermometer"></i>
-              </button>
+                this.setState({
+                  isRecording: true,
+                  isPlaying: this.state.headphonesMood
+                });
+              }}
+            >
+              <i className="fas fa-circle"></i>
+            </button>
+            {/* stop */}
+            <button
+              type="button"
+              className="btn btn-light mb-3 mr-2 text-warning"
+              disabled={!this.state.isPlaying && !this.state.isRecording}
+              onClick={() => {
+                this.props.setIsPlaying(false);
+                this.props.setIsRecording(false);
+                this.setState({ isPlaying: false, isRecording: false });
+              }}
+            >
+              <i className="fas fa-stop"></i>
+            </button>
+            {/* headphones mood control */}
+            <button
+              type="button"
+              className="btn btn-light mb-3 mr-2"
+              style={{
+                color: this.state.headphonesMood ? "#D2691E" : "grey"
+              }}
+              onClick={() => {
+                this.setState({ headphonesMood: !this.state.headphonesMood });
+              }}
+            >
+              <i className="fas fa-headphones-alt"></i>
+            </button>
+            <button
+              type="button"
+              className="btn btn-light mb-3 mr-2"
+              onClick={this.clearRecord}
+            >
+              Clear record
+            </button>
+            {/* metronome controle */}
+            <button
+              type="button"
+              className={`btn ${
+                this.state.active1234 ? "btn-warning" : "btn-secondary"
+              } mb-3 mr-2`}
+              onClick={() =>
+                this.setState({ active1234: !this.state.active1234 })
+              }
+            >
+              <span style={{ fontSize: "8px" }}>1</span>
+              <span style={{ fontSize: "10px" }}>2</span>
+              <span style={{ fontSize: "12px" }}>3</span>
+              <span style={{ fontSize: "14px" }}>4</span>
+            </button>
+            <button
+              type="button"
+              className={`btn ${
+                this.state.playMetronome ? "btn-warning" : "btn-secondary"
+              } mb-3 mr-2`}
+              onClick={() =>
+                this.setState({ playMetronome: !this.state.playMetronome })
+              }
+            >
+              <i className="fas fa-thermometer"></i>
+            </button>
 
-              <button
-                type="button"
-                className="btn btn-success mb-3 mr-2"
-                onClick={this.uploadRecord}
-              >
-                Save
-              </button>
+            <button
+              type="button"
+              className="btn btn-success mb-3 mr-2"
+              onClick={this.uploadRecord}
+            >
+              Save
+            </button>
 
-              <div
-                style={{
-                  width: "150px",
-                  float: "right",
-                  marginTop: "10px"
-                }}
-              >
-                <RangeSlider
-                  // disabled={this.props.editor.isPlaying}
-                  id="masterVolumeRange"
-                  value={this.state.volume}
-                  min={0}
-                  max={100}
-                  onChange={this.onVolumeChange}
-                />
-              </div>
+            <div
+              style={{
+                width: "150px",
+                float: "right",
+                marginTop: "10px",
+                position: "relative",
+                right: "20px"
+              }}
+            >
+              <RangeSlider
+                id="masterVolumeRange"
+                value={this.state.volume}
+                min={0}
+                max={100}
+                onChange={this.onVolumeChange}
+              />
             </div>
           </div>
-          <div className="col-md-4">
-            <Player pointerRef={this.props.pointerRef} />
-            <Metronome
-              play={
-                this.state.playMetronome &&
-                (this.state.isPlaying || this.state.isRecording)
-              }
-              bitsPerMin={this.props.project.project.tempo}
-              waitingTime={waitingTime}
-            />
-          </div>
+          <Metronome
+            play={
+              this.state.playMetronome &&
+              (this.state.isPlaying || this.state.isRecording)
+            }
+            bitsPerMin={this.props.project.project.tempo}
+            waitingTime={waitingTime}
+          />
+        </div>
+        <div
+          style={{
+            position: "absolute",
+            right: "35px",
+            width: "100%",
+            maxWidth: "400px",
+            float: "right"
+          }}
+        >
+          <Player
+            pointerRef={this.props.pointerRef}
+            projectId={this.props.project.project.id}
+          />
         </div>
       </div>
     );

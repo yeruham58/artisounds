@@ -163,7 +163,7 @@ class InstrumentItem extends Component {
           className="card card-body bg-light"
           style={{
             minHeight: imgInTop ? "280px" : "190px",
-            marginBottom: `${instrument.record_url ? "5px" : "55px"}`
+            marginBottom: "5px"
           }}
         >
           {imgInTop && (

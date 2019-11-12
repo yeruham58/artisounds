@@ -22,6 +22,7 @@ const initialState = {
   isPlaing: false,
   isRecording: false,
   audioStartTime: 0,
+  allowChangeTime: false,
   audioBuffer: null,
   buffersList: [],
   recordsDic: {},
@@ -51,8 +52,10 @@ export default function(state = initialState, action) {
     case SET_AUDIO_START_TIME:
       return {
         ...state,
-        audioStartTime: action.payload
+        audioStartTime: action.payload.audioStartTime,
+        allowChangeTime: action.payload.allowChangeTime
       };
+
     case SET_RECORDS_DIC:
       return {
         ...state,

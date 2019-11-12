@@ -6,12 +6,10 @@ import RecordingTopRuler from "./RecordingTopRuler";
 import Spinner from "../common/Spinner";
 import { getProject, clearProject } from "../../actions/projectActions";
 import {
-  setAudioBuffer,
   setBuffersList,
   setRecordsDic,
   setCurretRecordId
 } from "../../actions/audioEditorActions";
-import { mergeBuffers } from "./controlAudioBufferFuncs";
 import { initAudioDic, initBuffersList } from "./setPlayerTracks";
 import EditorControlBar from "./EditorControlBar";
 import Recorder from "./Recorder";
@@ -29,11 +27,11 @@ class WorkZone extends Component {
       project: null,
       recordBlob: null,
       buffersList: null,
-      masterVolume: this.props.editor.masterVolume
+      masterVolume: this.props.editor.masterVolume,
+      audioStartTime: null
     };
     this.setAudioDic = this.setAudioDic.bind(this);
     this.initBuffersList = this.initBuffersList.bind(this);
-    this.setBuffer = this.setBuffer.bind(this);
     this.setRecordBlob = this.setRecordBlob.bind(this);
   }
 
@@ -74,21 +72,25 @@ class WorkZone extends Component {
             this.initBuffersList(nextProp.editor.masterVolume);
           }, 20);
       }
-      if (nextProp.editor.audioStartTime) {
+      if (
+        nextProp.editor.audioStartTime !== this.state.audioStartTime &&
+        nextProp.editor.allowChangeTime
+      ) {
         this.setState({ audioStartTime: nextProp.editor.audioStartTime });
+        setTimeout(() => {
+          this.initBuffersList(nextProp.editor.masterVolume);
+        }, 20);
       }
       if (nextProp.editor.masterVolume !== this.state.masterVolume) {
         this.setState({ masterVolume: nextProp.editor.masterVolume });
         this.initBuffersList(nextProp.editor.masterVolume);
       }
-      if (Object.keys(nextProp.editor).indexOf("isPlaying") > 0) {
-        if (nextProp.editor.isPlaying && !this.state.isPlaying) {
-          this.setState({ isPlaying: true });
-        }
-        if (!nextProp.editor.isPlaying && this.state.isPlaying) {
-          this.initBuffersList(nextProp.editor.masterVolume);
-          this.setState({ isPlaying: false });
-        }
+      if (nextProp.editor.isPlaying && !this.state.isPlaying) {
+        this.setState({ isPlaying: true });
+      }
+      if (!nextProp.editor.isPlaying && this.state.isPlaying) {
+        this.initBuffersList(nextProp.editor.masterVolume);
+        this.setState({ isPlaying: false });
       }
     }
   }
@@ -125,16 +127,8 @@ class WorkZone extends Component {
     //Not working without time outwhen loading page, I have to understend why
     setTimeout(() => {
       const buffersList = initBuffersList(recordsDic, masterVolume);
-      this.props.setBuffersList(buffersList[1]);
-      if (buffersList[0][0]) {
-        this.setBuffer(buffersList[0]);
-      }
+      this.props.setBuffersList(buffersList);
     }, 500);
-  }
-
-  setBuffer(buffersList) {
-    const mergedBuffer = mergeBuffers(buffersList);
-    this.props.setAudioBuffer(mergedBuffer);
   }
 
   render() {
@@ -160,6 +154,7 @@ class WorkZone extends Component {
                   record_key={record_key}
                   pointerRef={this.pointerRef}
                 />
+                <div style={{ marginTop: "40px" }}></div>
                 <Recorder recordBlob={this.state.recordBlob} />
                 <RecordingTopRuler pointerRef={this.pointerRef} />
               </div>
@@ -191,7 +186,6 @@ WorkZone.propTypes = {
   setCurretRecordId: PropTypes.func.isRequired,
   getProject: PropTypes.func.isRequired,
   clearProject: PropTypes.func.isRequired,
-  setAudioBuffer: PropTypes.func.isRequired,
   setBuffersList: PropTypes.func.isRequired,
   setRecordsDic: PropTypes.func.isRequired,
   project: PropTypes.object.isRequired,
@@ -211,7 +205,6 @@ export default connect(
   {
     getProject,
     clearProject,
-    setAudioBuffer,
     setRecordsDic,
     setCurretRecordId,
     setBuffersList

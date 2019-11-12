@@ -2,7 +2,6 @@ import axios from "axios";
 
 import {
   SET_RECORDS_DIC,
-  SET_AUDIO_BUFFER,
   SET_IS_PLAYING,
   SET_IS_RECORDING,
   SET_AUDIO_START_TIME,
@@ -26,9 +25,7 @@ export const setCurretRecordId = recordsId => dispatch => {
 export const setRecordsDic = recordsDic => dispatch => {
   dispatch({ type: SET_RECORDS_DIC, payload: recordsDic });
 };
-export const setAudioBuffer = audioBuffer => dispatch => {
-  dispatch({ type: SET_AUDIO_BUFFER, payload: audioBuffer });
-};
+
 export const setBuffersList = buffersList => dispatch => {
   dispatch({ type: SET_BUFFERS_LIST, payload: buffersList });
 };
@@ -42,6 +39,7 @@ export const setIsRecording = isRecording => dispatch => {
 export const setAudioStartTime = startTime => dispatch => {
   dispatch({ type: SET_AUDIO_START_TIME, payload: startTime });
 };
+
 export const setPxPerBit = pxPerBit => dispatch => {
   dispatch({ type: SET_PX_PER_BIT, payload: pxPerBit });
 };
