@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import Popup from "reactjs-popup";
 
-import { deleteProject } from "../../../actions/projectActions";
+import { deleteProject, updateProject } from "../../../actions/projectActions";
 import { deleteNotificationsByProjectId } from "../../../actions/notificationActions";
 import CreateProject from "../create-project/CreateProject";
 import projectDefaultImg from "../../../img/musicGif.gif";
@@ -300,6 +300,35 @@ class ProjectItem extends Component {
                   : "View project"}
               </Link>
             ) : null}
+            {this.props.projectOwner && !this.props.showActions ? (
+              <button
+                type="button"
+                className={`btn ${
+                  project.in_action
+                    ? "btn-outline-success"
+                    : "btn-outline-warning"
+                } mr-2 mb-2`}
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      project.in_action
+                        ? "By back to edit project - people will be able to find your project and ask to join you, but you can't get likes or comments on a project you are still editing. \n\n The likes and comments that you alredy ahve will not be deleted by back to edit"
+                        : "By marking as finished project - people will not be able any more to find your project and ask to join you, but people will be able to find your project in finished projects and give you likes or comments!"
+                    )
+                  ) {
+                    this.props.updateProject(
+                      project.id,
+                      { in_action: !project.in_action },
+                      this.props.history
+                    );
+                  }
+                }}
+              >
+                {project.in_action
+                  ? "Mark as finished project"
+                  : "Back to work on project"}
+              </button>
+            ) : null}
           </div>
         </div>
       </div>
@@ -314,6 +343,7 @@ ProjectItem.defaultProps = {
 ProjectItem.propTypes = {
   project: PropTypes.object.isRequired,
   deleteProject: PropTypes.func.isRequired,
+  updateProject: PropTypes.func.isRequired,
   deleteNotificationsByProjectId: PropTypes.func.isRequired,
   projectOwner: PropTypes.bool
 };
@@ -327,6 +357,7 @@ export default connect(
   mapStateToProps,
   {
     deleteProject,
+    updateProject,
     deleteNotificationsByProjectId
   }
 )(ProjectItem);

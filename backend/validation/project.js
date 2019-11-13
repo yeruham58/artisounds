@@ -4,6 +4,7 @@ const isEmpty = require("./is-empty");
 
 module.exports = function validateProjectInput(data) {
   let errors = {};
+
   data.name = !isEmpty(data.name.toString()) ? data.name.toString() : "";
   data.original_by = !isEmpty(data.original_by.toString())
     ? data.original_by.toString()
