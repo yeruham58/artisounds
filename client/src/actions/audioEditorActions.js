@@ -17,8 +17,7 @@ import {
   SET_NUM_OF_BITS,
   SET_CURRENT_RECORD_ID,
   SET_BUFFERS_LIST,
-  SET_PLAYING_NOW_LIST,
-  SET_PLAYER_RECORDS_DIC
+  SET_PLAYING_NOW_LIST
 } from "./types";
 
 export const setCurretRecordId = recordsId => dispatch => {
@@ -31,9 +30,7 @@ export const setRecordsDic = recordsDic => dispatch => {
 export const setBuffersList = buffersList => dispatch => {
   dispatch({ type: SET_BUFFERS_LIST, payload: buffersList });
 };
-export const setPlayerRecordsDic = playerRecordsDic => dispatch => {
-  dispatch({ type: SET_PLAYER_RECORDS_DIC, payload: playerRecordsDic });
-};
+
 export const setIsPlaying = isPlaying => dispatch => {
   dispatch({ type: SET_IS_PLAYING, payload: isPlaying });
 };

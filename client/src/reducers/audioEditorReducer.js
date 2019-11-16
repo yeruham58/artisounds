@@ -3,7 +3,6 @@ import {
   SET_IS_RECORDING,
   SET_AUDIO_START_TIME,
   SET_RECORDS_DIC,
-  SET_AUDIO_BUFFER,
   SET_PX_PER_BIT,
   SET_SECONDS_PER_BIT,
   SET_SECONDS_PER_PX,
@@ -15,8 +14,7 @@ import {
   SET_NUM_OF_BITS,
   SET_CURRENT_RECORD_ID,
   SET_BUFFERS_LIST,
-  SET_PLAYING_NOW_LIST,
-  SET_PLAYER_RECORDS_DIC
+  SET_PLAYING_NOW_LIST
 } from "../actions/types";
 
 const initialState = {
@@ -25,7 +23,6 @@ const initialState = {
   isRecording: false,
   audioStartTime: 0,
   allowChangeTime: false,
-  audioBuffer: null,
   buffersList: {},
   playerRecordsDic: {},
   playingNowList: null,
@@ -64,11 +61,6 @@ export default function(state = initialState, action) {
       return {
         ...state,
         recordsDic: action.payload
-      };
-    case SET_AUDIO_BUFFER:
-      return {
-        ...state,
-        audioBuffer: action.payload
       };
     case SET_BUFFERS_LIST:
       return {
@@ -129,11 +121,6 @@ export default function(state = initialState, action) {
       return {
         ...state,
         playingNowList: action.payload
-      };
-    case SET_PLAYER_RECORDS_DIC:
-      return {
-        ...state,
-        playerRecordsDic: action.payload
       };
 
     default:
