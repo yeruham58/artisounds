@@ -8,8 +8,9 @@ import { deleteProject, updateProject } from "../../../actions/projectActions";
 import { deleteNotificationsByProjectId } from "../../../actions/notificationActions";
 import CreateProject from "../create-project/CreateProject";
 import projectDefaultImg from "../../../img/musicGif.gif";
-import InstrumentDefaultImg from "../../../img/stillNoBodyImg.jpeg";
 import ProjectAudioControls from "./ProjectAudioControls";
+import ArtistInProjectList from "./ArtistInProjectList";
+import ProjectDetiales from "./ProjectDetiales";
 
 class ProjectItem extends Component {
   constructor(props) {
@@ -51,198 +52,50 @@ class ProjectItem extends Component {
       return null;
     }
 
-    const moreDetailes1 = (
-      <div>
-        {project.scale ? (
-          <div>
-            <span>
-              <strong>Scale: </strong>
-            </span>
-            <span>{`${project.scale} ${project.scale_type}`}</span>
-          </div>
-        ) : null}
-        {project.bit ? (
-          <div>
-            <span>
-              <strong>Bit: </strong>
-            </span>
-            <span>{project.bit}</span>
-          </div>
-        ) : null}
-        {project.tempo ? (
-          <div>
-            <span>
-              <strong>Tempo (metronom): </strong>
-            </span>
-            <span>{project.tempo}</span>
-          </div>
-        ) : null}
-        <br />
-      </div>
-    );
-    const moreDetailes2 = (
-      <div>
-        {project.description ? (
-          <div>
-            <div>
-              <strong>Description: </strong>
-            </div>
-            <div className="project-details">{project.description}</div>
-          </div>
-        ) : null}
-        {project.comment ? (
-          <div>
-            <div>
-              <strong>Comment: </strong>
-            </div>
-            <div className="project-details">{project.comment}</div>
-          </div>
-        ) : null}
-        {project.description ? (
-          <div>
-            <div>
-              <strong>Text: </strong>
-            </div>
-            <div className="project-details">{project.text}</div>
-          </div>
-        ) : null}
-
-        <br />
-      </div>
-    );
+    const commentOrText =
+      project.comment || project.description || project.text;
 
     return (
       <div className="card card-body bg-light mb-3">
         <div className="row">
           <div className="col-md-7">
-            <div className="row">
-              <div className="col-md-5">
-                <img
-                  src={
-                    project.img_or_video_url
-                      ? project.img_or_video_url
-                      : projectDefaultImg
-                  }
-                  alt=""
-                  className="rounded mb-4"
-                  id="project-img"
-                />
-              </div>
-              <div className="col-7">
-                <h5>
-                  {project.original ? null : "Cover to "}
-                  <strong>{project.name}</strong>
-                </h5>
-                <h6>
-                  {project.original ? "Original!" : "Original by "}
-                  {!project.original ? (
-                    <strong>{project.original_by}</strong>
-                  ) : null}
-                </h6>
-
-                {project.genre ? (
-                  <p className="mt-4">
-                    <span className="genre">
-                      {"#" + project.genre.music_genre_name}
-                    </span>
-                  </p>
-                ) : null}
-                {this.state.moreDetails ||
-                (project.instruments && project.instruments[0])
-                  ? moreDetailes1
-                  : null}
-              </div>
-            </div>
-            {this.state.moreDetails ? <div>{moreDetailes2}</div> : null}
+            {window.location.href.indexOf("project-view") < 0 ? (
+              <ProjectDetiales
+                project={project}
+                moreDetails={this.state.moreDetails}
+                instrumentsList={this.state.instrumentsList}
+                showImg={true}
+              />
+            ) : (
+              <img
+                src={
+                  project.img_or_video_url
+                    ? project.img_or_video_url
+                    : projectDefaultImg
+                }
+                alt=""
+                className="rounded mb-4"
+                id="project-img"
+                style={{ maxWidth: "400px" }}
+              />
+            )}
           </div>
 
           <div className="col-md-5 d-none d-md-block col-4">
-            {this.state.moreDetails ||
-            !project.instruments ||
-            !project.instruments[0] ? (
-              <div>
-                <h4>Project Manager:</h4>
-                <ul className="list-group">
-                  <li className="list-group-item">
-                    <div className="row">
-                      <div className="col-3 col-lg-2">
-                        <img
-                          alt=""
-                          src={project.user_detailes.avatar}
-                          style={{ height: "35px", width: "35px" }}
-                          className="rounded-circle mt-1"
-                          onClick={() => {
-                            this.props.history.push(
-                              `/profile/${project.user_id}`
-                            );
-                          }}
-                        />
-                      </div>
-
-                      <div className="col-8">
-                        <div className="mt-2">
-                          <strong>{project.user_detailes.name}</strong>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            ) : null}
-            {project.instruments && project.instruments[0] ? (
-              <div>
-                <h4>Instruments:</h4>
-                <ul className="list-group">
-                  {project.instruments
-                    .slice(0, this.state.instrumentsList)
-                    .map((instrument, index) => (
-                      <li key={index} className="list-group-item">
-                        <div className="row">
-                          <div className="col-3 col-lg-2">
-                            <img
-                              alt=""
-                              src={
-                                instrument.user_detailes
-                                  ? instrument.user_detailes.avatar
-                                  : InstrumentDefaultImg
-                              }
-                              style={{ height: "35px", width: "35px" }}
-                              className="rounded-circle mt-1"
-                              onClick={() => {
-                                if (instrument.user_detailes) {
-                                  this.props.history.push(
-                                    `/profile/${instrument.user_id}`
-                                  );
-                                }
-                              }}
-                            />
-                          </div>
-
-                          <div className="col-8">
-                            <strong>
-                              {instrument.instrument_detailes.art_practic_name}
-                            </strong>
-                            <div
-                              style={
-                                !instrument.user_id ? { color: "green" } : null
-                              }
-                            >
-                              {instrument.user_detailes
-                                ? instrument.user_detailes.name
-                                : "Still open"}
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                  {project.instruments.length > this.state.instrumentsList ? (
-                    <li key={2} className="list-group-item">
-                      More...
-                    </li>
-                  ) : null}
-                </ul>
-              </div>
-            ) : null}
+            {window.location.href.indexOf("project-view") < 0 ? (
+              <ArtistInProjectList
+                project={project}
+                moreDetails={this.state.moreDetails}
+                instrumentsList={this.state.instrumentsList}
+              />
+            ) : (
+              <ProjectDetiales
+                project={project}
+                moreDetails={this.state.moreDetails}
+                instrumentsList={this.state.instrumentsList}
+                showImg={false}
+              />
+            )}
           </div>
         </div>
         <div className="row">
@@ -278,17 +131,20 @@ class ProjectItem extends Component {
                 </button>
               </div>
             ) : null}
-            <button
-              onClick={this.moreDetailesControl}
-              type="button"
-              className="btn btn-light mt-2 float-right "
-            >
-              {this.state.moreDetails ? (
-                <i className="fas fa-minus" />
-              ) : (
-                <i className="fas fa-plus" />
-              )}
-            </button>
+
+            {commentOrText && (
+              <button
+                onClick={this.moreDetailesControl}
+                type="button"
+                className="btn btn-light mt-2 float-right "
+              >
+                {this.state.moreDetails ? (
+                  <i className="fas fa-minus" />
+                ) : (
+                  <i className="fas fa-plus" />
+                )}
+              </button>
+            )}
 
             {this.props.showActions ? (
               <Link
@@ -348,7 +204,6 @@ ProjectItem.propTypes = {
   projectOwner: PropTypes.bool
 };
 
-// export default ProjectItem;
 const mapStateToProps = state => ({
   auth: state.auth
 });

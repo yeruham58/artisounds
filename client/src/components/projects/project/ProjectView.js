@@ -86,7 +86,8 @@ class ProjectView extends Component {
                 Back
               </button>
               {projectContant}
-              {this.props.auth.user &&
+              {project.in_action &&
+              this.props.auth.user &&
               this.props.auth.user.id === project.user_id ? (
                 <InstrumentForm project_id={this.props.project.project.id} />
               ) : null}

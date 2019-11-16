@@ -10,14 +10,16 @@ const RangeSlider = (value, onChange, info, error) => {
         min={value.min}
         max={value.max}
         className={
-          !value.id || value.id === "masterVolumeRange" ? "slider" : null
+          !value.id || value.id.toString().indexOf("masterVolumeRange") >= 0
+            ? "slider"
+            : null
         }
         id={value.id ? "myRange" + value.id : "myRange"}
         onChange={e => {
           value.onChange(e);
         }}
         style={
-          value.id && value.id !== "masterVolumeRange"
+          value.id && value.id.toString().indexOf("masterVolumeRange") < 0
             ? { width: "80px" }
             : null
         }

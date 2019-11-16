@@ -16,7 +16,9 @@ import {
   SET_MASTER_VOLUME,
   SET_NUM_OF_BITS,
   SET_CURRENT_RECORD_ID,
-  SET_BUFFERS_LIST
+  SET_BUFFERS_LIST,
+  SET_PLAYING_NOW_LIST,
+  SET_PLAYER_RECORDS_DIC
 } from "./types";
 
 export const setCurretRecordId = recordsId => dispatch => {
@@ -28,6 +30,9 @@ export const setRecordsDic = recordsDic => dispatch => {
 
 export const setBuffersList = buffersList => dispatch => {
   dispatch({ type: SET_BUFFERS_LIST, payload: buffersList });
+};
+export const setPlayerRecordsDic = playerRecordsDic => dispatch => {
+  dispatch({ type: SET_PLAYER_RECORDS_DIC, payload: playerRecordsDic });
 };
 export const setIsPlaying = isPlaying => dispatch => {
   dispatch({ type: SET_IS_PLAYING, payload: isPlaying });
@@ -60,6 +65,9 @@ export const setMasterVolume = masterVolume => dispatch => {
 };
 export const setNumOfBits = numOfBits => dispatch => {
   dispatch({ type: SET_NUM_OF_BITS, payload: numOfBits });
+};
+export const setPlayingNowList = playingNowList => dispatch => {
+  dispatch({ type: SET_PLAYING_NOW_LIST, payload: playingNowList });
 };
 
 //Upload record

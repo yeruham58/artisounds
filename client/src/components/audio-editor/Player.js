@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import { getLongestDuration } from "./setPlayerTracks";
 import {
   setIsPlaying,
+  setPlayingNowList,
   setAudioStartTime
 } from "../../actions/audioEditorActions";
 
@@ -14,58 +15,91 @@ class Player extends Component {
 
     this.state = {
       buffersList: null,
-      playingNowList: null,
+      // playingNowList: this.props.editor.playingNowList,
       audioStartTime:
         this.props.editor.audioStartTime > 0
           ? this.props.editor.audioStartTime
           : 0.00001,
+      // isPlaying: this.props.editor.isPlaying,
       isPlaying: false,
       volume: 0,
       startSec: 0,
-      allowChangeTime: false
+      allowChangeTime: false,
+      // allowChangeTime: this.props.editor.isPlaying,
+      intervalsIdList: []
     };
   }
 
-  componentWillReceiveProps(nextProp) {
-    if (nextProp.editor) {
-      if (
-        nextProp.editor.buffersList &&
-        nextProp.editor.buffersList !== this.state.buffersList
-      ) {
-        this.setState({
-          buffersList: nextProp.editor.buffersList
-        });
-        // if (nextProp.editor.allowChangeTime) {
-        if (this.state.allowChangeTime) {
-          this.setState({
-            audioStartTime: this.props.editor.audioStartTime
-          });
-        }
-        if (this.state.isPlaying) {
-          setTimeout(() => {
-            this.stopAndPlayNew();
-          }, 20);
-        }
-      }
+  componentWillUnmount() {
+    if (this.state.isPlaying) {
+      this.props.setAudioStartTime({
+        audioStartTime: this.state.audioStartTime,
+        allowChangeTime: true
+      });
+    }
 
-      if (nextProp.editor.isPlaying && !this.state.isPlaying) {
-        this.setState({ isPlaying: true });
-        //time out is for current audio to update
+    for (var inter of this.state.intervalsIdList) {
+      clearInterval(inter);
+    }
+    this.props.setAudioStartTime(0);
+    this.props.setIsPlaying(false);
+
+    this.onStop();
+  }
+
+  componentWillReceiveProps(nextProp) {
+    const changeOfPlayerInEditor =
+      nextProp.editor.buffersList &&
+      nextProp.editor.buffersList !== this.state.buffersList &&
+      !nextProp.buffersList;
+
+    const changeOfPlayerInProject =
+      nextProp.buffersList &&
+      nextProp.buffersList !== this.state.buffersList &&
+      nextProp.editor.isPlaying === this.props.projectId;
+
+    if (changeOfPlayerInEditor || changeOfPlayerInProject) {
+      const buffersList = changeOfPlayerInEditor
+        ? nextProp.editor.buffersList
+        : nextProp.buffersList;
+      this.setState({
+        buffersList
+      });
+      // if (nextProp.editor.allowChangeTime) {
+      if (this.state.allowChangeTime) {
+        this.setState({
+          audioStartTime: this.props.editor.audioStartTime
+        });
+      }
+      if (this.state.isPlaying) {
         setTimeout(() => {
-          this.onPlay();
-        }, 100);
+          this.stopAndPlayNew();
+        }, 20);
       }
-      if (!nextProp.editor.isPlaying && this.state.isPlaying) {
-        this.setState({ isPlaying: false });
-        this.onStop();
-      }
+    }
+    if (
+      nextProp.editor.isPlaying &&
+      !this.state.isPlaying &&
+      !nextProp.editor.playingNowList &&
+      (nextProp.editor.isPlaying === this.props.projectId ||
+        this.props.pointerRef)
+    ) {
+      this.setState({ isPlaying: true });
+      //time out is for current audio to update
+      setTimeout(() => {
+        this.onPlay();
+      }, 100);
+    }
+    if (!nextProp.editor.isPlaying && this.state.isPlaying) {
+      this.setState({ isPlaying: false });
+      this.onStop();
     }
   }
 
   stopAndPlayNew() {
     this.onStop();
     var id = setInterval(() => {
-      if (!this.state.playingNowList) {
+      if (!this.props.editor.playingNowList) {
         this.onPlay();
         clearInterval(id);
       }
@@ -80,6 +114,7 @@ class Player extends Component {
         !this.state.isPlaying ||
         this.state.startSec !== startSec ||
         this.state.allowChangeTime
+        // !this.props.editor.playingNowList
       ) {
         clearInterval(id);
       } else {
@@ -92,15 +127,19 @@ class Player extends Component {
         }
       }
     }, 100);
+    const stateIntervals = this.state.intervalsIdList;
+    stateIntervals.push(id);
+    this.setState({ intervalsIdList: stateIntervals });
   }
 
   onPlay() {
     this.setState({
-      playingNowList: this.props.editor.buffersList,
-      allowChangeTime: false
+      allowChangeTime: false,
+      intervalsIdList: []
     });
-    console.log("set to false");
-    for (var buffer of this.props.editor.buffersList) {
+    this.props.setPlayingNowList(this.state.buffersList);
+
+    for (var buffer of this.state.buffersList) {
       let { audioStartTime } = this.state;
       if (this.props.pointerRef) {
         const pointerLeftPx = this.props.pointerRef.current.offsetLeft;
@@ -122,9 +161,9 @@ class Player extends Component {
 
   onStop() {
     var id = setInterval(() => {
-      if (this.state.playingNowList) {
+      if (this.props.editor.playingNowList) {
         clearInterval(id);
-        for (var buffer of this.state.playingNowList) {
+        for (var buffer of this.props.editor.playingNowList) {
           try {
             buffer.stop();
           } catch (err) {
@@ -132,6 +171,7 @@ class Player extends Component {
           }
         }
         this.setState({ playingNowList: null });
+        this.props.setPlayingNowList(null);
       }
     }, 20);
   }
@@ -202,7 +242,6 @@ class Player extends Component {
                 fontSize: "12px",
                 position: "relative",
                 right: "5px"
-                // float: "right"
               }}
             >
               {durationTime}
@@ -216,6 +255,7 @@ class Player extends Component {
 
 Player.propTypes = {
   setIsPlaying: PropTypes.func.isRequired,
+  setPlayingNowList: PropTypes.func.isRequired,
   setAudioStartTime: PropTypes.func.isRequired,
   projectId: PropTypes.number.isRequired
 };
@@ -227,5 +267,5 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
 
-  { setIsPlaying, setAudioStartTime }
+  { setIsPlaying, setPlayingNowList, setAudioStartTime }
 )(Player);

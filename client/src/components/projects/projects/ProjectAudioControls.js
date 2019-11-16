@@ -5,11 +5,9 @@ import PropTypes from "prop-types";
 import RangeSlider from "../../common/RangeSlider";
 import {
   setBuffersList,
-  setRecordsDic
-} from "../../../actions/audioEditorActions";
-import {
   setIsPlaying,
-  setMasterVolume
+  setMasterVolume,
+  setRecordsDic
 } from "../../../actions/audioEditorActions";
 import {
   initAudioDic,
@@ -23,64 +21,101 @@ class ProjectAudioControls extends Component {
 
     this.state = {
       isPlaying: false,
-      volume: 80,
-      recordsDic: null
+      volume: this.props.editor.masterVolume,
+      masterVolume: this.props.editor.masterVolume,
+      recordsDic: null,
+      buffersList: null,
+      audioStartTime: this.props.editor.audioStartTime
     };
 
     this.onVolumeChange = this.onVolumeChange.bind(this);
   }
 
   componentDidMount() {
-    const { instruments } = this.props.project;
-    const recordsDic = initAudioDic(instruments);
-    this.props.setRecordsDic(recordsDic);
+    const { project } = this.props;
+    const recordsDic = initAudioDic(project.instruments);
+    setTimeout(() => {
+      this.setState({ recordsDic: recordsDic });
+      this.initBuffersList(this.props.editor.masterVolume);
+    }, 1000);
   }
 
   componentWillReceiveProps(nextProp) {
-    if (nextProp.editor.recordsDic !== this.state.recordsDic) {
-      this.setState({
-        recordsDic: nextProp.editor.recordsDic
-      });
-      // this timeout is for state to update in reload page
-      setTimeout(() => {
+    if (
+      nextProp.editor.isPlaying === nextProp.project.id ||
+      !this.props.editor.isPlaying
+    ) {
+      if (nextProp.editor.masterVolume !== this.state.masterVolume) {
+        this.setState({ masterVolume: nextProp.editor.masterVolume });
         this.initBuffersList(nextProp.editor.masterVolume);
-      }, 20);
-    }
-    if (nextProp.editor.audioStartTime !== this.state.audioStartTime) {
-      this.setState({ audioStartTime: nextProp.editor.audioStartTime });
-      setTimeout(() => {
+      }
+      if (nextProp.editor.audioStartTime !== this.state.audioStartTime) {
+        this.setState({ audioStartTime: nextProp.editor.audioStartTime });
+        setTimeout(() => {
+          this.initBuffersList(nextProp.editor.masterVolume);
+        }, 20);
+      }
+
+      if (nextProp.editor.isPlaying && !this.state.isPlaying) {
+        this.setState({ isPlaying: true });
+      }
+
+      if (!nextProp.editor.isPlaying && this.state.isPlaying) {
         this.initBuffersList(nextProp.editor.masterVolume);
-      }, 20);
-    }
-    if (nextProp.editor.masterVolume !== this.state.masterVolume) {
-      this.setState({ masterVolume: nextProp.editor.masterVolume });
-      this.initBuffersList(nextProp.editor.masterVolume);
-    }
-    if (nextProp.editor.isPlaying && !this.state.isPlaying) {
-      this.setState({ isPlaying: true });
-    }
-    if (!nextProp.editor.isPlaying && this.state.isPlaying) {
-      this.initBuffersList(nextProp.editor.masterVolume);
-      this.setState({ isPlaying: false });
+        this.setState({ isPlaying: false });
+      }
     }
   }
 
   initBuffersList(masterVolume) {
-    const { recordsDic } = this.props.editor;
+    const { recordsDic } = this.state;
+
     //Not working without time outwhen loading page, I have to understend why
     setTimeout(() => {
       const buffersList = initBuffersList(recordsDic, masterVolume);
-      this.props.setBuffersList(buffersList);
+
+      this.setState({ buffersList: buffersList });
     }, 500);
   }
 
   onVolumeChange() {
-    var slider = document.getElementById("myRangemasterVolumeRange");
+    var slider = document.getElementById(
+      "myRangemasterVolumeRange" + this.props.project.id
+    );
     this.setState({ volume: slider.value });
     document.onmouseup = () => {
       this.props.setMasterVolume(slider.value);
       document.onmouseup = null;
     };
+  }
+
+  onPlay() {
+    var slider = document.getElementById(
+      "myRangemasterVolumeRange" + this.props.project.id
+    );
+    var timeOut = 0;
+    if (this.props.editor.masterVolume.toString() !== slider.value) {
+      this.setState({ volume: slider.value });
+      this.props.setMasterVolume(slider.value);
+      timeOut = 500;
+    }
+
+    if (this.props.editor.isPlaying) {
+      this.props.setIsPlaying(false);
+      timeOut = 1000;
+    }
+
+    var id = setInterval(() => {
+      if (
+        this.props.editor.masterVolume.toString() === slider.value &&
+        !this.props.editor.isPlaying
+      ) {
+        clearInterval(id);
+        setTimeout(() => {
+          this.props.setIsPlaying(this.props.project.id);
+        }, timeOut);
+      }
+    }, 10);
   }
 
   render() {
@@ -101,15 +136,11 @@ class ProjectAudioControls extends Component {
               <button
                 type="button"
                 className="btn btn-light mb-2 mt-2 ml-2 text-success"
-                disabled={this.state.isPlaying}
-                onClick={() => {
-                  const waitingTime = (60 / this.state.projectTempo) * 1000;
-                  setTimeout(() => {
-                    this.props.setIsPlaying(true);
-                  }, waitingTime);
-
-                  this.setState({ isPlaying: true });
-                }}
+                disabled={
+                  this.props.editor.isPlaying === this.props.project.id ||
+                  !this.state.buffersList
+                }
+                onClick={this.onPlay.bind(this)}
               >
                 <i className="fas fa-play"></i>
               </button>
@@ -118,10 +149,9 @@ class ProjectAudioControls extends Component {
               <button
                 type="button"
                 className="btn btn-light mb-2 mt-2 ml-2 text-warning"
-                disabled={!this.state.isPlaying}
+                disabled={this.props.editor.isPlaying !== this.props.project.id}
                 onClick={() => {
                   this.props.setIsPlaying(false);
-                  this.setState({ isPlaying: false });
                 }}
               >
                 <i className="fas fa-stop"></i>
@@ -136,8 +166,10 @@ class ProjectAudioControls extends Component {
               }}
             >
               <RangeSlider
-                id="masterVolumeRange"
+                className="masterVolumeRange"
+                id={"masterVolumeRange" + this.props.project.id}
                 value={this.state.volume}
+                // value={this.state.volume}
                 min={0}
                 max={100}
                 onChange={this.onVolumeChange}
@@ -147,7 +179,10 @@ class ProjectAudioControls extends Component {
         </div>
 
         <div>
-          <Player projectId={this.props.project.id} />
+          <Player
+            projectId={this.props.project.id}
+            buffersList={this.state.buffersList}
+          />
         </div>
       </div>
     );
