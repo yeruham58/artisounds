@@ -20,14 +20,14 @@ const include = [
     model: MusicGenre,
     as: "genre"
   },
-  // {
-  //   model: ProjectLike,
-  //   as: "likes",
-  //   include: {
-  //     model: User,
-  //     as: "user_detailes"
-  //   }
-  // },
+  {
+    model: ProjectLike,
+    as: "likes",
+    include: {
+      model: User,
+      as: "user_detailes"
+    }
+  },
   // {
   //   model: ProjectDislike,
   //   as: "dislikes",
