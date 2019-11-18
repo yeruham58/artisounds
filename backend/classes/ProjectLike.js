@@ -17,7 +17,7 @@ ProjectLike.init(
     user_id: Sequelize.INTEGER,
     name: Sequelize.STRING,
     avatar: Sequelize.STRING,
-    post_id: Sequelize.INTEGER,
+    project_id: Sequelize.INTEGER,
     like_score: Sequelize.FLOAT
   },
   { sequelize, modelName: "ProjectLike" }

@@ -17,7 +17,7 @@ ProjectDislike.init(
     user_id: Sequelize.INTEGER,
     name: Sequelize.STRING,
     avatar: Sequelize.STRING,
-    post_id: Sequelize.INTEGER,
+    project_id: Sequelize.INTEGER,
     dislike_score: Sequelize.FLOAT
   },
   { sequelize, modelName: "ProjectDislike" }

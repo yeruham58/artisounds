@@ -12,7 +12,7 @@ ProjectComment.init(
     user_id: Sequelize.INTEGER,
     name: Sequelize.STRING,
     avatar: Sequelize.STRING,
-    post_id: Sequelize.INTEGER,
+    project_id: Sequelize.INTEGER,
     comment_contant: Sequelize.STRING
   },
   { sequelize, modelName: "ProjectComment" }

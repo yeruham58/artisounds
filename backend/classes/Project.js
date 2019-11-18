@@ -28,22 +28,22 @@ const include = [
       as: "user_detailes"
     }
   },
-  // {
-  //   model: ProjectDislike,
-  //   as: "dislikes",
-  //   include: {
-  //     model: User,
-  //     as: "user_detailes"
-  //   }
-  // },
-  // {
-  //   model: ProjectComment,
-  //   as: "comments",
-  //   include: {
-  //     model: User,
-  //     as: "user_detailes"
-  //   }
-  // },
+  {
+    model: ProjectDislike,
+    as: "dislikes",
+    include: {
+      model: User,
+      as: "user_detailes"
+    }
+  },
+  {
+    model: ProjectComment,
+    as: "comments",
+    include: {
+      model: User,
+      as: "user_detailes"
+    }
+  },
   {
     model: ProjectInstrument,
     as: "instruments",
