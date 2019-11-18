@@ -3,9 +3,9 @@ const sequelize = require("../config/database");
 const Op = Sequelize.Op;
 const Promise = require("promise");
 
-// const Like = require("./Like");
-// const Dislike = require("./Dislike");
-// const Comment = require("./Comment");
+const ProjectLike = require("./ProjectLike");
+const ProjectDislike = require("./ProjectDislike");
+const ProjectComment = require("./ProjectComment");
 const ProjectInstrument = require("./ProjectInstrument");
 const MusicGenre = require("./MusicGenre");
 const User = require("./user");
@@ -21,7 +21,7 @@ const include = [
     as: "genre"
   },
   // {
-  //   model: Like,
+  //   model: ProjectLike,
   //   as: "likes",
   //   include: {
   //     model: User,
@@ -29,7 +29,7 @@ const include = [
   //   }
   // },
   // {
-  //   model: Dislike,
+  //   model: ProjectDislike,
   //   as: "dislikes",
   //   include: {
   //     model: User,
@@ -37,13 +37,13 @@ const include = [
   //   }
   // },
   // {
-  //   model: Comment,
+  //   model: ProjectComment,
   //   as: "comments",
   //   include: {
   //     model: User,
   //     as: "user_detailes"
   //   }
-  // }
+  // },
   {
     model: ProjectInstrument,
     as: "instruments",
@@ -134,9 +134,9 @@ Project.init(
   { sequelize, modelName: "Project" }
 );
 
-// Project.hasMany(Like, { foreignKey: "project_id", as: "likes" });
-// Project.hasMany(Dislike, { foreignKey: "project_id", as: "dislikes" });
-// Project.hasMany(Comment, { foreignKey: "project_id", as: "comments" });
+Project.hasMany(ProjectLike, { foreignKey: "project_id", as: "likes" });
+Project.hasMany(ProjectDislike, { foreignKey: "project_id", as: "dislikes" });
+Project.hasMany(ProjectComment, { foreignKey: "project_id", as: "comments" });
 
 Project.hasMany(ProjectInstrument, {
   foreignKey: "project_id",

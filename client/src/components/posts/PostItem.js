@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import classnames from "classnames";
 import { Link } from "react-router-dom";
 import ReactPlayer from "react-player";
 
@@ -210,17 +209,14 @@ class PostItem extends Component {
                   onClick={this.onLikeClick.bind(this, post.id)}
                   type="button"
                   className="btn btn-light mr-1"
+                  onDoubleClick={() => {
+                    console.log("dublle klick");
+                  }}
                 >
                   <i
-                    className={classnames(
-                      "fas fa-thumbs-up",
-                      {
-                        "text-info": this.state.like
-                      },
-                      {
-                        "text-secondary": !this.state.like
-                      }
-                    )}
+                    className={`fas fa-thumbs-up ${
+                      this.state.like ? "text-info" : "text-secondary"
+                    }`}
                   />
                   {post.likes ? (
                     <span className="badge badge-light">
@@ -234,15 +230,9 @@ class PostItem extends Component {
                   className="btn btn-light mr-1"
                 >
                   <i
-                    className={classnames(
-                      "fas fa-thumbs-down",
-                      {
-                        "text-danger": this.state.dislike
-                      },
-                      {
-                        "text-secondary": !this.state.dislike
-                      }
-                    )}
+                    className={`fas fa-thumbs-down ${
+                      this.state.dislike ? "text-danger" : "text-secondary"
+                    }`}
                   />
                   {post.dislikes ? (
                     <span className="badge badge-light">
@@ -250,11 +240,18 @@ class PostItem extends Component {
                     </span>
                   ) : null}
                 </button>
-                <Link to={`/post/${post.id}`} className="btn btn-info mr-1">
-                  Comments{" "}
-                  {this.props.post.comments
-                    ? this.props.post.comments.length
-                    : null}
+                <Link
+                  to={`/post/${post.id}`}
+                  // style={{ fontSize: "18px", color: "grey" }}
+                  className="btn btn-light mr-1"
+                >
+                  <i className="far fa-comment"></i>
+
+                  {post.comments ? (
+                    <span className="badge badge-light">
+                      {post.comments.length}
+                    </span>
+                  ) : null}
                 </Link>
                 {post.user_id === auth.user.id ? (
                   <button

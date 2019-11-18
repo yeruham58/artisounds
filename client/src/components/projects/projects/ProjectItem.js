@@ -11,6 +11,7 @@ import projectDefaultImg from "../../../img/musicGif.gif";
 import ProjectAudioControls from "./ProjectAudioControls";
 import ArtistInProjectList from "./ArtistInProjectList";
 import ProjectDetiales from "./ProjectDetiales";
+import ProjectLikesAndCommentsControl from "./ProjectLikesAndCommentsControl";
 
 class ProjectItem extends Component {
   constructor(props) {
@@ -103,6 +104,15 @@ class ProjectItem extends Component {
             {project.instruments.find(instru => instru.record_url) && (
               <div style={{ float: "left", width: "100%" }}>
                 <ProjectAudioControls project={project} />
+              </div>
+            )}
+
+            {!project.in_action && (
+              <div className="float-right mt-2">
+                <ProjectLikesAndCommentsControl
+                  project={project}
+                  authUser={this.props.auth.user}
+                />
               </div>
             )}
 
