@@ -140,67 +140,68 @@ export const deleteProject = projectId => dispatch => {
     });
 };
 
-// //Add and remove like
-// export const addAndRemoveLike = (postId, likeData) => dispatch => {
-//   axios
-//     .post(`/api/posts/like/${postId}`, likeData)
-//     .then()
-//     .catch(err => {
-//       dispatch({
-//         type: GET_ERRORS,
-//         payload: err.response.data
-//       });
-//     });
-// };
+//Add and remove like
+export const addAndRemoveLike = (projectId, likeData) => dispatch => {
+  console.log(likeData);
+  axios
+    .post(`/api/projects/like/${projectId}`, likeData)
+    .then(a => console.log(a))
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      });
+    });
+};
 
-// //Add and remove dislike
-// export const addAndRemoveDislike = (postId, dislikeData) => dispatch => {
-//   axios
-//     .post(`/api/posts/dislike/${postId}`, dislikeData)
-//     .then()
-//     .catch(err => {
-//       dispatch({
-//         type: GET_ERRORS,
-//         payload: err.response.data
-//       });
-//     });
-// };
+//Add and remove dislike
+export const addAndRemoveDislike = (projectId, dislikeData) => dispatch => {
+  axios
+    .post(`/api/projects/dislike/${projectId}`, dislikeData)
+    .then()
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      });
+    });
+};
 
-// // Add comment
-// export const addComment = (postId, commentData) => dispatch => {
-//   axios
-//     .post(`/api/posts/comment/${postId}`, commentData)
-//     .then(res =>
-//       dispatch({
-//         type: GET_POST,
-//         payload: res.data
-//       })
-//     )
-//     .catch(err => {
-//       dispatch({
-//         type: GET_ERRORS,
-//         payload: err.response.data
-//       });
-//     });
-// };
+// Add comment
+export const addComment = (projectId, commentData) => dispatch => {
+  axios
+    .post(`/api/projects/comment/${projectId}`, commentData)
+    .then(res =>
+      dispatch({
+        type: GET_PROJECT,
+        payload: res.data
+      })
+    )
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      });
+    });
+};
 
-// // Delete comment
-// export const deleteComment = commentId => dispatch => {
-//   axios
-//     .delete(`/api/posts/comment/${commentId}`)
-//     .then(res =>
-//       dispatch({
-//         type: GET_POST,
-//         payload: res.data
-//       })
-//     )
-//     .catch(err => {
-//       dispatch({
-//         type: GET_ERRORS,
-//         payload: err.response.data
-//       });
-//     });
-// };
+// Delete comment
+export const deleteComment = commentId => dispatch => {
+  axios
+    .delete(`/api/projects/comment/${commentId}`)
+    .then(res =>
+      dispatch({
+        type: GET_PROJECT,
+        payload: res.data
+      })
+    )
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      });
+    });
+};
 
 // Add instrument
 export const addInstrument = (projectId, instrumentData) => dispatch => {

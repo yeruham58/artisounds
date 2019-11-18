@@ -9,10 +9,9 @@ const UserMusicGenre = require("./UserMusicGenre");
 const UserArtType = require("./UserArtType");
 const UserArtPractic = require("./UserArtPractic");
 
-const Post = require("./Post");
+const Project = require("./Project");
 
 const ArtType = require("./ArtType");
-// const SubArtType = require("./SubArtType");
 const ArtPractic = require("./ArtPractic");
 
 class User extends Sequelize.Model {
@@ -59,16 +58,6 @@ class User extends Sequelize.Model {
                   attributes: ["art_practic_name", "id"]
                 }
               }
-              // {
-              //   model: UserSubArtType,
-              //   as: "sub_art_types",
-              //   attributes: ["is_active"],
-              //   include: {
-              //     model: SubArtType,
-              //     as: "sub_art_type_details",
-              //     attributes: ["sub_art_type_name", "id"]
-              //   }
-              // }
             ]
           }
         ]
@@ -87,18 +76,6 @@ class User extends Sequelize.Model {
       // return User.findAll({
       const users = User.findAll({
         include: [
-          // {
-          //   model: UserArtType,
-          //   as: "art_types",
-          //   attributes: ["art_type_id"],
-          //   include: [
-          //     {
-          //       model: ArtType,
-          //       as: "art_type_details",
-          //       attributes: ["art_type_name", "id"]
-          //     }
-          //   ]
-          // }
           {
             model: UserArtPractic,
             as: "art_practics",
@@ -131,18 +108,18 @@ class User extends Sequelize.Model {
 
   static getUserScoreByUserId(userId) {
     return new Promise(function(resolve, reject) {
-      Post.getPostsByUserId(userId).then(posts => {
+      Project.getProjectsByUserId(userId).then(projects => {
         var userScore = 0;
-        posts.forEach(function(post) {
-          var postScore = 0;
-          post.likes.forEach(function(like) {
-            postScore += like.like_score;
+        projects.forEach(function(project) {
+          var projectScore = 0;
+          project.likes.forEach(function(like) {
+            projectScore += like.like_score;
           });
-          post.dislikes.forEach(function(dislike) {
-            postScore -= dislike.dislike_score;
+          project.dislikes.forEach(function(dislike) {
+            projectScore -= dislike.dislike_score;
           });
-          if (postScore > 50) {
-            userScore += postScore / 100;
+          if (projectScore > 50) {
+            userScore += projectScore / 100;
           }
         });
         resolve(userScore);

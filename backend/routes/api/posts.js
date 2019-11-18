@@ -93,6 +93,11 @@ router.delete(
           }).then(dislikes => {
             dislikes.map(dislike => dislike.destroy());
           });
+          Comment.findAll({
+            where: { post_id: post.id, user_id: req.user.id }
+          }).then(comments => {
+            comments.map(comment => comment.destroy());
+          });
           if (post.media_key) {
             deleteAwsFile(post.media_key, "postuploadedmedia");
           }
@@ -228,9 +233,7 @@ router.delete(
           });
         }
       })
-      .then(() => {
-        Post.getPostByPostId(req.params.id).then(post => res.json(post));
-      })
+
       .catch(err => res.json(err));
   }
 );

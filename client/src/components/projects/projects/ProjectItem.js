@@ -107,7 +107,7 @@ class ProjectItem extends Component {
               </div>
             )}
 
-            {!project.in_action && (
+            {!project.in_action && this.props.showActions && (
               <div className="float-right mt-2">
                 <ProjectLikesAndCommentsControl
                   project={project}

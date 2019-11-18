@@ -3,16 +3,16 @@ const router = express.Router();
 const passport = require("passport");
 
 const validateProjectInput = require("../../validation/project");
-// const validateCommentInput = require("../../validation/comment");
+const validateCommentInput = require("../../validation/comment");
 
-// const User = require("../../classes/User");
+const User = require("../../classes/User");
 const ArtPractic = require("../../classes/ArtPractic");
 const ProjectInstrument = require("../../classes/ProjectInstrument");
 const ProjectNotifications = require("../../classes/ProjectNotifications");
 const Project = require("../../classes/Project");
-// const Like = require("../../classes/Like");
-// const Dislike = require("../../classes/Dislike");
-// const Comment = require("../../classes/Comment");
+const ProjectLike = require("../../classes/ProjectLike");
+const ProjectDislike = require("../../classes/ProjectDislike");
+const ProjectComment = require("../../classes/ProjectComment");
 const { deleteAwsFile } = require("./uploadPostMedia");
 
 //@ route   GET api/projects/instruments
@@ -103,7 +103,7 @@ router.post(
         });
       })
       .catch(err => {
-        errors.error = "Some error with upload your post, please try again";
+        errors.error = "Some error with upload your project, please try again";
         return res.status(400).json(errors);
       });
   }
@@ -154,7 +154,7 @@ router.patch(
         });
       })
       .catch(err => {
-        errors.error = "Some error with upload your post, please try again";
+        errors.error = "Some error with upload your project, please try again";
         return res.status(400).json(errors);
       });
   }
@@ -167,24 +167,14 @@ router.delete(
   "/:projectId",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    //chack the post ouner
+    //chack the project ouner
     Project.findByPk(req.params.projectId)
       .then(project => {
         if (project.user_id !== req.user.id) {
           return res
             .status(401)
-            .json({ msg: "This post is not belong to you!" });
+            .json({ msg: "This project is not belong to you!" });
         } else {
-          // Like.findAll({
-          //   where: { post_id: post.id, user_id: req.user.id }
-          // }).then(likes => {
-          //   likes.map(like => like.destroy());
-          // });
-          // Dislike.findAll({
-          //   where: { post_id: post.id, user_id: req.user.id }
-          // }).then(dislikes => {
-          //   dislikes.map(dislike => dislike.destroy());
-          // });
           if (
             project.instruments &&
             project.instruments[0] &&
@@ -205,13 +195,34 @@ router.delete(
                 });
               });
           } else {
+            ProjectLike.findAll({
+              where: { project_id: project.id, user_id: req.user.id }
+            }).then(likes => {
+              likes.map(like => like.destroy());
+            });
+            ProjectDislike.findAll({
+              where: { project_id: project.id, user_id: req.user.id }
+            }).then(dislikes => {
+              dislikes.map(dislike => dislike.destroy());
+            });
+            ProjectComment.findAll({
+              where: { project_id: project.id, user_id: req.user.id }
+            }).then(comments => {
+              comments.map(comment => comment.destroy());
+            });
             ProjectInstrument.findAll({
               where: { project_id: project.id }
             }).then(projectInstrument => {
-              projectInstrument.map(projectInstrument =>
-                //TODO: delete instrument record
-                projectInstrument.destroy()
-              );
+              projectInstrument.map(projectInstrument => {
+                if (projectInstrument.record_key) {
+                  deleteAwsFile(
+                    projectInstrument.record_key,
+                    "projects-records"
+                  );
+                }
+
+                projectInstrument.destroy();
+              });
             });
             if (project.img_or_video_key) {
               deleteAwsFile(project.img_or_video_key, "projectimgorvideo");
@@ -228,139 +239,149 @@ router.delete(
   }
 );
 
-// // TODO: Edit this code to project like and dislike
+//@ route   POST api/projects/like/:id
+//@desc     like project
+//@access   private
+router.post(
+  "/like/:id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    //if already liked
+    ProjectLike.findOne({
+      where: { project_id: req.params.id, user_id: req.user.id }
+    })
+      .then(like => {
+        if (!like) {
+          const likeInfo = {};
+          likeInfo.user_id = req.user.id;
+          likeInfo.project_id = req.params.id;
+          likeInfo.name = req.body.name;
+          likeInfo.avatar = req.body.avatar;
+          ProjectDislike.findOne({
+            where: { project_id: req.params.id, user_id: req.user.id }
+          }).then(dislike => {
+            if (dislike) {
+              dislike.destroy();
+            }
+          });
+          User.getUserScoreByUserId(likeInfo.user_id).then(userScore => {
+            ProjectLike.createLike(likeInfo, userScore).then(() => {
+              Project.getProjectByProjectId(req.params.id).then(project =>
+                res.json(project)
+              );
+            });
+          });
+        } else {
+          like
+            .destroy()
+            .then(() =>
+              Project.getProjectByProjectId(req.params.id).then(project =>
+                res.json(project)
+              )
+            );
+        }
+      })
+      .catch(err => res.json(err));
+  }
+);
 
-// //@ route   POST api/posts/like/:id
-// //@desc     like post
-// //@access   private
-// router.post(
-//   "/like/:id",
-//   passport.authenticate("jwt", { session: false }),
-//   (req, res) => {
-//     //if already liked
-//     Like.findOne({
-//       where: { post_id: req.params.id, user_id: req.user.id }
-//     })
-//       .then(like => {
-//         if (!like) {
-//           const likeInfo = {};
-//           likeInfo.user_id = req.user.id;
-//           likeInfo.post_id = req.params.id;
-//           likeInfo.name = req.body.name;
-//           likeInfo.avatar = req.body.avatar;
-//           Dislike.findOne({
-//             where: { post_id: req.params.id, user_id: req.user.id }
-//           }).then(dislike => {
-//             if (dislike) {
-//               dislike.destroy();
-//             }
-//           });
-//           User.getUserScoreByUserId(likeInfo.user_id).then(userScore => {
-//             Like.createLike(likeInfo, userScore).then(() => {
-//               Post.getPostByPostId(req.params.id).then(post => res.json(post));
-//             });
-//           });
-//         } else {
-//           like
-//             .destroy()
-//             .then(() =>
-//               Post.getPostByPostId(req.params.id).then(post => res.json(post))
-//             );
-//         }
-//       })
-//       .catch(err => res.json(err));
-//   }
-// );
+//@ route   POST api/projects/dislike/:id
+//@desc     dislike project
+//@access   private
+router.post(
+  "/dislike/:id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    //if already liked
+    ProjectDislike.findOne({
+      where: { project_id: req.params.id, user_id: req.user.id }
+    })
+      .then(dislike => {
+        if (!dislike) {
+          const dislikeInfo = {};
+          dislikeInfo.user_id = req.user.id;
+          dislikeInfo.project_id = req.params.id;
+          dislikeInfo.name = req.body.name;
+          dislikeInfo.avatar = req.body.avatar;
+          ProjectLike.findOne({
+            where: { project_id: req.params.id, user_id: req.user.id }
+          }).then(like => {
+            if (like) {
+              like.destroy();
+            }
+          });
+          ProjectDislike.createDislike(dislikeInfo).then(() => {
+            Project.getProjectByProjectId(req.params.id).then(project =>
+              res.json(project)
+            );
+          });
+        } else {
+          dislike.destroy().then(() => {
+            Project.getProjectByProjectId(req.params.id).then(project =>
+              res.json(project)
+            );
+          });
+        }
+      })
+      .catch(err => res.json({ msg: "Sorry, we have some err" }));
+  }
+);
 
-// //@ route   POST api/posts/dislike/:id
-// //@desc     dislike post
-// //@access   private
-// router.post(
-//   "/dislike/:id",
-//   passport.authenticate("jwt", { session: false }),
-//   (req, res) => {
-//     //if already liked
-//     Dislike.findOne({ where: { post_id: req.params.id, user_id: req.user.id } })
-//       .then(dislike => {
-//         if (!dislike) {
-//           const dislikeInfo = {};
-//           dislikeInfo.user_id = req.user.id;
-//           dislikeInfo.post_id = req.params.id;
-//           dislikeInfo.name = req.body.name;
-//           dislikeInfo.avatar = req.body.avatar;
-//           Like.findOne({
-//             where: { post_id: req.params.id, user_id: req.user.id }
-//           }).then(like => {
-//             if (like) {
-//               like.destroy();
-//             }
-//           });
-//           Dislike.createDislike(dislikeInfo).then(() => {
-//             Post.getPostByPostId(req.params.id).then(post => res.json(post));
-//           });
-//         } else {
-//           dislike.destroy().then(() => {
-//             Post.getPostByPostId(req.params.id).then(post => res.json(post));
-//           });
-//         }
-//       })
-//       .catch(err => res.json({ msg: "Sorry, we have some err" }));
-//   }
-// );
+//@ route   POST api/projects/comment/:id
+//@desc     add comment to project
+//@access   private
+router.post(
+  "/comment/:id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const { errors, isValid } = validateCommentInput(req.body);
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
+    const commentInfo = {};
+    commentInfo.user_id = req.user.id;
+    commentInfo.project_id = req.params.id;
+    commentInfo.name = req.body.name;
+    commentInfo.avatar = req.body.avatar;
+    commentInfo.comment_contant = req.body.comment_contant;
 
-// //@ route   POST api/posts/comment/:id
-// //@desc     add comment to post
-// //@access   private
-// router.post(
-//   "/comment/:id",
-//   passport.authenticate("jwt", { session: false }),
-//   (req, res) => {
-//     const { errors, isValid } = validateCommentInput(req.body);
-//     if (!isValid) {
-//       return res.status(400).json(errors);
-//     }
-//     const commentInfo = {};
-//     commentInfo.user_id = req.user.id;
-//     commentInfo.post_id = req.params.id;
-//     commentInfo.name = req.body.name;
-//     commentInfo.avatar = req.body.avatar;
-//     commentInfo.comment_contant = req.body.comment_contant;
+    ProjectComment.create(commentInfo)
+      .then(() => {
+        Project.getProjectByProjectId(req.params.id).then(project =>
+          res.json(project)
+        );
+      })
+      .catch(err => res.json(err));
+  }
+);
 
-//     Comment.create(commentInfo)
-//       .then(() => {
-//         Post.getPostByPostId(req.params.id).then(post => res.json(post));
-//       })
-//       .catch(err => res.json(err));
-//   }
-// );
+//@ route   DELETE api/projects/comment/:id/comment_id
+//@desc     remove comment from project
+//@access   private
+router.delete(
+  "/comment/:comment_id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    //chack the comment ouner
+    ProjectComment.findByPk(req.params.comment_id)
+      .then(comment => {
+        if (comment.user_id !== req.user.id) {
+          return res
+            .status(401)
+            .json({ msg: "This comment is not belong to you!" });
+        } else {
+          projectId = comment.project_id;
+          comment.destroy().then(() => {
+            Project.getProjectByProjectId(projectId).then(project =>
+              res.json(project)
+            );
+          });
+        }
+      })
 
-// //@ route   DELETE api/posts/comment/:id/comment_id
-// //@desc     remove comment from post
-// //@access   private
-// router.delete(
-//   "/comment/:comment_id",
-//   passport.authenticate("jwt", { session: false }),
-//   (req, res) => {
-//     //chack the comment ouner
-//     Comment.findByPk(req.params.comment_id)
-//       .then(comment => {
-//         if (comment.user_id !== req.user.id) {
-//           return res
-//             .status(401)
-//             .json({ msg: "This comment is not belong to you!" });
-//         } else {
-//           postId = comment.post_id;
-//           comment.destroy().then(() => {
-//             Post.getPostByPostId(postId).then(post => res.json(post));
-//           });
-//         }
-//       })
-//       .then(() => {
-//         Post.getPostByPostId(req.params.id).then(post => res.json(post));
-//       })
-//       .catch(err => res.json(err));
-//   }
-// );
+      .catch(err => res.json(err));
+  }
+);
 
 //@ route   POST api/projects/instrument/:id
 //@desc     add instrument to project

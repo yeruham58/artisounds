@@ -25,6 +25,7 @@ import Chat from "./components/chat/ChatPage";
 import TestChat from "./components/chat/TestChat";
 import CreateProject from "./components/projects/create-project/CreateProject";
 import ProjectView from "./components/projects/project/ProjectView";
+import Project from "./components/projects/project/Project";
 import ProjectFeed from "./components/projects/projects/ProjectFeed";
 import WorkZone from "./components/audio-editor/WorkZone";
 
@@ -59,13 +60,6 @@ function App() {
         <div className="App">
           <Navbar />
           <Route exact path="/" component={Landing} />
-          {/* <Switch>
-            <Route
-              exact
-              path="/projects/work-zone/:projectId/:instrumentId"
-              component={WorkZone}
-            />
-          </Switch> */}
           <div className="container">
             <Route exact path="/register" component={Register} />
             <Route exact path="/login" component={Login} />
@@ -107,6 +101,9 @@ function App() {
             </Switch>
             <Switch>
               <PrivateRoute exact path="/post/:id" component={Post} />
+            </Switch>
+            <Switch>
+              <PrivateRoute exact path="/project/:id" component={Project} />
             </Switch>
             <Switch>
               <PrivateRoute exact path="/dashboard" component={Dashboard} />
