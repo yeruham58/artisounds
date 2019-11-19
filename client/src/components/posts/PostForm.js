@@ -221,7 +221,7 @@ class PostForm extends Component {
                 <div>
                   <div>
                     <label
-                      className="btn btn-light mr-1"
+                      className="btn btn-light mr-1 float-left"
                       onClick={() => {
                         this.componentWillReceiveProps({
                           displayAddFileIcon: false
@@ -231,7 +231,7 @@ class PostForm extends Component {
                       <i className="far fa-file-image" />
                     </label>
                   </div>
-                  <button type="submit" className="btn btn-dark">
+                  <button type="submit" className="btn btn-dark float-left">
                     Submit
                   </button>
                 </div>

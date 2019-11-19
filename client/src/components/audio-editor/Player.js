@@ -6,7 +6,8 @@ import { getLongestDuration } from "./setPlayerTracks";
 import {
   setIsPlaying,
   setPlayingNowList,
-  setAudioStartTime
+  setAudioStartTime,
+  clearEditor
 } from "../../actions/audioEditorActions";
 
 class Player extends Component {
@@ -43,6 +44,7 @@ class Player extends Component {
     }
     this.props.setAudioStartTime(0);
     this.props.setIsPlaying(false);
+    this.props.clearEditor();
 
     this.onStop();
   }
@@ -255,6 +257,7 @@ class Player extends Component {
 
 Player.propTypes = {
   setIsPlaying: PropTypes.func.isRequired,
+  clearEditor: PropTypes.func.isRequired,
   setPlayingNowList: PropTypes.func.isRequired,
   setAudioStartTime: PropTypes.func.isRequired,
   projectId: PropTypes.number.isRequired
@@ -267,5 +270,5 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
 
-  { setIsPlaying, setPlayingNowList, setAudioStartTime }
+  { setIsPlaying, setPlayingNowList, setAudioStartTime, clearEditor }
 )(Player);

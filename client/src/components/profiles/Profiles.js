@@ -22,9 +22,9 @@ class Profiles extends Component {
     }
   }
 
-  // componentWillUnmount() {
-  //   // this.props.clearProject();
-  // }
+  componentWillUnmount() {
+    this.props.clearProject();
+  }
   render() {
     const { profiles, loading } = this.props.profile;
     const { project } = this.props.project;

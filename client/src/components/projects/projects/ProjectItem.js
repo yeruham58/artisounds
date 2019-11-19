@@ -4,7 +4,12 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import Popup from "reactjs-popup";
 
-import { deleteProject, updateProject } from "../../../actions/projectActions";
+import {
+  deleteProject,
+  updateProject,
+  clearProject
+} from "../../../actions/projectActions";
+import { clearEditor } from "../../../actions/audioEditorActions";
 import { deleteNotificationsByProjectId } from "../../../actions/notificationActions";
 import CreateProject from "../create-project/CreateProject";
 import projectDefaultImg from "../../../img/musicGif.gif";
@@ -24,6 +29,11 @@ class ProjectItem extends Component {
     this.moreDetailesControl = this.moreDetailesControl.bind(this);
     this.deleteProject = this.deleteProject.bind(this);
   }
+
+  // componentWillUnmount() {
+  //   this.props.clearProject();
+  //   this.props.clearEditor();
+  // }
 
   moreDetailesControl() {
     this.setState({
@@ -210,8 +220,10 @@ ProjectItem.propTypes = {
   project: PropTypes.object.isRequired,
   deleteProject: PropTypes.func.isRequired,
   updateProject: PropTypes.func.isRequired,
+  clearProject: PropTypes.func.isRequired,
   deleteNotificationsByProjectId: PropTypes.func.isRequired,
-  projectOwner: PropTypes.bool
+  projectOwner: PropTypes.bool,
+  clearEditor: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -223,6 +235,8 @@ export default connect(
   {
     deleteProject,
     updateProject,
-    deleteNotificationsByProjectId
+    clearProject,
+    deleteNotificationsByProjectId,
+    clearEditor
   }
 )(ProjectItem);

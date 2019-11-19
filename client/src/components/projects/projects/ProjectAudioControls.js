@@ -7,7 +7,8 @@ import {
   setBuffersList,
   setIsPlaying,
   setMasterVolume,
-  setRecordsDic
+  setRecordsDic,
+  clearEditor
 } from "../../../actions/audioEditorActions";
 import {
   initAudioDic,
@@ -23,22 +24,25 @@ class ProjectAudioControls extends Component {
       isPlaying: false,
       volume: this.props.editor.masterVolume,
       masterVolume: this.props.editor.masterVolume,
-      recordsDic: null,
+      // recordsDic: null,
       buffersList: null,
       audioStartTime: this.props.editor.audioStartTime
     };
 
     this.onVolumeChange = this.onVolumeChange.bind(this);
+    this.initBuffersList = this.initBuffersList.bind(this);
   }
 
   componentDidMount() {
     const { project } = this.props;
     const recordsDic = initAudioDic(project.instruments);
     setTimeout(() => {
-      this.setState({ recordsDic: recordsDic });
+      this.recordsDic = recordsDic;
       this.initBuffersList(this.props.editor.masterVolume);
     }, 1000);
   }
+
+  componentWillUnmount() {}
 
   componentWillReceiveProps(nextProp) {
     if (
@@ -68,13 +72,13 @@ class ProjectAudioControls extends Component {
   }
 
   initBuffersList(masterVolume) {
-    const { recordsDic } = this.state;
+    const recordsDic = this.recordsDic;
 
     //Not working without time outwhen loading page, I have to understend why
     setTimeout(() => {
       const buffersList = initBuffersList(recordsDic, masterVolume);
-
-      this.setState({ buffersList: buffersList });
+      //this setState is the reason of the error of memmory lake, I dont know yet how to fix it, it happens only because we init on mount
+      this.setState({ buffersList });
     }, 500);
   }
 
@@ -191,6 +195,7 @@ class ProjectAudioControls extends Component {
 
 ProjectAudioControls.propTypes = {
   setIsPlaying: PropTypes.func.isRequired,
+  clearEditor: PropTypes.func.isRequired,
   setMasterVolume: PropTypes.func.isRequired,
   setBuffersList: PropTypes.func.isRequired,
   setRecordsDic: PropTypes.func.isRequired,
@@ -208,6 +213,7 @@ export default connect(
     setIsPlaying,
     setMasterVolume,
     setBuffersList,
-    setRecordsDic
+    setRecordsDic,
+    clearEditor
   }
 )(ProjectAudioControls);

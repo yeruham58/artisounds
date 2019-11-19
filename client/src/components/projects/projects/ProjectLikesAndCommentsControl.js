@@ -2,11 +2,13 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import Popup from "reactjs-popup";
 
 import {
   addAndRemoveLike,
   addAndRemoveDislike
 } from "../../../actions/projectActions";
+import GiveLikePopup from "../../common/GiveLikePopup";
 
 class projectLikesAndCommentsControl extends Component {
   constructor(props) {
@@ -21,7 +23,8 @@ class projectLikesAndCommentsControl extends Component {
         ? this.props.project.dislikes.length
         : 0,
       like: this.findUserLikeOrDisilke(this.props.project.likes),
-      dislike: this.findUserLikeOrDisilke(this.props.project.dislikes)
+      dislike: this.findUserLikeOrDisilke(this.props.project.dislikes),
+      likeNumColor: "grey"
     };
   }
 
@@ -74,34 +77,79 @@ class projectLikesAndCommentsControl extends Component {
           <button
             onClick={this.onLikeClick.bind(this, project.id)}
             type="button"
-            className="btn btn-light mr-1"
-            // onDoubleClick={() => {
-            //   console.log("dublle klick");
-            // }}
+            className="btn btn-light"
+            style={project.likes[0] && { paddingRight: "5px" }}
           >
             <i
               className={`fas fa-thumbs-up ${
                 this.state.like ? "text-info" : "text-secondary"
               }`}
             />
-            {project.likes ? (
-              <span className="badge badge-light">{this.state.likeNum}</span>
-            ) : null}
           </button>
+          {project.likes[0] ? (
+            <Popup
+              modal
+              trigger={
+                <span
+                  className="badge badge-light mr-3"
+                  style={{
+                    paddingLeft: "2px",
+                    color: this.state.likeNumColor,
+                    cursor: "pointer"
+                  }}
+                  onMouseOver={() => {
+                    this.setState({ likeNumColor: "black" });
+                  }}
+                  onMouseOut={() => {
+                    this.setState({ likeNumColor: "grey" });
+                  }}
+                >
+                  {this.state.likeNum}
+                </span>
+              }
+            >
+              <GiveLikePopup giveLikeList={project.likes} />
+            </Popup>
+          ) : null}
           <button
             onClick={this.onDislikeClick.bind(this, project.id)}
             type="button"
-            className="btn btn-light mr-1"
+            className="btn btn-light"
+            style={project.dislikes[0] && { paddingRight: "5px" }}
           >
             <i
               className={`fas fa-thumbs-down ${
                 this.state.dislike ? "text-danger" : "text-secondary"
               }`}
             />
-            {project.dislikes ? (
-              <span className="badge badge-light">{this.state.dislikeNum}</span>
-            ) : null}
           </button>
+
+          {project.dislikes[0] ? (
+            <Popup
+              modal
+              trigger={
+                <span
+                  className="badge badge-light mr-3"
+                  style={{
+                    paddingLeft: "2px",
+                    color: this.state.likeNumColor,
+                    cursor: "pointer"
+                  }}
+                  onMouseOver={() => {
+                    this.setState({ likeNumColor: "black" });
+                  }}
+                  onMouseOut={() => {
+                    this.setState({ likeNumColor: "grey" });
+                  }}
+                >
+                  {this.state.dislikeNum}
+                </span>
+              }
+            >
+              <GiveLikePopup giveLikeList={project.dislikes} />
+            </Popup>
+          ) : null}
+
           <Link to={`/project/${project.id}`} className="btn btn-light mr-1">
             <i className="far fa-comment"></i>
 

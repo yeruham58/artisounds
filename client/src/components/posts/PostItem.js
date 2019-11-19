@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import ReactPlayer from "react-player";
+import Popup from "reactjs-popup";
 
 import musicGif from "../../img/musicGif.gif";
 import {
@@ -10,6 +11,7 @@ import {
   addAndRemoveLike,
   addAndRemoveDislike
 } from "../../actions/postActions";
+import GiveLikePopup from "../common/GiveLikePopup";
 
 class PostItem extends Component {
   constructor(props) {
@@ -208,38 +210,79 @@ class PostItem extends Component {
                 <button
                   onClick={this.onLikeClick.bind(this, post.id)}
                   type="button"
-                  className="btn btn-light mr-1"
-                  onDoubleClick={() => {
-                    console.log("dublle klick");
-                  }}
+                  className={`btn btn-light ${!post.likes[0] && "mr-2"}`}
+                  style={post.likes[0] && { paddingRight: "5px" }}
                 >
                   <i
                     className={`fas fa-thumbs-up ${
                       this.state.like ? "text-info" : "text-secondary"
                     }`}
                   />
-                  {post.likes ? (
-                    <span className="badge badge-light">
-                      {this.state.likeNum}
-                    </span>
-                  ) : null}
                 </button>
+                {post.likes[0] ? (
+                  <Popup
+                    modal
+                    trigger={
+                      <span
+                        className="badge mr-3"
+                        style={{
+                          paddingLeft: "2px",
+                          color: this.state.likeNumColor,
+                          cursor: "pointer"
+                        }}
+                        onMouseOver={() => {
+                          this.setState({ likeNumColor: "black" });
+                        }}
+                        onMouseOut={() => {
+                          this.setState({ likeNumColor: "grey" });
+                        }}
+                      >
+                        {this.state.likeNum}
+                      </span>
+                    }
+                  >
+                    <GiveLikePopup giveLikeList={post.likes} />
+                  </Popup>
+                ) : null}
                 <button
                   onClick={this.onDislikeClick.bind(this, post.id)}
                   type="button"
-                  className="btn btn-light mr-1"
+                  className={`btn btn-light ${!post.dislikes[0] && "mr-2"}`}
+                  style={post.dislikes[0] && { paddingRight: "5px" }}
                 >
                   <i
                     className={`fas fa-thumbs-down ${
                       this.state.dislike ? "text-danger" : "text-secondary"
                     }`}
                   />
-                  {post.dislikes ? (
-                    <span className="badge badge-light">
-                      {this.state.dislikeNum}
-                    </span>
-                  ) : null}
                 </button>
+
+                {post.dislikes[0] ? (
+                  <Popup
+                    modal
+                    trigger={
+                      <span
+                        className="badge mr-3"
+                        style={{
+                          paddingLeft: "2px",
+                          color: this.state.likeNumColor,
+                          cursor: "pointer"
+                        }}
+                        onMouseOver={() => {
+                          this.setState({ likeNumColor: "black" });
+                        }}
+                        onMouseOut={() => {
+                          this.setState({ likeNumColor: "grey" });
+                        }}
+                      >
+                        {this.state.dislikeNum}
+                      </span>
+                    }
+                  >
+                    <GiveLikePopup giveLikeList={post.dislikes} />
+                  </Popup>
+                ) : null}
+
                 <Link
                   to={`/post/${post.id}`}
                   // style={{ fontSize: "18px", color: "grey" }}

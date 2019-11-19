@@ -14,7 +14,8 @@ import {
   SET_NUM_OF_BITS,
   SET_CURRENT_RECORD_ID,
   SET_BUFFERS_LIST,
-  SET_PLAYING_NOW_LIST
+  SET_PLAYING_NOW_LIST,
+  CLEAR_EDITOR
 } from "../actions/types";
 
 const initialState = {
@@ -122,6 +123,8 @@ export default function(state = initialState, action) {
         ...state,
         playingNowList: action.payload
       };
+    case CLEAR_EDITOR:
+      return { state: {} };
 
     default:
       return state;

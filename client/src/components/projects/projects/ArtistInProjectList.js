@@ -48,23 +48,18 @@ class ArtistInProjectList extends Component {
                   <li key={index} className="list-group-item">
                     <div className="row">
                       <div className="col-3 col-lg-2">
-                        <img
-                          alt=""
-                          src={
-                            instrument.user_detailes
-                              ? instrument.user_detailes.avatar
-                              : InstrumentDefaultImg
-                          }
-                          style={{ height: "35px", width: "35px" }}
-                          className="rounded-circle mt-1"
-                          onClick={() => {
-                            if (instrument.user_detailes) {
-                              this.props.history.push(
-                                `/profile/${instrument.user_id}`
-                              );
+                        <Link to={`/profile/${instrument.user_id}`}>
+                          <img
+                            alt=""
+                            src={
+                              instrument.user_detailes
+                                ? instrument.user_detailes.avatar
+                                : InstrumentDefaultImg
                             }
-                          }}
-                        />
+                            style={{ height: "35px", width: "35px" }}
+                            className="rounded-circle mt-1"
+                          />
+                        </Link>
                       </div>
 
                       <div className="col-8">
