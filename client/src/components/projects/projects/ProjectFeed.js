@@ -7,6 +7,14 @@ import ProjectItem from "./ProjectItem";
 import { getProjects, deleteProject } from "../../../actions/projectActions";
 
 class ProjectFeed extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      all: false,
+      finished: true,
+      inAction: false
+    };
+  }
   componentDidMount() {
     if (!this.props.filterdProjects) this.props.getProjects();
   }
@@ -27,19 +35,104 @@ class ProjectFeed extends Component {
     if (loading) {
       return <Spinner />;
     }
-    const projectsListToShow = filterdProjects ? filterdProjects : projects;
+    var projectsListToShow = filterdProjects ? filterdProjects : projects;
 
-    return projectsListToShow.map(project => (
-      <ProjectItem
-        key={project.id}
-        project={project}
-        projectOwner={
-          this.props.auth.user && this.props.auth.user.id === project.user_id
-        }
-        deleteProject={this.props.deleteProject}
-        history={this.props.history}
-      />
-    ));
+    if (!filterdProjects && (this.state.finished || this.state.inAction)) {
+      projectsListToShow = this.state.finished
+        ? projectsListToShow.filter(project => !project.in_action)
+        : projectsListToShow.filter(project => project.in_action);
+    }
+
+    const radioButtons = (
+      <div className="container">
+        <div className="row">
+          <div
+            className="col-sm-12"
+            // style={{ position: "absolute", top: "100px" }}
+          >
+            <form>
+              <div className="radio float-left ml-4">
+                <label>
+                  <input
+                    type="radio"
+                    value="option1"
+                    className="mr-2"
+                    checked={this.state.finished}
+                    onChange={() => {
+                      this.setState({
+                        finished: true,
+                        all: false,
+                        inAction: false
+                      });
+                    }}
+                  />
+                  Finished projects
+                </label>
+              </div>
+              <div className="radio float-left ml-4">
+                <label>
+                  <input
+                    type="radio"
+                    value="option2"
+                    className="mr-2"
+                    checked={this.state.inAction}
+                    onChange={() => {
+                      this.setState({
+                        finished: false,
+                        all: false,
+                        inAction: true
+                      });
+                    }}
+                  />
+                  Projects in action
+                </label>
+              </div>
+
+              <div className="radio float-left ml-4">
+                <label>
+                  <input
+                    type="radio"
+                    value="option3"
+                    className="mr-2"
+                    checked={this.state.all}
+                    onChange={() => {
+                      this.setState({
+                        finished: false,
+                        all: true,
+                        inAction: false
+                      });
+                    }}
+                  />
+                  All
+                </label>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+
+    var projectsListToShowElm = [];
+    projectsListToShow.map(project =>
+      projectsListToShowElm.push(
+        <ProjectItem
+          key={project.id}
+          project={project}
+          projectOwner={
+            this.props.auth.user && this.props.auth.user.id === project.user_id
+          }
+          deleteProject={this.props.deleteProject}
+          history={this.props.history}
+        />
+      )
+    );
+
+    return (
+      <div>
+        <div>{filterdProjects ? "" : radioButtons}</div>
+        {projectsListToShowElm}
+      </div>
+    );
   }
 }
 
