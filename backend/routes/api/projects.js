@@ -38,16 +38,20 @@ router.get("/", (req, res) => {
     });
 });
 
-//@ route   GET api/projects/user/:userId
-//@desc     get all user projects
+//@ route   GET api/projects/user/user_id
+//@desc     get user projects
 //@access   private
 router.get(
-  "/user",
+  "/user/:user_id",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    Project.getProjectsByUserId(req.user.id)
+    Project.getProjectsByUserId(req.params.user_id)
       .then(projects => {
-        res.json(projects);
+        res.json(
+          parseInt(req.params.user_id) === req.user.id
+            ? projects
+            : projects.filter(project => project.public)
+        );
       })
       .catch(err => {
         console.log(err);

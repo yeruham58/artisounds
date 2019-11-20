@@ -3,9 +3,9 @@ import { connect } from "react-redux";
 
 import PropTypes from "prop-types";
 import ProfileHeader from "./ProfileHeader";
-import ProfileAbout from "./ProfileAbout";
 import Spinner from "../common/Spinner";
 import { getProfileById } from "../../actions/profileActions";
+import ProfileNav from "./ProfileNav";
 
 class Profile extends Component {
   componentDidMount() {
@@ -27,7 +27,9 @@ class Profile extends Component {
         profileContent = (
           <div>
             <div className="row">
-              <div className="col-md-6">
+              {/* <div className="col-md-6"> */}
+              <div className="col-md-1"></div>
+              <div className="col-md-10">
                 <button
                   type="button"
                   className="btn btn-light mb-3"
@@ -35,17 +37,19 @@ class Profile extends Component {
                 >
                   Back
                 </button>
+                {/* </div> */}
+                {/* <div className="col-md-6" /> */}
+                <ProfileHeader profile={profile} />
+                {this.props.auth.user.id === profile.id && (
+                  <a href="/edit-profile" className="btn btn-light mb-2">
+                    <i className="fas fa-graduation-cap text-info mr-1" /> Edit
+                    Profile
+                  </a>
+                )}
+
+                <ProfileNav profile={profile} />
               </div>
-              <div className="col-md-6" />
             </div>
-            <ProfileHeader profile={profile} />
-            {this.props.auth.user.id === profile.id && (
-              <a href="/edit-profile" className="btn btn-light mb-2">
-                <i className="fas fa-graduation-cap text-info mr-1" /> Edit
-                Profile
-              </a>
-            )}
-            <ProfileAbout profile={profile} />
           </div>
         );
       }

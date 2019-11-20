@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 
 import Spiner from "../common/Spinner";
 import { getCurrentProfile } from "../../actions/profileActions";
-import ProfileActions from "./ProfileActions";
+import CreateProjectButton from "./CreateProjectButton";
 import ProjectFeed from "../projects/projects/ProjectFeed";
 import { getUserProjects } from "../../actions/projectActions";
 import { getNotificationsByUserId } from "../../actions/notificationActions";
@@ -26,10 +26,7 @@ class Dashboard extends Component {
   componentDidMount() {
     this.props.getCurrentProfile();
     this.props.getNotificationsByUserId();
-    this.props.getUserProjects();
-  }
-
-  componentWillReceiveProps(nextProp) {
+    this.props.getUserProjects(this.props.auth.user.id);
     this.setState({
       opendTab: localStorage.getItem("dashboardTab")
         ? localStorage.getItem("dashboardTab")
@@ -109,7 +106,7 @@ class Dashboard extends Component {
               Wellcome
               <Link to={`/profile/${profile.id}`}> {user.name}</Link>
             </p>
-            <ProfileActions />
+            <CreateProjectButton />
             <div className="container">
               <div className="row">
                 <button
@@ -189,10 +186,7 @@ class Dashboard extends Component {
       <div className="dashboard">
         <div className="container">
           <div className="row">
-            <div className="col-md-12">
-              {/* <h1 className="display-6">Dashboard</h1> */}
-              {dashboardContent}
-            </div>
+            <div className="col-md-12">{dashboardContent}</div>
           </div>
         </div>
       </div>

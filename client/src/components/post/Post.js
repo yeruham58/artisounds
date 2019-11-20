@@ -28,20 +28,17 @@ class Post extends Component {
       );
     }
     return (
-      <div className="post">
-        <div className="container">
-          <div className="row">
-            <div className="col-md-12">
-              <button
-                type="button"
-                className="btn btn-light mb-3"
-                onClick={() => window.history.back()}
-              >
-                Back
-              </button>
-              {postContant}
-            </div>
-          </div>
+      <div className="row">
+        <div className="col-md-1">{""}</div>
+        <div className="col-md-10">
+          <button
+            type="button"
+            className="btn btn-light mb-3"
+            onClick={() => window.history.back()}
+          >
+            Back
+          </button>
+          {postContant}
         </div>
       </div>
     );

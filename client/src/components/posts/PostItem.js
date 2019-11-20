@@ -159,8 +159,9 @@ class PostItem extends Component {
                 }
                 alt=""
                 id="profile-img"
-                height={this.state.imgHeight + "px"}
-                onLoad={this.onImgLoad.bind(this)}
+                // height={this.state.imgHeight + "px"}
+                // onLoad={this.onImgLoad.bind(this)}
+                style={{ height: "80px", width: "80px" }}
               />
             </Link>
           </div>
@@ -210,8 +211,9 @@ class PostItem extends Component {
                 <button
                   onClick={this.onLikeClick.bind(this, post.id)}
                   type="button"
-                  className={`btn btn-light ${!post.likes[0] && "mr-2"}`}
-                  style={post.likes[0] && { paddingRight: "5px" }}
+                  className={`btn btn-light ${!post.likes ||
+                    ((!post.likes || !post.likes[0]) && "mr-2")}`}
+                  style={post.likes && post.likes[0] && { paddingRight: "5px" }}
                 >
                   <i
                     className={`fas fa-thumbs-up ${
@@ -219,7 +221,7 @@ class PostItem extends Component {
                     }`}
                   />
                 </button>
-                {post.likes[0] ? (
+                {post.likes && post.likes[0] ? (
                   <Popup
                     modal
                     trigger={
@@ -247,8 +249,12 @@ class PostItem extends Component {
                 <button
                   onClick={this.onDislikeClick.bind(this, post.id)}
                   type="button"
-                  className={`btn btn-light ${!post.dislikes[0] && "mr-2"}`}
-                  style={post.dislikes[0] && { paddingRight: "5px" }}
+                  className={`btn btn-light ${(!post.dislikes ||
+                    !post.dislikes[0]) &&
+                    "mr-2"}`}
+                  style={
+                    post.dislikes && post.dislikes[0] && { paddingRight: "5px" }
+                  }
                 >
                   <i
                     className={`fas fa-thumbs-down ${
@@ -257,7 +263,7 @@ class PostItem extends Component {
                   />
                 </button>
 
-                {post.dislikes[0] ? (
+                {post.dislikes && post.dislikes[0] ? (
                   <Popup
                     modal
                     trigger={

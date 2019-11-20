@@ -26,6 +26,24 @@ router.get("/", (req, res) => {
     .catch(err => res.status(404).json({ msg: "no post found" }));
 });
 
+//@ route   GET api/posts/user/:user_id
+//@desc     get user posts
+//@access   private
+router.get(
+  "/user/:user_id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Post.getPostsByUserId(req.params.user_id)
+      .then(posts => {
+        res.json(posts);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(404).json({ msg: "no posts found" });
+      });
+  }
+);
+
 //@ route   GET api/posts/:id
 //@desc     get post by id
 //@access   public

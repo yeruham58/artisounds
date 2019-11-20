@@ -79,10 +79,10 @@ export const getProjects = () => dispatch => {
 };
 
 // Get user porojects
-export const getUserProjects = () => dispatch => {
+export const getUserProjects = userId => dispatch => {
   dispatch(setProjectLoading());
   axios
-    .get("/api/projects/user")
+    .get(`/api/projects/user/${userId}`)
     .then(res =>
       dispatch({
         type: GET_PROJECTS,

@@ -169,74 +169,81 @@ class PostForm extends Component {
     const { fileUrl, fileType, videoPlayerConfig } = this.state;
     const { loading } = this.props.upload;
     return (
-      <div className="post-form mb-3">
-        <div className="card card-info">
-          <div className="card-header bg-info text-white">Say Somthing...</div>
-          <div className="card-body">
-            <form onSubmit={this.onSubmit}>
-              {loading && <Spinner />}
-              {fileUrl && !loading && (
-                <div className="mb-3">
-                  {fileType.indexOf("image") > -1 && (
-                    <img src={fileUrl} alt="" className="rounded" />
-                  )}
-                  {fileType.indexOf("video") > -1 && (
-                    <ReactPlayer
-                      url={fileUrl}
-                      playing={videoPlayerConfig.playing}
-                      controls
-                      muted
-                      volume={videoPlayerConfig.volume}
-                      width="100%"
-                    />
-                  )}
-                  {fileType.indexOf("audio") > -1 && (
-                    <div>
-                      {/* <img src={musicGif} alt="" className="rounded" /> */}
-                      <ReactPlayer
-                        height="70px"
-                        url={fileUrl}
-                        playing={false}
-                        controls
-                        muted
-                        volume={2}
-                        width="100%"
-                      />
+      <div className="row">
+        <div className="col-md-1"></div>
+        <div className="col-md-10">
+          <div className="post-form mb-3">
+            <div className="card card-info">
+              <div className="card-header bg-info text-white">
+                Say Somthing...
+              </div>
+              <div className="card-body">
+                <form onSubmit={this.onSubmit}>
+                  {loading && <Spinner />}
+                  {fileUrl && !loading && (
+                    <div className="mb-3">
+                      {fileType.indexOf("image") > -1 && (
+                        <img src={fileUrl} alt="" className="rounded" />
+                      )}
+                      {fileType.indexOf("video") > -1 && (
+                        <ReactPlayer
+                          url={fileUrl}
+                          playing={videoPlayerConfig.playing}
+                          controls
+                          muted
+                          volume={videoPlayerConfig.volume}
+                          width="100%"
+                        />
+                      )}
+                      {fileType.indexOf("audio") > -1 && (
+                        <div>
+                          {/* <img src={musicGif} alt="" className="rounded" /> */}
+                          <ReactPlayer
+                            height="70px"
+                            url={fileUrl}
+                            playing={false}
+                            controls
+                            muted
+                            volume={2}
+                            width="100%"
+                          />
+                        </div>
+                      )}
                     </div>
                   )}
-                </div>
-              )}
 
-              <div className="form-group">
-                <TextAreaFieldGroup
-                  placeholder="Create a post"
-                  name="text"
-                  value={this.state.text}
-                  onChange={this.onChange}
-                  error={errors.text_contant_or_link}
-                />
-              </div>
-              {displayAddFileIcon ? null : uploadDataWithFile}
-              {displayAddFileIcon ? (
-                <div>
-                  <div>
-                    <label
-                      className="btn btn-light mr-1 float-left"
-                      onClick={() => {
-                        this.componentWillReceiveProps({
-                          displayAddFileIcon: false
-                        });
-                      }}
-                    >
-                      <i className="far fa-file-image" />
-                    </label>
+                  <div className="form-group">
+                    <TextAreaFieldGroup
+                      placeholder="Create a post"
+                      name="text"
+                      value={this.state.text}
+                      onChange={this.onChange}
+                      error={errors.text_contant_or_link}
+                    />
                   </div>
-                  <button type="submit" className="btn btn-dark float-left">
-                    Submit
-                  </button>
-                </div>
-              ) : null}
-            </form>
+                  {displayAddFileIcon ? null : uploadDataWithFile}
+                  {displayAddFileIcon ? (
+                    <div>
+                      <div>
+                        <label
+                          className="btn btn-light mr-1 float-left"
+                          onClick={() => {
+                            this.componentWillReceiveProps({
+                              displayAddFileIcon: false
+                            });
+                          }}
+                        >
+                          <i className="far fa-file-image" />
+                        </label>
+                      </div>
+                      <button type="submit" className="btn btn-dark float-left">
+                        Submit
+                      </button>
+                    </div>
+                  ) : null}
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       </div>
