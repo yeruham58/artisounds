@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+
 import PropTypes from "prop-types";
 import ProfileHeader from "./ProfileHeader";
 import ProfileAbout from "./ProfileAbout";
@@ -38,6 +39,12 @@ class Profile extends Component {
               <div className="col-md-6" />
             </div>
             <ProfileHeader profile={profile} />
+            {this.props.auth.user.id === profile.id && (
+              <a href="/edit-profile" className="btn btn-light mb-2">
+                <i className="fas fa-graduation-cap text-info mr-1" /> Edit
+                Profile
+              </a>
+            )}
             <ProfileAbout profile={profile} />
           </div>
         );
@@ -61,7 +68,8 @@ Profile.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  profile: state.profile
+  profile: state.profile,
+  auth: state.auth
 });
 
 export default connect(

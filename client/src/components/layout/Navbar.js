@@ -12,6 +12,7 @@ import {
   clearCurrentProfile,
   getCurrentProfile
 } from "../../actions/profileActions";
+import icon from "../../img/asicon.png";
 
 class Navbar extends Component {
   constructor(props) {
@@ -162,12 +163,18 @@ class Navbar extends Component {
       </ul>
     );
 
-    const logoDir = isAuthenticated ? "/feed" : "/";
+    const logoDir = isAuthenticated ? "/projects" : "/";
 
     return (
       <nav className="navbar navbar-expand-sm navbar-dark bg-dark mb-4">
         <div className="container">
           <Link className="navbar-brand" to={logoDir}>
+            <img
+              src={icon}
+              alt=""
+              style={{ height: "30px", width: "30px", marginRight: "8px" }}
+              className="rounded"
+            />
             ArtiSounds
           </Link>
           <button
