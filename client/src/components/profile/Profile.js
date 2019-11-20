@@ -27,7 +27,6 @@ class Profile extends Component {
         profileContent = (
           <div>
             <div className="row">
-              {/* <div className="col-md-6"> */}
               <div className="col-md-1"></div>
               <div className="col-md-10">
                 <button
@@ -37,8 +36,7 @@ class Profile extends Component {
                 >
                   Back
                 </button>
-                {/* </div> */}
-                {/* <div className="col-md-6" /> */}
+
                 <ProfileHeader profile={profile} />
                 {this.props.auth.user.id === profile.id && (
                   <a href="/edit-profile" className="btn btn-light mb-2">
