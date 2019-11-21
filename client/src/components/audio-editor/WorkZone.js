@@ -36,14 +36,13 @@ class WorkZone extends Component {
   }
 
   componentDidMount() {
-    this.props.getProject(this.props.match.params.projectId);
-    this.props.setCurretRecordId(
-      parseInt(
-        window.location.href.split("/")[
-          window.location.href.split("/").length - 1
-        ]
-      )
+    const currentRecordId = parseInt(
+      window.location.href.split("/")[
+        window.location.href.split("/").length - 1
+      ]
     );
+    this.props.getProject(this.props.match.params.projectId);
+    this.props.setCurretRecordId(currentRecordId);
   }
 
   componentWillReceiveProps(nextProp) {
@@ -134,7 +133,13 @@ class WorkZone extends Component {
   render() {
     const { project, loading } = this.props.project;
 
-    if (loading || !project) {
+    if (
+      loading ||
+      !project ||
+      project.instruments.find(
+        instru => instru.id === this.props.editor.currentRecordId
+      ).user_id !== this.props.auth.user.id
+    ) {
       return <Spinner />;
     }
 
@@ -195,7 +200,6 @@ WorkZone.propTypes = {
 const mapStateToProps = state => ({
   project: state.project,
   auth: state.auth,
-  profile: state.profile,
   editor: state.audioEditor
 });
 

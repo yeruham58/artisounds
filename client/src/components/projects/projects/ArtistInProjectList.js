@@ -48,7 +48,13 @@ class ArtistInProjectList extends Component {
                   <li key={index} className="list-group-item">
                     <div className="row">
                       <div className="col-3 col-lg-2">
-                        <a href={`/profile/${instrument.user_id}`}>
+                        <a
+                          href={
+                            instrument.user_id
+                              ? `/profile/${instrument.user_id}`
+                              : null
+                          }
+                        >
                           <img
                             alt=""
                             src={
