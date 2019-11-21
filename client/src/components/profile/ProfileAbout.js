@@ -5,6 +5,14 @@ class ProfileAbout extends Component {
   render() {
     const { profile } = this.props;
 
+    // if (!profile.profile && !loading) {
+    //   return (
+    //     <div className="text-center mt-5">
+    //       <strong>This user still don't have an artist profile yet</strong>
+    //     </div>
+    //   );
+    // }
+
     //get first name
     const firstName =
       profile.name.charAt(0).toUpperCase() +
@@ -79,18 +87,7 @@ class ProfileAbout extends Component {
             </h5>
             <div className="row">
               <div className="d-flex flex-wrap justify-content-center align-items-center">
-                <div className="p-3">
-                  {singelCategoryArtSrt}
-                  {/* <h5>
-                    <strong>
-                      {" "}
-                      {singelCategoryArtSrt.substring(
-                        0,
-                        singelCategoryArtSrt.length - 2
-                      ) + "."}
-                    </strong>
-                  </h5> */}
-                </div>
+                <div className="p-3">{singelCategoryArtSrt}</div>
               </div>
             </div>
             <div className="row">

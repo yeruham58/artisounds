@@ -64,16 +64,11 @@ function App() {
             <Route exact path="/register" component={Register} />
             <Route exact path="/login" component={Login} />
             <Route exact path="/profiles" component={Profiles} />
-            <Route exact path="/profile/:id" component={Profile} />
+
             <Route exact path="/projects" component={ProjectFeed} />
-            <Route
-              exact
-              path="/project/project-view/:projectId"
-              component={ProjectView}
-            />
 
             <Switch>
-              <Route
+              <PrivateRoute
                 exact
                 path="/projects/work-zone/:projectId/:instrumentId"
                 component={WorkZone}
@@ -81,11 +76,22 @@ function App() {
             </Switch>
 
             <Switch>
-              <Route
+              <PrivateRoute
                 exact
                 path="/profiles/:projectId/:instrumentId"
                 component={Profiles}
               />
+            </Switch>
+            <Switch>
+              <PrivateRoute
+                exact
+                path="/project/project-view/:projectId"
+                component={ProjectView}
+              />
+            </Switch>
+
+            <Switch>
+              <PrivateRoute exact path="/profile/:id" component={Profile} />
             </Switch>
             <Switch>
               <PrivateRoute exact path="/feed" component={Posts} />

@@ -35,6 +35,14 @@ class ProfileHeader extends Component {
 
   render() {
     const { profile } = this.props;
+    // if (!profile.profile && !loading) {
+    //   return (
+    //     <div className="text-center mt-5">
+    //       <strong>This user still don't have an artist profile</strong>
+    //     </div>
+    //   );
+    // }
+
     const scoreLine =
       profile.user_score > 0 ? (
         <span>

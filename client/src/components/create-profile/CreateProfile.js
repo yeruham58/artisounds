@@ -149,7 +149,7 @@ class CreateProfile extends Component {
       this.state.art_types === "0" ||
       this.state.art_types === "" ||
       window.confirm(
-        "Are you sure you dont want to add the art types you have marked? if you want to add it,  - press the button 'add' before you submit, press 'ok' to submit, and 'cancle' to add your art types"
+        "Are you sure you don't want to add the art types you have marked? if you want to add it,  - press the button 'add' before you submit, press 'ok' to submit, and 'cancle' to add your art types"
       )
     ) {
       const profileData = {

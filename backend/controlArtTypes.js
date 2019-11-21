@@ -45,7 +45,7 @@ function insertMusicGenres(musicGenersList) {
 }
 
 // can insert to db art practics
-// attention: if you enter artPractics, it can be only releted to one art type, so dont confuse!
+// attention: if you enter artPractics, it can be only releted to one art type, so don't confuse!
 function insertArtPractics(artPracticNameList, artTypeId) {
   ArtType.findOne({ where: { id: artTypeId } }).then(artType => {
     if (artType) {

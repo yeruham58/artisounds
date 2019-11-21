@@ -26,7 +26,7 @@ class Profiles extends Component {
     this.props.clearProject();
   }
   render() {
-    const { profiles, loading } = this.props.profile;
+    let { profiles, loading } = this.props.profile;
     const { project } = this.props.project;
     const { user } = this.props.auth;
     const { notifications } = this.props.notifications;
@@ -38,6 +38,7 @@ class Profiles extends Component {
             notification.project_instrument_id.toString() === instrumentId
         )
       : null;
+
     const showInviteButton =
       project &&
       user &&
@@ -65,7 +66,7 @@ class Profiles extends Component {
     }
 
     let profileItems;
-    if (profiles === null || loading) {
+    if (!profiles || loading) {
       profileItems = <Spinner />;
     } else {
       const profilesList = newProfiles ? newProfiles : profiles;

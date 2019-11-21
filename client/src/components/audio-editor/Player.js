@@ -31,8 +31,15 @@ class Player extends Component {
     };
   }
 
+  componentWillMount() {
+    if (this.props.buffersList) {
+      this.setState({ buffersList: this.props.buffersList });
+    }
+  }
+
   componentWillUnmount() {
     if (this.state.isPlaying) {
+      this.onStop();
       this.props.setAudioStartTime({
         audioStartTime: this.state.audioStartTime,
         allowChangeTime: true
@@ -45,8 +52,6 @@ class Player extends Component {
     this.props.setAudioStartTime(0);
     this.props.setIsPlaying(false);
     this.props.clearEditor();
-
-    this.onStop();
   }
 
   componentWillReceiveProps(nextProp) {
@@ -64,6 +69,7 @@ class Player extends Component {
       const buffersList = changeOfPlayerInEditor
         ? nextProp.editor.buffersList
         : nextProp.buffersList;
+
       this.setState({
         buffersList
       });

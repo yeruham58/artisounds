@@ -92,9 +92,9 @@ class Navbar extends Component {
           </Link>
         </li>
         <li className="nav-item">
-          <Link to="/dashboard" className="nav-link">
+          <a href="/dashboard" className="nav-link">
             Dashboard
-          </Link>
+          </a>
         </li>
         {/* <li className="nav-item">
           <Link to="/test-chat" className="nav-link">
@@ -195,10 +195,10 @@ class Navbar extends Component {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/projects">
-                  {" "}
+                <a className="nav-link" href="/projects">
+                  {/* {" "} */}
                   Projects
-                </Link>
+                </a>
               </li>
             </ul>
             {isAuthenticated ? authLinks : guestLinks}

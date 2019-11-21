@@ -9,20 +9,26 @@ import ProfileNav from "./ProfileNav";
 
 class Profile extends Component {
   componentDidMount() {
-    if (this.props.match.params.id) {
-      this.props.getProfileById(this.props.match.params.id);
-    }
+    setTimeout(() => {
+      if (this.props.match.params.id && this.props.profile.profile) {
+        this.props.getProfileById(this.props.match.params.id);
+      }
+    }, 300);
   }
 
   render() {
     const { profile, loading } = this.props.profile;
     let profileContent;
 
-    if (profile === null || loading) {
+    if (
+      !profile ||
+      loading ||
+      profile.id !== parseInt(this.props.match.params.id)
+    ) {
       profileContent = <Spinner />;
     } else {
-      if (profile.profile === null) {
-        profileContent = <p>{profile.name} dont have an artist profile yet</p>;
+      if (!profile.profile) {
+        profileContent = <p>{profile.name} Don't have an artist profile yet</p>;
       } else {
         profileContent = (
           <div>

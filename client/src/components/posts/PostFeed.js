@@ -8,7 +8,7 @@ class PostFeed extends Component {
     if ((!posts && !loading) || posts.length < 1) {
       return (
         <div className="text-center mt-4">
-          <strong>Dont have any posts yet</strong>
+          <strong>Don't have any posts yet</strong>
         </div>
       );
     }

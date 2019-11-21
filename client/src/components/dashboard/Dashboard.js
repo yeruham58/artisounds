@@ -59,7 +59,7 @@ class Dashboard extends Component {
     if (!projects || projects.length <= 0) {
       pageContant = (
         <div className="text-center">
-          <strong>You still dont have any projects</strong>
+          <strong>You still don't have any projects</strong>
         </div>
       );
     } else {

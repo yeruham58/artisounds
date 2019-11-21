@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+// import { Link } from "react-router-dom";
 
 import projectDefaultImg from "../../../img/musicGif.gif";
 
@@ -95,14 +96,14 @@ class ProjectDetiales extends Component {
               ) : null}
             </h6>
 
-            <div
-              className="mt-3"
-              onClick={() => {
-                this.props.history.push(`/profile/${project.user_id}`);
-              }}
-            >
+            <div className="mt-3">
               <strong>Project Manager: </strong>
-              {project.user_detailes.name}
+              <a
+                href={`/profile/${project.user_id}`}
+                style={{ color: "black" }}
+              >
+                <div>{project.user_detailes.name}</div>
+              </a>
             </div>
             {project.genre ? (
               <p className="mt-4">

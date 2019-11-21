@@ -4,7 +4,11 @@ import { connect } from "react-redux";
 
 import Spinner from "../../common/Spinner";
 import ProjectItem from "./ProjectItem";
-import { getProjects, deleteProject } from "../../../actions/projectActions";
+import {
+  getProjects,
+  deleteProject,
+  clearProject
+} from "../../../actions/projectActions";
 
 class ProjectFeed extends Component {
   constructor(props) {
@@ -18,6 +22,7 @@ class ProjectFeed extends Component {
   componentDidMount() {
     if (!this.props.filterdProjects) this.props.getProjects();
   }
+
   render() {
     const { projects, loading } = this.props.project;
     const { filterdProjects } = this.props;
@@ -27,7 +32,7 @@ class ProjectFeed extends Component {
     ) {
       return (
         <div className="text-center mt-4">
-          <strong>You still dont have any projects here</strong>
+          <strong>You still don't have any projects here</strong>
         </div>
       );
     }
@@ -140,7 +145,8 @@ ProjectFeed.propTypes = {
   project: PropTypes.object.isRequired,
   finishedProjects: PropTypes.object,
   getProjects: PropTypes.func.isRequired,
-  deleteProject: PropTypes.func.isRequired
+  deleteProject: PropTypes.func.isRequired,
+  clearProject: PropTypes.func.isRequired
 };
 
 // export default ProjectFeed;
@@ -151,5 +157,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { getProjects, deleteProject }
+  { getProjects, deleteProject, clearProject }
 )(ProjectFeed);

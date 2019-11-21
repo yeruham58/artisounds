@@ -10,6 +10,7 @@ import {
   clearProject
 } from "../../../actions/projectActions";
 import { clearEditor } from "../../../actions/audioEditorActions";
+import { initAudioDic } from "../../audio-editor/setPlayerTracks";
 import { deleteNotificationsByProjectId } from "../../../actions/notificationActions";
 import CreateProject from "../create-project/CreateProject";
 import projectDefaultImg from "../../../img/musicGif.gif";
@@ -63,6 +64,8 @@ class ProjectItem extends Component {
       return null;
     }
 
+    const recordsDic = initAudioDic(project.instruments);
+
     const commentOrText =
       project.comment || project.description || project.text;
 
@@ -113,18 +116,23 @@ class ProjectItem extends Component {
           <div className="col-12">
             {project.instruments.find(instru => instru.record_url) && (
               <div style={{ float: "left", width: "100%" }}>
-                <ProjectAudioControls project={project} />
-              </div>
-            )}
-
-            {!project.in_action && this.props.showActions && (
-              <div className="float-right mt-2">
-                <ProjectLikesAndCommentsControl
-                  project={project}
-                  authUser={this.props.auth.user}
+                <ProjectAudioControls
+                  projectId={project.id}
+                  recordsDic={recordsDic}
                 />
               </div>
             )}
+
+            {!project.in_action &&
+              this.props.showActions &&
+              this.props.auth.isAuthenticated && (
+                <div className="float-right mt-2">
+                  <ProjectLikesAndCommentsControl
+                    project={project}
+                    authUser={this.props.auth.user}
+                  />
+                </div>
+              )}
 
             {this.props.projectOwner ? (
               <div>
@@ -166,7 +174,7 @@ class ProjectItem extends Component {
               </button>
             )}
 
-            {this.props.showActions ? (
+            {this.props.showActions && this.props.auth.isAuthenticated ? (
               <Link
                 to={`/project/project-view/${project.id}`}
                 className="btn btn-outline-success mr-2 mb-2"

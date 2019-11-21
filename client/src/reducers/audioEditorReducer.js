@@ -24,7 +24,7 @@ const initialState = {
   isRecording: false,
   audioStartTime: 0,
   allowChangeTime: false,
-  buffersList: {},
+  buffersList: [],
   playerRecordsDic: {},
   playingNowList: null,
   recordsDic: {},

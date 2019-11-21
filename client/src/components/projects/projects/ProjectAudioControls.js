@@ -10,10 +10,7 @@ import {
   setRecordsDic,
   clearEditor
 } from "../../../actions/audioEditorActions";
-import {
-  initAudioDic,
-  initBuffersList
-} from "../../audio-editor/setPlayerTracks";
+import { initBuffersList } from "../../audio-editor/setPlayerTracks";
 import Player from "../../audio-editor/Player";
 
 class ProjectAudioControls extends Component {
@@ -23,7 +20,8 @@ class ProjectAudioControls extends Component {
     this.state = {
       isPlaying: false,
       volume: this.props.editor.masterVolume,
-      masterVolume: this.props.editor.masterVolume,
+      // masterVolume: this.props.editor.masterVolume,
+      masterVolume: null,
       // recordsDic: null,
       buffersList: null,
       audioStartTime: this.props.editor.audioStartTime
@@ -34,19 +32,34 @@ class ProjectAudioControls extends Component {
   }
 
   componentDidMount() {
-    const { project } = this.props;
-    const recordsDic = initAudioDic(project.instruments);
-    setTimeout(() => {
-      this.recordsDic = recordsDic;
-      this.initBuffersList(this.props.editor.masterVolume);
-    }, 1000);
+    const { recordsDic } = this.props;
+    this.recordsDic = recordsDic;
+
+    let buffersList = [];
+
+    const id = setInterval(() => {
+      if (buffersList[0]) {
+        setTimeout(() => {
+          this.props.setMasterVolume(80);
+        }, 500);
+
+        clearInterval(id);
+      } else {
+        buffersList = initBuffersList(
+          recordsDic,
+          this.props.editor.masterVolume
+        );
+      }
+    }, 20);
   }
 
-  componentWillUnmount() {}
+  componentWillUnmount() {
+    this.props.clearEditor();
+  }
 
   componentWillReceiveProps(nextProp) {
     if (
-      nextProp.editor.isPlaying === nextProp.project.id ||
+      nextProp.editor.isPlaying === nextProp.projectId ||
       !this.props.editor.isPlaying
     ) {
       if (nextProp.editor.masterVolume !== this.state.masterVolume) {
@@ -65,8 +78,8 @@ class ProjectAudioControls extends Component {
       }
 
       if (!nextProp.editor.isPlaying && this.state.isPlaying) {
-        this.initBuffersList(nextProp.editor.masterVolume);
         this.setState({ isPlaying: false });
+        this.initBuffersList(nextProp.editor.masterVolume);
       }
     }
   }
@@ -74,17 +87,16 @@ class ProjectAudioControls extends Component {
   initBuffersList(masterVolume) {
     const recordsDic = this.recordsDic;
 
-    //Not working without time outwhen loading page, I have to understend why
+    //Not working without time out when loading page, I have to understend why
     setTimeout(() => {
       const buffersList = initBuffersList(recordsDic, masterVolume);
-      //this setState is the reason of the error of memmory lake, I dont know yet how to fix it, it happens only because we init on mount
       this.setState({ buffersList });
     }, 500);
   }
 
   onVolumeChange() {
     var slider = document.getElementById(
-      "myRangemasterVolumeRange" + this.props.project.id
+      "myRangemasterVolumeRange" + this.props.projectId
     );
     this.setState({ volume: slider.value });
     document.onmouseup = () => {
@@ -95,7 +107,7 @@ class ProjectAudioControls extends Component {
 
   onPlay() {
     var slider = document.getElementById(
-      "myRangemasterVolumeRange" + this.props.project.id
+      "myRangemasterVolumeRange" + this.props.projectId
     );
     var timeOut = 0;
     if (this.props.editor.masterVolume.toString() !== slider.value) {
@@ -116,7 +128,7 @@ class ProjectAudioControls extends Component {
       ) {
         clearInterval(id);
         setTimeout(() => {
-          this.props.setIsPlaying(this.props.project.id);
+          this.props.setIsPlaying(this.props.projectId);
         }, timeOut);
       }
     }, 10);
@@ -141,7 +153,7 @@ class ProjectAudioControls extends Component {
                 type="button"
                 className="btn btn-light mb-2 mt-2 ml-2 text-success"
                 disabled={
-                  this.props.editor.isPlaying === this.props.project.id ||
+                  this.props.editor.isPlaying === this.props.projectId ||
                   !this.state.buffersList
                 }
                 onClick={this.onPlay.bind(this)}
@@ -153,7 +165,7 @@ class ProjectAudioControls extends Component {
               <button
                 type="button"
                 className="btn btn-light mb-2 mt-2 ml-2 text-warning"
-                disabled={this.props.editor.isPlaying !== this.props.project.id}
+                disabled={this.props.editor.isPlaying !== this.props.projectId}
                 onClick={() => {
                   this.props.setIsPlaying(false);
                 }}
@@ -171,7 +183,7 @@ class ProjectAudioControls extends Component {
             >
               <RangeSlider
                 className="masterVolumeRange"
-                id={"masterVolumeRange" + this.props.project.id}
+                id={"masterVolumeRange" + this.props.projectId}
                 value={this.state.volume}
                 // value={this.state.volume}
                 min={0}
@@ -183,10 +195,12 @@ class ProjectAudioControls extends Component {
         </div>
 
         <div>
-          <Player
-            projectId={this.props.project.id}
-            buffersList={this.state.buffersList}
-          />
+          {this.state.buffersList && this.state.buffersList[0] && (
+            <Player
+              projectId={this.props.projectId}
+              buffersList={this.state.buffersList}
+            />
+          )}
         </div>
       </div>
     );
@@ -199,7 +213,7 @@ ProjectAudioControls.propTypes = {
   setMasterVolume: PropTypes.func.isRequired,
   setBuffersList: PropTypes.func.isRequired,
   setRecordsDic: PropTypes.func.isRequired,
-  project: PropTypes.object.isRequired
+  projectId: PropTypes.number.isRequired
 };
 
 const mapStateToProps = state => ({

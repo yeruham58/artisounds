@@ -48,7 +48,7 @@ class ArtistInProjectList extends Component {
                   <li key={index} className="list-group-item">
                     <div className="row">
                       <div className="col-3 col-lg-2">
-                        <Link to={`/profile/${instrument.user_id}`}>
+                        <a href={`/profile/${instrument.user_id}`}>
                           <img
                             alt=""
                             src={
@@ -59,7 +59,7 @@ class ArtistInProjectList extends Component {
                             style={{ height: "35px", width: "35px" }}
                             className="rounded-circle mt-1"
                           />
-                        </Link>
+                        </a>
                       </div>
 
                       <div className="col-8">

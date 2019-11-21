@@ -26,7 +26,8 @@ export default function(state = initialState, action) {
     case CLEAR_PROJECT:
       return {
         ...state,
-        project: null
+        project: null,
+        projects: null
       };
     case GET_PROJECTS:
       return {
