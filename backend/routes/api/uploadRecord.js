@@ -9,6 +9,7 @@ const path = require("path");
 
 const keys = require("../../config/keys");
 const ProjectInstrument = require("../../classes/ProjectInstrument");
+const Project = require("../../classes/Project");
 
 /**
  * PROFILE IMAGE STORING STARTS
@@ -45,26 +46,30 @@ const recordUpload = multer({
  * @access private
  */
 router.post(
-  // "/record-upload",
   "/record-upload/:recordId", // the instrument id inside the project
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    recordUpload(req, res, error => {
-      if (error) {
-        res.json({ error: error });
-      } else {
-        // If File not found
-        if (req.file === undefined) {
-          res.json("Error: No File Selected");
-        } else {
-          // If Success
-          const recordKey = req.file.key;
-          const recordLocation = req.file.location;
+    ProjectInstrument.findOne({ where: { id: req.params.recordId } })
+      .then(instrumentRecord => {
+        if (instrumentRecord && instrumentRecord.user_id === req.user.id) {
+          recordUpload(req, res, error => {
+            if (error) {
+              res.json({ error: error });
+            } else {
+              // If File not found
+              if (req.file === undefined) {
+                res.json("Error: No File Selected");
+              } else {
+                // If Success
+                const recordKey = req.file.key;
+                const recordLocation = req.file.location;
 
-          // Save the file name into database into project instrument model
-          ProjectInstrument.findOne({ where: { id: req.params.recordId } })
-            .then(instrumentRecord => {
-              if (instrumentRecord.user_id === req.user.id) {
+                res.json({
+                  recordLocation
+                });
+
+                // Save the file name into database into project instrument model
+
                 if (instrumentRecord.record_key) {
                   deleteAwsFile(
                     instrumentRecord.record_key,
@@ -77,15 +82,11 @@ router.post(
                   record_url: recordLocation
                 });
               }
-            })
-            .catch(err => console.log(err));
-
-          res.json({
-            location: recordLocation
+            }
           });
         }
-      }
-    });
+      })
+      .catch(err => console.log(err));
   }
 );
 

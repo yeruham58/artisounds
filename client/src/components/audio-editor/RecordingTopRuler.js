@@ -67,18 +67,27 @@ class RecordingTopRuler extends Component {
 
   componentWillReceiveProps(nextProp) {
     if (nextProp.project && nextProp.project.project) {
+      // const id = setInterval(() => {
+      //   if (
+      //     nextProp.project.project.instruments &&
+      //     nextProp.project.project.instruments[0]
+      //   )
+      //     clearInterval(id);
       const instruList = nextProp.project.project.instruments.filter(
         instrument =>
           instrument.record_url ||
           instrument.id === this.props.editor.currentRecordId
       );
-      this.setState({ instruListLen: instruList.length });
+      this.setState({
+        instruListLen: instruList.length
+      });
       const highth = instruList.length * (90 + 18);
       if (highth < this.state.recordsHighth) {
         this.setState({ timelineOverflowY: "hidden" });
       } else {
         this.setState({ timelineOverflowY: "scroll" });
       }
+      // }, 1000);
     }
     if (nextProp.editor) {
       if (this.state.pointerStartPos !== nextProp.editor.audioStartTime) {
@@ -99,7 +108,8 @@ class RecordingTopRuler extends Component {
         }
         if (
           this.state.movePointer &&
-          (!nextProp.editor.isPlaying && !nextProp.editor.isRecording)
+          !nextProp.editor.isPlaying &&
+          !nextProp.editor.isRecording
         ) {
           this.setState({
             movePointer: false

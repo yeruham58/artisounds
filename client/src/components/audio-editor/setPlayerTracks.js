@@ -28,9 +28,6 @@ export const initAudioDic = instruments => {
           console.log("err in Crunker create buffer");
         });
     }
-    // else {
-    //   // console.log("No record yet");
-    // }
   });
   return recordsDic;
 };

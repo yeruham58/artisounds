@@ -57,16 +57,28 @@ class EditorControlBar extends Component {
   uploadRecord() {
     const volume = this.props.editor.recordsDic[this.state.currentInstrumentId]
       .volume;
-    this.props.updateInstrument(this.state.currentInstrumentId, { volume }, "");
+    const oldVolume = this.props.project.project.instruments.find(
+      instru => instru.id === this.state.currentInstrumentId
+    ).volume;
+
+    if (volume !== oldVolume) {
+      this.props.updateInstrument(
+        this.state.currentInstrumentId,
+        { volume },
+        ""
+      );
+    }
+
     if (
       this.props.editor.courrentRecordBolb &&
       this.props.editor.courrentRecordBolb.size
     ) {
+      console.log("send new");
       const data = new FormData();
       data.append(
         "projectRecord",
         this.props.editor.courrentRecordBolb,
-        "some name"
+        this.props.project.project.name
       );
       this.props.uploadRecord(data, this.state.currentInstrumentId);
     } else {
@@ -80,7 +92,7 @@ class EditorControlBar extends Component {
       }
     }
 
-    this.props.setCurrentBolb(null);
+    // this.props.setCurrentBolb(null);
   }
 
   onVolumeChange() {
@@ -147,9 +159,14 @@ class EditorControlBar extends Component {
                 const waitBeforeRecord = this.state.active1234
                   ? waitingTime * (this.state.projectBit + 1)
                   : waitingTime;
+                this.setState({
+                  isRecording: true
+                });
                 setTimeout(() => {
-                  this.props.setIsRecording(true);
-                  this.props.setIsPlaying(this.state.headphonesMood);
+                  if (this.state.isRecording) {
+                    this.props.setIsRecording(true);
+                    this.props.setIsPlaying(this.state.headphonesMood);
+                  }
                 }, waitBeforeRecord);
 
                 this.setState({

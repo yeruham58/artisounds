@@ -93,6 +93,7 @@ export default function(state = initialState, action) {
         ...state,
         saving: false
       };
+
     case SAVING_RECORD:
       return {
         ...state,

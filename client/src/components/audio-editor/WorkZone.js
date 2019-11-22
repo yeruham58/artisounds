@@ -54,7 +54,7 @@ class WorkZone extends Component {
       this.setState({ project: nextProp.project.project });
       setTimeout(() => {
         this.setAudioDic();
-        this.setRecordBlob();
+        this.setRecordBlob(nextProp.project.project);
       }, 20);
     }
     if (nextProp.editor) {
@@ -94,11 +94,10 @@ class WorkZone extends Component {
     }
   }
 
-  setRecordBlob() {
-    const recordObject = this.props.project.project.instruments.find(
+  setRecordBlob(project) {
+    const recordObject = project.instruments.find(
       record => record.id === this.props.editor.currentRecordId
     );
-
     const recordUrl = recordObject ? recordObject.record_url : null;
 
     if (recordUrl) {
@@ -131,19 +130,22 @@ class WorkZone extends Component {
   }
 
   render() {
-    const { project, loading } = this.props.project;
+    const { loading } = this.props.project;
+    const { project } = this.state;
 
-    if (
-      loading ||
-      !project ||
-      project.instruments.find(
-        instru => instru.id === this.props.editor.currentRecordId
-      ).user_id !== this.props.auth.user.id
-    ) {
+    if (loading || !project) {
       return <Spinner />;
     }
 
-    const recordObject = this.props.project.project.instruments.find(
+    const instrument = project.instruments.find(
+      instru => instru.id === this.props.editor.currentRecordId
+    );
+
+    if (instrument.user_id !== this.props.auth.user.id) {
+      return <Spinner />;
+    }
+
+    const recordObject = project.instruments.find(
       record => record.id === this.props.editor.currentRecordId
     );
 
