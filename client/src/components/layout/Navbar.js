@@ -87,12 +87,28 @@ class Navbar extends Component {
     const authLinks = (
       <ul className="navbar-nav ml-auto">
         <li className="nav-item">
-          <Link to="/feed" className="nav-link">
-            Home
-          </Link>
+          <a
+            href="/feed"
+            className="nav-link"
+            style={
+              window.location.href.indexOf("feed") > 0
+                ? { color: "white" }
+                : null
+            }
+          >
+            Posts
+          </a>
         </li>
         <li className="nav-item">
-          <a href="/dashboard" className="nav-link">
+          <a
+            href="/dashboard"
+            className="nav-link"
+            style={
+              window.location.href.indexOf("dashboard") > 0
+                ? { color: "white" }
+                : null
+            }
+          >
             Dashboard
           </a>
         </li>
@@ -102,7 +118,15 @@ class Navbar extends Component {
           </Link>
         </li> */}
         <li className="nav-item">
-          <Link to="/chat" className="nav-link">
+          <Link
+            to="/chat"
+            className="nav-link"
+            style={
+              window.location.href.indexOf("chat") > 0
+                ? { color: "white" }
+                : null
+            }
+          >
             Messages
             {this.state.unreadMessages &&
             window.location.href.indexOf("chat") < 0 ? (
@@ -189,13 +213,29 @@ class Navbar extends Component {
           <div className="collapse navbar-collapse" id="mobile-nav">
             <ul className="navbar-nav mr-auto">
               <li className="nav-item">
-                <Link className="nav-link" to="/profiles">
+                <Link
+                  className="nav-link"
+                  to="/profiles"
+                  style={
+                    window.location.href.indexOf("profiles") > 0
+                      ? { color: "white" }
+                      : null
+                  }
+                >
                   {" "}
                   Profiles
                 </Link>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="/projects">
+                <a
+                  className="nav-link"
+                  href="/projects"
+                  style={
+                    window.location.href.indexOf("projects") > 0
+                      ? { color: "white" }
+                      : null
+                  }
+                >
                   {/* {" "} */}
                   Projects
                 </a>
@@ -224,13 +264,10 @@ const mapStateToProps = state => ({
   chat: state.chat
 });
 
-export default connect(
-  mapStateToProps,
-  {
-    logoutUser,
-    clearCurrentProfile,
-    getCurrentProfile,
-    connectUserToChat,
-    updateDisconnectChat
-  }
-)(Navbar);
+export default connect(mapStateToProps, {
+  logoutUser,
+  clearCurrentProfile,
+  getCurrentProfile,
+  connectUserToChat,
+  updateDisconnectChat
+})(Navbar);

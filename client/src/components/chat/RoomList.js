@@ -4,11 +4,16 @@ import { splitNameAndId } from "../../config/chatConfig";
 
 class RoomList extends Component {
   render() {
-    const orderedRooms = [...this.props.rooms].sort(
-      (a, b) => Date.parse(b.lastMessageAt) - Date.parse(a.lastMessageAt)
-    );
+    const orderedRooms = [...this.props.rooms]
+      .sort((a, b) => Date.parse(b.lastMessageAt) - Date.parse(a.lastMessageAt))
+      .filter(room => room.lastMessageAt);
     return (
-      <div>
+      <div
+        style={{
+          overflowY: "scroll",
+          overflowX: "hidden"
+        }}
+      >
         <h3>Contacts:</h3>
         <hr align="left" width="100%" className="mb-0" />
 
