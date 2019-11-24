@@ -111,10 +111,6 @@ router.post(
     Profile.createAndUpdateUserArtTypes(artTypeList, req.user.id);
 
     //Should be a list
-    // const subArtTypeList = req.body.sub_art_types ? req.body.sub_art_types : [];
-    // Profile.updateUserSubArtTypes(subArtTypeList, req.user.id);
-
-    //Should be a list
     const artPracticList = req.body.art_practics ? req.body.art_practics : [];
     Profile.updateUserPractics(artPracticList, req.user.id);
 

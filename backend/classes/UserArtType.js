@@ -2,7 +2,6 @@ const Sequelize = require("sequelize");
 const sequelize = require("../config/database");
 
 const ArtType = require("./ArtType");
-const UserSubArtType = require("./UserSubArtType");
 const UserArtPractic = require("./UserArtPractic");
 
 class UserArtType extends Sequelize.Model {
@@ -25,11 +24,6 @@ UserArtType.belongsTo(ArtType, {
 UserArtType.hasMany(UserArtPractic, {
   foreignKey: "user_art_type_id",
   as: "art_practics"
-});
-
-UserArtType.hasMany(UserSubArtType, {
-  foreignKey: "user_art_type_id",
-  as: "sub_art_types"
 });
 
 module.exports = UserArtType;
