@@ -1,6 +1,5 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/database");
-const Op = Sequelize.Op;
 const Promise = require("promise");
 
 const Project = require("./Project");
@@ -17,11 +16,8 @@ class ProjectNotifications extends Sequelize.Model {
 
   // Get user notifications
   static getNotificationsByUserId(userId) {
-    return ProjectNotifications.findAll({
-      [Op.or]: [{ sender_id: userId }, { sent_to_id: userId }],
-
-      order: ["updatedAt"],
-      include: [
+    return new Promise(function(resolve, reject) {
+      const include = [
         {
           model: Project,
           as: "project",
@@ -42,7 +38,27 @@ class ProjectNotifications extends Sequelize.Model {
           model: User,
           as: "send_to_detailes"
         }
-      ]
+      ];
+
+      let IMsender = [];
+      let sentToMe = [];
+      ProjectNotifications.findAll({
+        where: { sender_id: userId },
+
+        order: ["updatedAt"],
+        include: include
+      }).then(not => {
+        IMsender = not;
+        ProjectNotifications.findAll({
+          where: { sent_to_id: userId },
+
+          order: ["updatedAt"],
+          include: include
+        }).then(not => {
+          sentToMe = not;
+          resolve([...IMsender, ...sentToMe]);
+        });
+      });
     });
   }
 

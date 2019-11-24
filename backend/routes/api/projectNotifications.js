@@ -27,9 +27,9 @@ router.post(
 
     ProjectNotifications.create(newNotification)
       .then(() => {
-        ProjectNotifications.getNotificationsByUserId(req.user.id).then(
-          notifications => res.json(notifications)
-        );
+        ProjectNotifications.getNotificationsByUserId(
+          req.user.id
+        ).then(notifications => res.json(notifications));
       })
       .catch(err => {
         errors.error = "Some error with send this notification";

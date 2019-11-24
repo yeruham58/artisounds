@@ -56,7 +56,7 @@ class Dashboard extends Component {
     let pageContant;
     let filterdProjects;
 
-    if (!projects || projects.length <= 0) {
+    if ((!projects || projects.length <= 0) && opendTab !== "notifications") {
       pageContant = (
         <div className="text-center">
           <strong>You still don't have any projects</strong>
@@ -116,12 +116,7 @@ class Dashboard extends Component {
                       : "btn-light"
                   } col-md-3 col-6 mb-3`}
                   style={{ width: "100%" }}
-                  onClick={() => {
-                    localStorage.setItem("dashboardTab", "projects-you-manage");
-                    this.setState({
-                      opendTab: "projects-you-manage"
-                    });
-                  }}
+                  onClick={() => this.pageContantChange("projects-you-manage")}
                 >
                   Projects you manage
                 </button>
@@ -210,7 +205,8 @@ const mapStateToProps = state => ({
   auth: state.auth
 });
 
-export default connect(
-  mapStateToProps,
-  { getCurrentProfile, getNotificationsByUserId, getUserProjects }
-)(Dashboard);
+export default connect(mapStateToProps, {
+  getCurrentProfile,
+  getNotificationsByUserId,
+  getUserProjects
+})(Dashboard);

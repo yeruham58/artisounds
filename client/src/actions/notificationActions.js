@@ -57,12 +57,12 @@ export const getNotificationsByUserId = () => dispatch => {
   // dispatch(setPostLoading());
   axios
     .get(`/api/projectNotifications`)
-    .then(res =>
+    .then(res => {
       dispatch({
         type: GET_NOTIFICATIONS,
         payload: res.data
-      })
-    )
+      });
+    })
     .catch(err =>
       dispatch({
         type: GET_NOTIFICATIONS,
