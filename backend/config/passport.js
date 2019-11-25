@@ -1,6 +1,5 @@
 const JwtStradegy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
-// const User = require("../models/User");
 const Sequelize = require("sequelize");
 const db = require("./database");
 const User = require("../models/user")(db, Sequelize.DataTypes);
