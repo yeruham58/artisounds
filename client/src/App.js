@@ -12,7 +12,7 @@ import { clearCurrentProfile } from "./actions/profileActions";
 import Navbar from "./components/layout/Navbar";
 // import Footer from "./components/layout/Footer";
 import Landing from "./components/layout/Landing";
-import NotFound from "./components/layout/NotFound";
+// import NotFound from "./components/layout/NotFound";
 import Register from "./components/auth/Register";
 import Login from "./components/auth/Login";
 import Dashboard from "./components/dashboard/Dashboard";
@@ -60,8 +60,9 @@ function App() {
       <Router>
         <div className="App">
           <Navbar />
+
+          {/* <Route exact path="*" component={NotFound} /> */}
           <Route exact path="/" component={Landing} />
-          <Route exact path="*" component={NotFound} />
           <div className="container">
             <Route exact path="/register" component={Register} />
             <Route exact path="/login" component={Login} />
