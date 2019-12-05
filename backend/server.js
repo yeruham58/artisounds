@@ -10,9 +10,12 @@ const uploadRecord = require("./routes/api/uploadRecord");
 const bodyParser = require("body-parser");
 const passport = require("passport");
 
+const cors = require("cors");
+
 const app = express();
 
 //body parser
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 

@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Provider } from "react-redux";
 import jwt_decode from "jwt-decode";
-
+import axios from "axios";
 import store from "./store";
 import PrivateRoute from "./components/common/PrivateRoute";
 
@@ -31,6 +31,8 @@ import ProjectFeed from "./components/projects/projects/ProjectFeed";
 import WorkZone from "./components/audio-editor/WorkZone";
 
 import "./App.css";
+
+axios.defaults.baseURL = "http://localhost:5000" || "3.132.212.40";
 
 // Chack for token
 if (localStorage.jwtToken) {
