@@ -1,9 +1,9 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/database");
 
-const ArtPractic = require("../classes/artpractic");
-const UserArtType = require("../classes/userarttype");
-const UserArtPractic = require("../classes/userartpractic");
+const ArtPractic = require("../classes/ArtPractic");
+const UserArtType = require("../classes/UserArtType");
+const UserArtPractic = require("../classes/UserArtPractic");
 
 class Profile extends Sequelize.Model {
   static associate(models) {}
