@@ -4,7 +4,7 @@ const sequelize = require("../config/database");
 const Like = require("./Like");
 const Dislike = require("./Dislike");
 const Comment = require("./Comment");
-const User = require("./user");
+const User = require("./User");
 
 const include = [
   {

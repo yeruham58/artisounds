@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../config/database");
 
-const User = require("./user");
+const User = require("./User");
 
 class Dislike extends Sequelize.Model {
   static associate(models) {}
