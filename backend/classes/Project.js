@@ -8,8 +8,8 @@ const ProjectDislike = require("./ProjectDislike");
 const ProjectComment = require("./ProjectComment");
 const ProjectInstrument = require("./ProjectInstrument");
 const MusicGenre = require("./MusicGenre");
-const User = require("./user");
 const ArtPractic = require("./ArtPractic");
+const User = require("./User1");
 
 const include = [
   {
