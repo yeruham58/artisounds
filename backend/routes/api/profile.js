@@ -9,7 +9,7 @@ const ArtType = require("../../classes/ArtType");
 const MusicGenre = require("../../classes/MusicGenre");
 const UserMusicGenre = require("../../classes/UserMusicGenre");
 const User = require("../../classes/User");
-const Profile = require("../../classes/profile");
+const Profile = require("../../classes/Profile");
 
 //@ route   GET api/profile/test
 //@desc     test profile route
