@@ -32,7 +32,7 @@ export default function(state = initialState, action) {
     case GET_PROJECTS:
       return {
         ...state,
-        projects: action.payload.reverse(),
+        projects: action.payload ? action.payload.reverse() : null,
         loading: false
       };
     case GET_PROJECT:

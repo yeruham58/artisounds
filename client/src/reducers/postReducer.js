@@ -22,7 +22,7 @@ export default function(state = initialState, action) {
     case GET_POSTS:
       return {
         ...state,
-        posts: action.payload.reverse(),
+        posts: action.payload ? action.payload.reverse() : null,
         loading: false
       };
     case GET_POST:

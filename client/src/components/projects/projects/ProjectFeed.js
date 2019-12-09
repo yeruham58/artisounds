@@ -37,7 +37,7 @@ class ProjectFeed extends Component {
       );
     }
 
-    if (loading) {
+    if (loading || (!filterdProjects && !projects)) {
       return <Spinner />;
     }
     var projectsListToShow = filterdProjects ? filterdProjects : projects;
@@ -155,7 +155,8 @@ const mapStateToProps = state => ({
   project: state.project
 });
 
-export default connect(
-  mapStateToProps,
-  { getProjects, deleteProject, clearProject }
-)(ProjectFeed);
+export default connect(mapStateToProps, {
+  getProjects,
+  deleteProject,
+  clearProject
+})(ProjectFeed);

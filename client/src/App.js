@@ -32,7 +32,14 @@ import WorkZone from "./components/audio-editor/WorkZone";
 
 import "./App.css";
 
-axios.defaults.baseURL = "http://localhost:5000" || "3.132.212.40";
+axios.defaults.baseURL = !process.env.DEV
+  ? "http://3.132.212.40:8080"
+  : "http://localhost:5000";
+
+console.log("process.env.DEV");
+console.log(process.env.DEV);
+console.log("axios.defaults.baseURL");
+console.log(axios.defaults.baseURL);
 
 // Chack for token
 if (localStorage.jwtToken) {
