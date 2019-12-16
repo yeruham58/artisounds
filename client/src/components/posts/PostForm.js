@@ -160,7 +160,7 @@ class PostForm extends Component {
                 this.componentWillReceiveProps({ displayAddFileIcon: true });
               }}
             >
-              Cancle
+              Cancel
             </label>
           </div>
         </div>
@@ -266,7 +266,9 @@ const mapStateToProps = state => ({
   upload: state.upload
 });
 
-export default connect(
-  mapStateToProps,
-  { addPost, clearErrors, uploadDataWithFile, addPostWithFile }
-)(PostForm);
+export default connect(mapStateToProps, {
+  addPost,
+  clearErrors,
+  uploadDataWithFile,
+  addPostWithFile
+})(PostForm);

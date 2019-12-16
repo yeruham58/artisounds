@@ -59,7 +59,7 @@ class Dashboard extends Component {
     if ((!projects || projects.length <= 0) && opendTab !== "notifications") {
       pageContant = (
         <div className="text-center">
-          <strong>You still don't have any projects</strong>
+          <strong>Don't have any projects yet</strong>
         </div>
       );
     } else {
@@ -103,7 +103,7 @@ class Dashboard extends Component {
         dashboardContent = (
           <div>
             <p className="lead text-muted">
-              Wellcome
+              Welcome
               <Link to={`/profile/${profile.id}`}> {user.name}</Link>
             </p>
             <CreateProjectButton />
@@ -167,8 +167,8 @@ class Dashboard extends Component {
         // User is logged in but has no profile
         dashboardContent = (
           <div>
-            <p className="lead text-muted">Wellcome {user.name}</p>
-            <p>You have not yet set up a profile, please add some info</p>
+            <p className="lead text-muted">Welcome {user.name}</p>
+            <p>You have not set up a profile yet, please add some info</p>
             <Link to="/create-profile" className="btn btn-lg btn-info">
               Create profile
             </Link>

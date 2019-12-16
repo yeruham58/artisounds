@@ -83,7 +83,7 @@ class ProfileAbout extends Component {
             )}
 
             <h5 className="text-center text-info mb-3">
-              <strong>{firstName}'s music sciles</strong>
+              <strong>{firstName}'s music skills</strong>
             </h5>
             <div className="row">
               <div className="d-flex flex-wrap justify-content-center align-items-center">
@@ -99,7 +99,7 @@ class ProfileAbout extends Component {
             {isEmpty(userMusicGenres) ? null : (
               <div>
                 <h5 className="text-center text-info mb-3">
-                  <strong>{firstName}'s favorit genres</strong>
+                  <strong>{firstName}'s favorite genres</strong>
                 </h5>
                 <div className="row">
                   <div className="d-flex flex-wrap justify-content-center align-items-center">

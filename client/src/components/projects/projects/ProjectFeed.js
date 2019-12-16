@@ -32,7 +32,7 @@ class ProjectFeed extends Component {
     ) {
       return (
         <div className="text-center mt-4">
-          <strong>You still don't have any projects here</strong>
+          <strong>Don't have any projects yet</strong>
         </div>
       );
     }

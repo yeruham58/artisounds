@@ -197,7 +197,7 @@ class CreateProject extends Component {
                 value={this.state.name}
                 onChange={this.onChange}
                 error={errors.name}
-                info="Please enter name of the song you gonna play, This name will be also the name of the project"
+                info="Please enter the name of the song you gonna play, This name will be also the name of the project"
               />
               <RadioButtenGroup
                 name="original"
@@ -226,7 +226,7 @@ class CreateProject extends Component {
                   value={this.state.original_by}
                   onChange={this.onChange}
                   error={errors.original_by}
-                  info="Please enter name of the original performer"
+                  info="Please enter the name of the original performer"
                 />
               ) : null}
               <div className="row">
@@ -343,7 +343,8 @@ const mapStateToProps = state => ({
   errors: state.errors
 });
 
-export default connect(
-  mapStateToProps,
-  { createProject, updateProject, clearErrors }
-)(withRouter(CreateProject));
+export default connect(mapStateToProps, {
+  createProject,
+  updateProject,
+  clearErrors
+})(withRouter(CreateProject));

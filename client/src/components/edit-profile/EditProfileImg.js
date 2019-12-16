@@ -134,7 +134,7 @@ class EditProfilImg extends Component {
           ) : null}
           <div className="mt-5">
             <label className="btn btn-info" onClick={this.uploadFile}>
-              Change profile img
+              Submit
             </label>
             <label
               className="btn btn-light ml-3"
@@ -142,7 +142,7 @@ class EditProfilImg extends Component {
                 this.componentWillReceiveProps({ fileDisable: true });
               }}
             >
-              Cancle
+              Cancel
             </label>
           </div>
         </div>
@@ -200,7 +200,7 @@ const mapStateToProps = state => ({
   upload: state.upload
 });
 
-export default connect(
-  mapStateToProps,
-  { uploadDataWithFile, deleteProfileImg }
-)(EditProfilImg);
+export default connect(mapStateToProps, {
+  uploadDataWithFile,
+  deleteProfileImg
+})(EditProfilImg);

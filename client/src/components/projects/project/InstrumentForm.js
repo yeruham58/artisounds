@@ -249,7 +249,7 @@ class AddInstrument extends Component {
                     className="btn btn-light  mt-4 mb-4"
                     onClick={this.clearState}
                   >
-                    Cancle
+                    Cancel
                   </div>
                 </div>
               ) : null}
@@ -273,7 +273,6 @@ const mapStateToProps = state => ({
   auth: state.auth
 });
 
-export default connect(
-  mapStateToProps,
-  { addInstrument, updateInstrument }
-)(AddInstrument);
+export default connect(mapStateToProps, { addInstrument, updateInstrument })(
+  AddInstrument
+);

@@ -18,7 +18,7 @@ class RecordControlList extends Component {
       if (
         !this.props.editor.courrentRecordBolb ||
         window.confirm(
-          "Are you sure you wanna change instrument before save your changes?"
+          "Are you sure you wanna change an instrument before saving your changes?"
         )
       ) {
         window.location.href = `/projects/work-zone/${instrument.project_id}/${instrument.id}`;

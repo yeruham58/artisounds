@@ -212,7 +212,7 @@ class CreateProfile extends Component {
       this.state.art_types === "0" ||
       this.state.art_types === "" ||
       window.confirm(
-        "Are you sure you don't want to add the art types you have marked? if you want to add it,  - press the button 'add' before you submit, press 'ok' to submit, and 'cancle' to add your art types"
+        "To add the instruments you have already selected, you should press the 'add' button in the page.\n\n Press 'Ok' to submit anyway, or 'cancel' to add the instruments you have selected."
       )
     ) {
       const profileData = {
@@ -238,7 +238,7 @@ class CreateProfile extends Component {
         errors: {
           ...errors,
           art_practics:
-            "To add an art type to your profile, you shold check at least one art practic"
+            "To add an instrument category, you should check at least one instrument of this category"
         }
       });
     } else {
@@ -341,8 +341,8 @@ class CreateProfile extends Component {
 
     // Select options for art type
     const lableToOptions = this.state.art_types_to_send[0]
-      ? "Select another art type (Optional)"
-      : "* Select art type";
+      ? "Select another category (Optional)"
+      : "* Select category";
     let artTypesOptions = [
       {
         lable: lableToOptions,
@@ -434,9 +434,9 @@ class CreateProfile extends Component {
             value={"art_practics"}
             onChange={this.checkboxOnChange}
             options={checkboxArtPractics}
-            lable="* select some art practics"
+            lable="* select some instruments"
             error={errors.art_practics}
-            info="Check the art practics that relevant to you"
+            info="Check the instruments that is relevant to you"
           />
           <small className="text-danger mb-2">{errors.art_practics}</small>
           <div className="mb-3">
@@ -545,18 +545,18 @@ class CreateProfile extends Component {
                 ) : null}
                 {addedArtTypes}
                 <SelectListGroup
-                  placeholder="* Select your art types"
+                  placeholder="* Select your categories"
                   name="art_types"
                   value={this.state.art_types}
                   onChange={this.artTypesOnChange}
                   options={artTypesOptions}
                   error={errors.art_types}
-                  info="Please tel us what kind of art are you doing"
+                  info="Please tell us what instruments are you playing at"
                 />
                 {artPractics}
                 <br />
                 <strong className="mb-4">
-                  Select yout favorit music genres:
+                  Select yout favorite music genres:
                 </strong>
                 {checkboxArtTypeOptions ? (
                   <CheckboxListGroup
@@ -565,7 +565,7 @@ class CreateProfile extends Component {
                     onChange={this.checkboxOnChange}
                     options={checkboxMusicGenres}
                     error={errors.music_genres}
-                    info="Select your favorit music genres"
+                    info="Select your favorite music genres"
                   />
                 ) : null}
                 <TextAreaFieldGroup
@@ -582,7 +582,7 @@ class CreateProfile extends Component {
                   value={this.state.location}
                   onChange={this.onChange}
                   error={errors.location}
-                  info="Please enter your location to help other artist in your area to find for you"
+                  info="Please enter your location to help other artists in your area to find you"
                 />
                 <div className="mb-3">
                   <button
@@ -626,7 +626,8 @@ const mapStateToProps = state => ({
   errors: state.errors
 });
 
-export default connect(
-  mapStateToProps,
-  { createProfile, getCurrentProfile, clearErrors }
-)(withRouter(CreateProfile));
+export default connect(mapStateToProps, {
+  createProfile,
+  getCurrentProfile,
+  clearErrors
+})(withRouter(CreateProfile));

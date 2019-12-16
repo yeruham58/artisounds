@@ -20,8 +20,8 @@ class Landing extends Component {
                 <h1 className="display-3 mb-4">ArtiSounds</h1>
                 <p className="lead">
                   {" "}
-                  Create an artist/follower profile, share your art with other
-                  artists and followers
+                  Create an artist/follower profile, share your music with other
+                  musitions and followers
                 </p>
                 <hr />
                 <Link to="/register" className="btn btn-lg btn-info mr-2">

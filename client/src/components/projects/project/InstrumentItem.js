@@ -41,7 +41,7 @@ class InstrumentItem extends Component {
     ) {
       if (
         window.confirm(
-          "Are you sure? \n By confirm you gonna delete all your info connected to this instrument including your access to this project thrue this instrument"
+          "Are you sure? \n By confirm, you gonna delete all your info connected to this instrument including your access to this project through this instrument"
         )
       ) {
         this.props.updateInstrument(
@@ -59,7 +59,7 @@ class InstrumentItem extends Component {
     } else {
       if (
         window.confirm(
-          "Are you sure? \nBy confirm you gonna delete all your info connected to this instrument"
+          "Are you sure? \nBy confirm, you gonna delete all your info connected to this instrument"
         )
       ) {
         if (notification)
@@ -448,14 +448,11 @@ const mapStateToProps = state => ({
   auth: state.auth
 });
 
-export default connect(
-  mapStateToProps,
-  {
-    updateInstrument,
-    deleteInstrument,
-    deleteNotificationsByInstrumentId,
-    deleteNotificationsById,
-    sendNotification,
-    updateNotification
-  }
-)(InstrumentItem);
+export default connect(mapStateToProps, {
+  updateInstrument,
+  deleteInstrument,
+  deleteNotificationsByInstrumentId,
+  deleteNotificationsById,
+  sendNotification,
+  updateNotification
+})(InstrumentItem);

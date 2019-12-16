@@ -165,7 +165,7 @@ class ProfileItem extends Component {
                     );
                   }}
                 >
-                  Cancle invitation
+                  Cancel invitation
                 </button>
               )}
           </div>

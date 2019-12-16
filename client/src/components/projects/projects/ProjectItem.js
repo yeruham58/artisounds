@@ -46,7 +46,7 @@ class ProjectItem extends Component {
   deleteProject() {
     if (
       window.confirm(
-        "Are you sure?\nBy delete this project you gonna give other artist in this group to be the manager!\nIf you have any records for this project, you can access this project thrue your records (if thre is another artist in this project) but not like a manager!"
+        "Are you sure?\nBy delete this project, you gonna give other artist in this group to be the manager!\nIf you have any records for this project, you will still be able to access this project through your records (if there is another artist in this project to become a manager) but not like a manager!"
       )
     ) {
       this.props.deleteProject(this.props.project.id);
@@ -196,7 +196,7 @@ class ProjectItem extends Component {
                   if (
                     window.confirm(
                       project.in_action
-                        ? "By back to edit project - people will be able to find your project and ask to join you, but you can't get likes or comments on a project you are still editing. \n\n The likes and comments that you alredy ahve will not be deleted by back to edit"
+                        ? "By back to edit project - people will be able to find your project and ask to join you, but you can't get likes or comments on a project you are still editing. \n\n The likes and comments that you already have will not be deleted by back to edit"
                         : "By marking as finished project - people will not be able any more to find your project and ask to join you, but people will be able to find your project in finished projects and give you likes or comments!"
                     )
                   ) {
@@ -238,13 +238,10 @@ const mapStateToProps = state => ({
   auth: state.auth
 });
 
-export default connect(
-  mapStateToProps,
-  {
-    deleteProject,
-    updateProject,
-    clearProject,
-    deleteNotificationsByProjectId,
-    clearEditor
-  }
-)(ProjectItem);
+export default connect(mapStateToProps, {
+  deleteProject,
+  updateProject,
+  clearProject,
+  deleteNotificationsByProjectId,
+  clearEditor
+})(ProjectItem);
