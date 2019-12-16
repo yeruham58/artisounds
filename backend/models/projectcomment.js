@@ -1,7 +1,7 @@
 "use strict";
 module.exports = (sequelize, DataTypes) => {
   const ProjetComment = sequelize.define(
-    "ProjetComment",
+    "ProjectComment",
     {
       user_id: DataTypes.INTEGER,
       name: DataTypes.STRING,
@@ -14,5 +14,5 @@ module.exports = (sequelize, DataTypes) => {
   ProjetComment.associate = function(models) {
     // associations can be defined here
   };
-  return ProjetComment;
+  return ProjectComment;
 };

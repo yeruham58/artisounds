@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       tempo: DataTypes.INTEGER,
       scale: DataTypes.STRING,
       scale_type: DataTypes.STRING,
-      genere_id: DataTypes.INTEGER,
+      genre_id: DataTypes.INTEGER,
       description: DataTypes.STRING,
       comment: DataTypes.STRING,
       text: DataTypes.STRING,

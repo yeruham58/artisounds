@@ -32,14 +32,8 @@ import WorkZone from "./components/audio-editor/WorkZone";
 
 import "./App.css";
 
-axios.defaults.baseURL = !process.env.DEV
-  ? "http://3.132.212.40:8080"
-  : "http://localhost:5000";
-
-console.log("process.env.DEV");
-console.log(process.env.DEV);
-console.log("axios.defaults.baseURL");
-console.log(axios.defaults.baseURL);
+// axios.defaults.baseURL = "http://localhost:5000";
+axios.defaults.baseURL = "https://api.artisounds.com";
 
 // Chack for token
 if (localStorage.jwtToken) {
