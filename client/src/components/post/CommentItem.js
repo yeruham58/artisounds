@@ -56,8 +56,9 @@ class CommentItem extends Component {
                 }
                 alt=""
                 id="profile-img"
-                height={this.state.imgHeight + "px"}
-                onLoad={this.onImgLoad.bind(this)}
+                style={{ height: "70px", width: "70px" }}
+                // height={this.state.imgHeight + "px"}
+                // onLoad={this.onImgLoad.bind(this)}
               />
             </Link>
           </div>
@@ -94,7 +95,4 @@ const mapStateToProps = state => ({
   auth: state.auth
 });
 
-export default connect(
-  mapStateToProps,
-  { deleteComment }
-)(CommentItem);
+export default connect(mapStateToProps, { deleteComment })(CommentItem);
