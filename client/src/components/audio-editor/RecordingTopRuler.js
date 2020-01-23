@@ -102,6 +102,7 @@ class RecordingTopRuler extends Component {
           !this.state.movePointer &&
           (nextProp.editor.isPlaying || nextProp.editor.isRecording)
         ) {
+          this.movePointer();
           this.setState({
             movePointer: true
           });
@@ -115,11 +116,6 @@ class RecordingTopRuler extends Component {
             movePointer: false
           });
         }
-        if (
-          !this.state.movePointer &&
-          (nextProp.editor.isPlaying || nextProp.editor.isRecording)
-        )
-          this.movePointer();
         if (nextProp.editor.numOfBits !== this.state.numOfBits) {
           this.setState({ numOfBits: nextProp.editor.numOfBits });
           setTimeout(() => {
@@ -176,7 +172,7 @@ class RecordingTopRuler extends Component {
     setTimeout(() => {
       const { secondsPerBit } = this.state;
       const pxPerBit = this.state.spacing / this.state.projectBit;
-      var pos = this.state.pointerStartPos / this.state.secondsPerPx;
+      var pos = this.state.pointerStartPos / this.state.secondsPerPx || 0;
       var id = setInterval(() => {
         if (!this.state.movePointer) {
           // pos = 0;

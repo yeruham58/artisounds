@@ -20,7 +20,7 @@ import {
 
 const initialState = {
   currentRecordId: null,
-  isPlaing: false,
+  isPlaying: false,
   isRecording: false,
   audioStartTime: 0,
   allowChangeTime: false,

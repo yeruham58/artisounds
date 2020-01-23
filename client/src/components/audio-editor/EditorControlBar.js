@@ -73,7 +73,6 @@ class EditorControlBar extends Component {
       this.props.editor.courrentRecordBolb &&
       this.props.editor.courrentRecordBolb.size
     ) {
-      console.log("send new");
       const data = new FormData();
       data.append(
         "projectRecord",
