@@ -32,8 +32,8 @@ import WorkZone from "./components/audio-editor/WorkZone";
 
 import "./App.css";
 
-axios.defaults.baseURL = "http://localhost:5000";
-// axios.defaults.baseURL = "https://api.artisounds.com";
+// axios.defaults.baseURL = "http://localhost:5000";
+axios.defaults.baseURL = "https://api.artisounds.com";
 
 // Chack for token
 if (localStorage.jwtToken) {
