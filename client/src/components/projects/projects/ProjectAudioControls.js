@@ -8,10 +8,11 @@ import {
   setIsPlaying,
   setMasterVolume,
   setRecordsDic,
-  clearEditor
+  clearEditor,
 } from "../../../actions/audioEditorActions";
 import { initBuffersList } from "../../audio-editor/setPlayerTracks";
 import Player from "../../audio-editor/Player";
+// import Player from "../../../projectTools/audioPlayer/Player";
 
 class ProjectAudioControls extends Component {
   constructor(props) {
@@ -24,7 +25,7 @@ class ProjectAudioControls extends Component {
       masterVolume: null,
       // recordsDic: null,
       buffersList: null,
-      audioStartTime: this.props.editor.audioStartTime
+      audioStartTime: this.props.editor.audioStartTime,
     };
 
     this.onVolumeChange = this.onVolumeChange.bind(this);
@@ -89,8 +90,9 @@ class ProjectAudioControls extends Component {
 
     //Not working without time out when loading page, I have to understend why
     setTimeout(() => {
-      const buffersList = initBuffersList(recordsDic, masterVolume);
-      this.setState({ buffersList });
+      // const buffersList = initBuffersList(recordsDic, masterVolume);
+      // this.setState({ buffersList });
+      this.setState({ buffersList: recordsDic });
     }, 500);
   }
 
@@ -142,7 +144,7 @@ class ProjectAudioControls extends Component {
           maxWidth: "400px",
           minHeight: "55px",
           marginBottom: "8px",
-          width: "100%"
+          width: "100%",
         }}
       >
         <div className="row">
@@ -178,7 +180,7 @@ class ProjectAudioControls extends Component {
             <div
               style={{
                 width: "100%",
-                marginTop: "18px"
+                marginTop: "18px",
               }}
             >
               <RangeSlider
@@ -194,11 +196,12 @@ class ProjectAudioControls extends Component {
           </div>
         </div>
 
-        <div>
-          {this.state.buffersList && this.state.buffersList[0] && (
+        <div id={`playlistProject${this.props.projectId}`}>
+          {/* {this.state.buffersList && this.state.buffersList[0] && ( */}
+          {this.state.buffersList && (
             <Player
               projectId={this.props.projectId}
-              buffersList={this.state.buffersList}
+              trackList={this.state.buffersList}
             />
           )}
         </div>
@@ -213,11 +216,11 @@ ProjectAudioControls.propTypes = {
   setMasterVolume: PropTypes.func.isRequired,
   setBuffersList: PropTypes.func.isRequired,
   setRecordsDic: PropTypes.func.isRequired,
-  projectId: PropTypes.number.isRequired
+  projectId: PropTypes.number.isRequired,
 };
 
-const mapStateToProps = state => ({
-  editor: state.audioEditor
+const mapStateToProps = (state) => ({
+  editor: state.audioEditor,
 });
 
 export default connect(
@@ -228,6 +231,6 @@ export default connect(
     setMasterVolume,
     setBuffersList,
     setRecordsDic,
-    clearEditor
+    clearEditor,
   }
 )(ProjectAudioControls);

@@ -7,7 +7,7 @@ import {
   setIsPlaying,
   setPlayingNowList,
   setAudioStartTime,
-  clearEditor
+  clearEditor,
 } from "../../actions/audioEditorActions";
 
 class Player extends Component {
@@ -27,7 +27,7 @@ class Player extends Component {
       startSec: 0,
       allowChangeTime: false,
       // allowChangeTime: this.props.editor.isPlaying,
-      intervalsIdList: []
+      intervalsIdList: [],
     };
   }
 
@@ -42,7 +42,7 @@ class Player extends Component {
       this.onStop();
       this.props.setAudioStartTime({
         audioStartTime: this.state.audioStartTime,
-        allowChangeTime: true
+        allowChangeTime: true,
       });
     }
 
@@ -71,12 +71,12 @@ class Player extends Component {
         : nextProp.buffersList;
 
       this.setState({
-        buffersList
+        buffersList,
       });
       // if (nextProp.editor.allowChangeTime) {
       if (this.state.allowChangeTime) {
         this.setState({
-          audioStartTime: this.props.editor.audioStartTime
+          audioStartTime: this.props.editor.audioStartTime,
         });
       }
       if (this.state.isPlaying) {
@@ -143,7 +143,7 @@ class Player extends Component {
   onPlay() {
     this.setState({
       allowChangeTime: false,
-      intervalsIdList: []
+      intervalsIdList: [],
     });
     this.props.setPlayingNowList(this.state.buffersList);
 
@@ -196,7 +196,7 @@ class Player extends Component {
       document.onmouseup = () => {
         this.props.setAudioStartTime({
           audioStartTime: slider.value / 10,
-          allowChangeTime: true
+          allowChangeTime: true,
         });
 
         document.onmouseup = null;
@@ -219,7 +219,7 @@ class Player extends Component {
         style={{
           background: "#343a40",
           width: "100%",
-          maxWidth: "400px"
+          maxWidth: "400px",
         }}
       >
         <div className="row">
@@ -249,7 +249,7 @@ class Player extends Component {
                 marginRight: "5px",
                 fontSize: "12px",
                 position: "relative",
-                right: "5px"
+                right: "5px",
               }}
             >
               {durationTime}
@@ -266,11 +266,11 @@ Player.propTypes = {
   clearEditor: PropTypes.func.isRequired,
   setPlayingNowList: PropTypes.func.isRequired,
   setAudioStartTime: PropTypes.func.isRequired,
-  projectId: PropTypes.number.isRequired
+  projectId: PropTypes.number.isRequired,
 };
 
-const mapStateToProps = state => ({
-  editor: state.audioEditor
+const mapStateToProps = (state) => ({
+  editor: state.audioEditor,
 });
 
 export default connect(

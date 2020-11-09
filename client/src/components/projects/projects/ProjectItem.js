@@ -7,7 +7,7 @@ import Popup from "reactjs-popup";
 import {
   deleteProject,
   updateProject,
-  clearProject
+  clearProject,
 } from "../../../actions/projectActions";
 import { clearEditor } from "../../../actions/audioEditorActions";
 import { initAudioDic } from "../../audio-editor/setPlayerTracks";
@@ -24,7 +24,7 @@ class ProjectItem extends Component {
     super(props);
     this.state = {
       moreDetails: false,
-      instrumentsList: 2
+      instrumentsList: 2,
     };
 
     this.moreDetailesControl = this.moreDetailesControl.bind(this);
@@ -39,7 +39,7 @@ class ProjectItem extends Component {
   moreDetailesControl() {
     this.setState({
       moreDetails: !this.state.moreDetails,
-      instrumentsList: this.state.moreDetails ? 2 : 4
+      instrumentsList: this.state.moreDetails ? 2 : 4,
     });
   }
 
@@ -65,6 +65,8 @@ class ProjectItem extends Component {
     }
 
     const recordsDic = initAudioDic(project.instruments);
+    console.log("project");
+    console.log(project);
 
     const commentOrText =
       project.comment || project.description || project.text;
@@ -114,7 +116,7 @@ class ProjectItem extends Component {
         </div>
         <div className="row">
           <div className="col-12">
-            {project.instruments.find(instru => instru.record_url) && (
+            {project.instruments.find((instru) => instru.record_url) && (
               <div style={{ float: "left", width: "100%" }}>
                 <ProjectAudioControls
                   projectId={project.id}
@@ -147,7 +149,7 @@ class ProjectItem extends Component {
                     </button>
                   }
                 >
-                  {close => <CreateProject project={project} close={close} />}
+                  {(close) => <CreateProject project={project} close={close} />}
                 </Popup>
 
                 <button
@@ -221,7 +223,7 @@ class ProjectItem extends Component {
 }
 
 ProjectItem.defaultProps = {
-  showActions: true
+  showActions: true,
 };
 
 ProjectItem.propTypes = {
@@ -231,11 +233,11 @@ ProjectItem.propTypes = {
   clearProject: PropTypes.func.isRequired,
   deleteNotificationsByProjectId: PropTypes.func.isRequired,
   projectOwner: PropTypes.bool,
-  clearEditor: PropTypes.func.isRequired
+  clearEditor: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({
-  auth: state.auth
+const mapStateToProps = (state) => ({
+  auth: state.auth,
 });
 
 export default connect(mapStateToProps, {
@@ -243,5 +245,5 @@ export default connect(mapStateToProps, {
   updateProject,
   clearProject,
   deleteNotificationsByProjectId,
-  clearEditor
+  clearEditor,
 })(ProjectItem);

@@ -22,8 +22,8 @@ import Profiles from "./components/profiles/Profiles";
 import Profile from "./components/profile/Profile";
 import Posts from "./components/posts/Posts";
 import Post from "./components/post/Post";
-import Chat from "./components/chat/ChatPage";
-import TestChat from "./components/chat/TestChat";
+// import Chat from "./components/chat/ChatPage";
+// import TestChat from "./components/chat/TestChat";
 import CreateProject from "./components/projects/create-project/CreateProject";
 import ProjectView from "./components/projects/project/ProjectView";
 import Project from "./components/projects/project/Project";
@@ -32,8 +32,8 @@ import WorkZone from "./components/audio-editor/WorkZone";
 
 import "./App.css";
 
-// axios.defaults.baseURL = "http://localhost:5000";
-axios.defaults.baseURL = "https://api.artisounds.com";
+axios.defaults.baseURL = "http://localhost:5000";
+// axios.defaults.baseURL = "https://api.artisounds.com";
 
 // Chack for token
 if (localStorage.jwtToken) {
@@ -102,15 +102,15 @@ function App() {
             <Switch>
               <PrivateRoute exact path="/feed" component={Posts} />
             </Switch>
-            <Switch>
+            {/* <Switch>
               <PrivateRoute exact path="/test-chat" component={TestChat} />
-            </Switch>
-            <Switch>
+            </Switch> */}
+            {/* <Switch>
               <PrivateRoute exact path="/chat" component={Chat} />
-            </Switch>
-            <Switch>
+            </Switch> */}
+            {/* <Switch>
               <PrivateRoute exact path="/chat/:nameAndId" component={Chat} />
-            </Switch>
+            </Switch> */}
             <Switch>
               <PrivateRoute exact path="/post/:id" component={Post} />
             </Switch>
